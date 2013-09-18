@@ -23,6 +23,10 @@ mvaVbfCatBoundaries=1.,0.985,0.93
 ## Singal mass points to book
 sigPointsToBook=105,110,115,120,125,130,135,140,145,150,124,126
 
+## tHq:
+includetHqLeptonic=1
+includetHqHadronic=1
+
 ## Hadronic TTH tag
 includeTTHhad=0
 leadEtTTHhadCut=60
