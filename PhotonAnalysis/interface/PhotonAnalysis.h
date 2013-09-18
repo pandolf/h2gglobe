@@ -15,6 +15,9 @@
 #include "TMVA/Reader.h"
 #include "PhotonFix.h"
 #include <stdio.h>
+
+#include "THqLeptonicLikelihoodCalculator.h"
+
 // #include "HiggsToGammaGamma/interface/GBRForest.h"
 //#include "../../../../HiggsToGammaGamma/interface/GBRForest.h"
 //#include "HiggsAnalysis/HiggsToGammaGamma/interface/GBRForest.h"
@@ -91,6 +94,9 @@ class PhotonAnalysis : public BaseAnalysis
     int nElectronCategories;
     int nMuonCategories;
     bool includeVHmet;  //met at analysis step
+    bool includetHqLeptonic;
+    bool includetHqHadronic;
+
     int nMetCategories;
 
     bool reRunCiCForData;
@@ -104,6 +110,8 @@ class PhotonAnalysis : public BaseAnalysis
     float leadEtTTHlepCut;
     float leadEtTTHhadCut;
     float leadEtVHlepCut;
+    float leadEttHqLeptonicCut;
+    float leadEttHqHadronicCut;
     float leadEtVHmetCut;  //met at analysis step
     float subleadEtCut;
     float subleadEtVBFCut;
@@ -113,6 +121,8 @@ class PhotonAnalysis : public BaseAnalysis
     float subleadEtVHmetCut;  //met at analysis step
     float subleadEtTTHhadCut;
     float subleadEtTTHlepCut;
+    float subleadEttHqLeptonicCut;
+    float subleadEttHqHadronicCut;
     int nVBFEtaCategories;
     int nVHhadEtaCategories;
     int nVBFDijetJetCategories;
@@ -424,6 +434,10 @@ class PhotonAnalysis : public BaseAnalysis
     float generatorPt_;
     float generatorY_;
 
+    THqLeptonicLikelihoodCalculator *thqlikeli;
+
+
+
  protected:
     void PreselectPhotons(LoopAll& l, int jentry);
     float GetSmearSigma(float eta, float r9, int epoch=0);
@@ -451,6 +465,10 @@ class PhotonAnalysis : public BaseAnalysis
     bool TTHleptonicTag2012(LoopAll& l, int diphoton_id, float* smeared_pho_energy=0, bool nm1=false, float eventweight=1, float myweight=1,float phoidMvaCut=-1,bool *jetid_flags=0,bool mvaselection=false );
     //TTH leptonic category
     bool TTHhadronicTag2012(LoopAll& l, int diphoton_id, float* smeared_pho_energy=0, bool nm1=false, float eventweight=1, float myweight=1,bool *jetid_flags=0);
+    //tHqLeptonic category
+    bool tHqLeptonicTag(LoopAll& l, int diphoton_id, float* smeared_pho_energy=0, bool nm1=false, float eventweight=1, float myweight=1,bool *jetid_flags=0);
+    //tHqHadronic category
+    bool tHqHadronicTag(LoopAll& l, int diphoton_id, float* smeared_pho_energy=0, bool nm1=false, float eventweight=1, float myweight=1,bool *jetid_flags=0);
 
     //btag syst
     float BtagReweight(LoopAll& l, bool shiftBtagEffUp_bc, bool shiftBtagEffDown_bc, bool shiftBtagEffUp_l, bool shiftBtagEffDown_l,int WP);

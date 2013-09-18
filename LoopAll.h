@@ -152,6 +152,8 @@ class LoopAll {
   float drGsf;
 
   int diphoton_id_lep;
+  int diphoton_id_had;
+  float thqLD_lept;
 
   TFile * outputFile;
   TString outputFileName;
@@ -578,6 +580,15 @@ int DiphotonCiCSelection( phoCiCIDLevel LEADCUTLEVEL = phoLOOSE,
                           bool split=false, int fixedvtx=-1, std::vector<bool> veto_indices=std::vector<bool>(false),
                           std::vector<int> cutsbycat=std::vector<int>(0));
 
+ int DiphotonCiCSelectionEleVeto( phoCiCIDLevel LEADCUTLEVEL = phoLOOSE,
+				  phoCiCIDLevel SUBLEADCUTLEVEL = phoLOOSE,
+				  Float_t leadPtMin = 30,
+				  Float_t subleadPtMin = 20,
+				  int ncategories=6,
+				  bool applyPtoverM=false,
+				  float *pho_energy_array=0,
+				  bool split=false, int fixedvtx=-1, std::vector<bool> veto_indices=std::vector<bool>(false),
+				  bool doApplyEleVeto=false,std::vector<int> cutsbycat=std::vector<int>(0));
 
 int DiphotonMITPreSelection(Float_t leadPtMin, Float_t subleadPtMin, Float_t phoidMvaCut, bool applyPtoverM, float *pho_energy_array=0, int fixedvtx=-1, bool split=false, bool kinonly=false, std::vector<bool> veto_indices=std::vector<bool>(false));
 int DiphotonMITPreSelection2011(Float_t leadPtMin, Float_t subleadPtMin, Float_t phoidMvaCut, bool applyPtoverM, float *pho_energy_array=0, bool kinonly=false);
@@ -603,6 +614,7 @@ int   PhotonCiCSelectionLevel( int photon_index, int vertex_index, std::vector<s
 
 bool   PhotonMITPreSelection( int photon_index, int vertex_index,float *pho_energy_array=0);
 bool   PhotonMITPreSelection2011( int photon_index, int vertex_index,float *pho_energy_array=0);
+bool   PhotonMITPreSelectionEleVeto( int photon_index, int vertex_index, float *pho_energy_array, int applyElectronVeto );
 
 // Functions to calculate variables used in CiC selection
 Float_t DeltaRToTrack(Int_t photon_ind=-1, Int_t vtxind=-1, Float_t PtMin=1., Float_t dzmax=0.2, Float_t dxymax=0.1, int maxlosthits=0);
@@ -1208,6 +1220,8 @@ void doJetMatching(TClonesArray & reco, TClonesArray & gen, Bool_t * match_flag,
 
 std::pair<int, int> Select2HighestPtJets(TLorentzVector& leadpho, TLorentzVector& subleadpho, Bool_t * jetid_flags=0);
 
+ vector<int> SelectJets_looser(LoopAll& l, int diphoton_id,const TLorentzVector& leadpho, const TLorentzVector& subleadpho, Bool_t * jetid_flags=0);
+ std::pair<int, int> SelectBtaggedAndHighestPtJets(LoopAll& l,int diphoton_id,const TLorentzVector& leadpho,const TLorentzVector& subleadpho, Bool_t * jetid_flags=0);
 
 int RescaleJetEnergy(bool force=false);
 
@@ -1218,6 +1232,7 @@ int MuonSelection2012(TLorentzVector& pho1, TLorentzVector& pho2, int vtxind);
 bool MuonPhotonCuts2012(TLorentzVector& pho1, TLorentzVector& pho2, TLorentzVector* thismu);
 //HCP2012
 int MuonSelection2012B(float muptcut=20.);
+std::vector<int> GetMuonsPassingSelection2012B(float muptcut=10., bool tightIso=false);
 bool MuonPhotonCuts2012B(TLorentzVector& pho1, TLorentzVector& pho2, TLorentzVector* thismu,float deltaRcut=1.0);
 bool MuonLooseID2012(int indmu);
 bool MuonTightID2012(int indmu, int vtxind=-1);
@@ -1226,14 +1241,17 @@ int FindMuonVertex(int mu_ind);
 
 //Moriond2012
 int ElectronSelection(TLorentzVector& pho1, TLorentzVector& pho2, int vtxind);
+ std::vector<int> GetIndexesElectronsPassingSelectionCutBased2012(float elptcut=20.);
 bool ElectronPhotonCuts(TLorentzVector& pho1, TLorentzVector& pho2, TLorentzVector& ele);
 //ICHEP2012
 int ElectronSelection2012(TLorentzVector& pho1, TLorentzVector& pho2, int vtxind,  bool phodepend=true);
 bool ElectronLooseEGammaID(int electronindex, int vertexindex=-1);
+bool ElectronMediumEGammaID(int electronindex, int vertexindex=-1);
 bool ElectronTightEGammaID(int electronindex, int vertexindex=-1);
 //HCP2012
 int ElectronSelectionMVA2012(float elptcut=20.);
 std::vector<int> GetIndexesElectronsPassingSelectionMVA2012(float elptcut=20.);
+ int GetNelectronsPassingSelectionMVA2012(float elptcut,TLorentzVector& pho1, TLorentzVector& pho2,float deltaRPholep_cut);
 bool ElectronMVACuts(int el_ind, int vtx_ind=-1);
 bool ElectronPhotonCuts2012B(TLorentzVector& pho1, TLorentzVector& pho2, TLorentzVector& ele, bool includeVHlepPlusMet=false,float deltaRcut=1.0);
 int FindElectronVertex(int el_ind);
