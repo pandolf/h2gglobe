@@ -1,0 +1,32 @@
+intL=19620. histfile=CMS-HGG_test.root output=eventList.txt
+#intL=19620. histfile=/store/user/pandolf/globe/finalized/summer12_s10/%(label)s/CMS-HGG.root output=eventList.txt
+
+split typ=-71 ind=1 draw=1   Nam=thq_m125_8TeV CaDir=/store/group/phys_higgs/pandolf/test/h2gglobe/reduced/thq_leptonic/mc/thqLeptonic/tHqLeptonic_mH125_8TeV_testtest   red=0 lum=1000000.0   xsec=-1.0   kfac=1.000000   scal=1.000000
+
+#split typ=-37 ind=1 draw=1   Nam=ggh_m125_8TeV CaDir=/store/group/phys_higgs/pandolf/test/h2gglobe/reduced/thq_leptonic/mc/thqLeptonic/tHqLeptonic_mH125_8TeV_testtest   red=0 lum=1000000.0   xsec=-1.0   kfac=1.000000   scal=1.000000
+
+#split typ=-37 ind=1 draw=1   Nam=ggh_m125_8TeV   CaDir=/store/user/pandolf/globe/reduced/summer12_s10/thq_test0/GluGluToHToGG_M-125_8TeV-powheg-pythia6_Summer12_DR53X-PU_S10_START53_V7A-v1   red=0 lum=1000000.0   xsec=-1.0   kfac=1.000000   scal=1.000000
+#split typ=-38 ind=2 draw=1   Nam=vbf_m125_8TeV   CaDir=/store/user/pandolf/globe/reduced/summer12_s10/thq_test0/VBF_HToGG_M-125_8TeV-powheg-pythia6_Summer12_DR53X-PU_S10_START53_V7A-v1   red=0 lum=1000000.0   xsec=-1.0   kfac=1.000000   scal=1.000000
+#split typ=-40 ind=4 draw=1   Nam=wzh_m125_8TeV   CaDir=/store/user/pandolf/globe/reduced/summer12_s10/thq_test0/WH_ZH_HToGG_M-125_8TeV-pythia6_Summer12_DR53X-PU_S10_START53_V7A-v1   red=0 lum=1000000.0   xsec=-1.0   kfac=1.000000   scal=1.000000
+#split typ=-39 ind=3 draw=1   Nam=tth_m125_8TeV   CaDir=/store/user/pandolf/globe/reduced/summer12_s10/thq_test0/TTH_HToGG_M-125_8TeV-pythia6_Summer12_DR53X-PU_S10_START53_V7A-v1   red=0 lum=1000000.0   xsec=-1.0   kfac=1.000000   scal=1.000000
+
+
+
+#
+# Branches to use
+#
+inputBranches minimal_analysis_input.dat
+inputBranches minimal_statanalysis_input.dat
+inputBranches minimal_leptmetanalysis_input.dat
+
+treevariables common/RadionTree.dat
+
+## define analyses to run
+##   a library containing the class dictionary has loaded before parsing the
+##   configuration file
+## syntax:
+##   analyzer <class_name> <config_file>
+##
+## analyzer PhotonAnalysis photonanalysis.dat
+#analyzer StatAnalysis photonanalysis.dat analysis_settings.dat statanalysis.dat saveDatacardTrees_=0 dumpAscii=1 dumpMcAscii=0 scaleR9Only=0
+analyzer StatAnalysis photonanalysis.dat analysis_settings.dat statanalysis.dat saveDatacardTrees_=0 fillOptTree=1 dumpAscii=1 dumpMcAscii=1 scaleR9Only=0 doSystematics=0  scale_offset_file=escale_and_smearing_jan22rereco_8TeV_std_mc.dat
