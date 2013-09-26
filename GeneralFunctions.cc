@@ -454,119 +454,6 @@ Float_t LoopAll::diphotonMVA(Int_t leadingPho, Int_t subleadingPho, Int_t vtx, f
     return mva;
 }
 
-int LoopAll::DiphotonCiCSelectionEleVeto( phoCiCIDLevel LEADCUTLEVEL, phoCiCIDLevel SUBLEADCUTLEVEL, 
-                   Float_t leadPtMin, Float_t subleadPtMin, int ncategories, bool applyPtoverM, 
-                   float *pho_energy_array, bool split, int fixedvtx, std::vector<bool> veto_indices, 
-					  bool applyElectronVeto,std::vector<int> cutsbycat) {
-
-  //rho=0;// CAUTION SETTING RHO TO 0 FOR 2010 DATA FILES (RHO ISN'T IN THESE FILES)
-  int g = -1;
-  int selected_sublead_index = -1;
-  float selected_lead_pt = -1;
-  float selected_sublead_pt = -1;
-
-  if( ! cutsbycat.empty() ) {
-      assert( cutsbycat.size() == 4 );
-      /// std::cout << "cutsbycat " << cutsbycat.size() <<std::endl;
-  }
-  
-  std::vector<int> passing_dipho;
-  std::vector<float> passing_sumpt;
-  for(int idipho = 0; idipho < dipho_n; ++idipho ) {
-    if( idipho >= MAX_DIPHOTONS-1 ) { 
-      std::cout << "Warning diphoton index exceeds array capacity. Throwing even away " << idipho << " " << MAX_DIPHOTONS <<  dipho_n << " " << run << " " << lumis << " " << event << " " << std::endl;
-      if( itype[current] == 0 ) { assert( 0 ); }
-      return -1;
-    }
-    int ivtx = (fixedvtx==-1) ? dipho_vtxind[idipho] : fixedvtx;
-    int lead = dipho_leadind[idipho];
-    int sublead = dipho_subleadind[idipho];
-    
-    if( lead == sublead ) { continue; }
-
-    if(veto_indices.size()!=0) {
-        if(veto_indices[lead]) continue;
-        if(veto_indices[sublead]) continue;
-    }
-
-    //    if( usePFCiC 
-    //	&& ( ! PhotonMITPreSelection(lead, ivtx, pho_energy_array) || 
-    //	     ! PhotonMITPreSelection(sublead, ivtx,  pho_energy_array) ) ) { continue; }
-
-
-  if( usePFCiC &&     ( 
-       (
-	PhotonMITPreSelectionEleVeto(lead, ivtx, pho_energy_array, 1 )
-	&& PhotonMITPreSelectionEleVeto(sublead,ivtx, pho_energy_array , 0 ) ) 
-       && 
-       (
-	PhotonMITPreSelectionEleVeto(lead, ivtx, pho_energy_array,  0 )
-	&& PhotonMITPreSelectionEleVeto(sublead,ivtx, pho_energy_array , 1 )
-	)
-       )
-      ){continue;}
-
-    TLorentzVector lead_p4 = get_pho_p4(lead,ivtx,pho_energy_array); 
-    TLorentzVector sublead_p4 = get_pho_p4(sublead,ivtx,pho_energy_array); 
-    
-    if (sublead_p4.Pt() > lead_p4.Pt()){ // Swap them but also swap the indeces
-            int tmp = lead;
-            lead = sublead;
-            sublead =tmp;
-            dipho_leadind[idipho] = lead;
-            dipho_subleadind[idipho] = sublead;
-    }
-    
-    float leadEta = fabs(((TVector3 *)sc_xyz->At(pho_scind[lead]))->Eta());
-    float subleadEta = fabs(((TVector3 *)sc_xyz->At(pho_scind[sublead]))->Eta());
-    float m_gamgam = (lead_p4+sublead_p4).M();
-    
-    if( leadEta > 2.5 || subleadEta > 2.5 || 
-	( leadEta > 1.4442 && leadEta < 1.566 ) ||
-	( subleadEta > 1.4442 && subleadEta < 1.566 ) ) { continue; }
-    
-    float leadpt = lead_p4.Pt() > sublead_p4.Pt() ? lead_p4.Pt() : sublead_p4.Pt();
-    float subleadpt = lead_p4.Pt() < sublead_p4.Pt() ? lead_p4.Pt() : sublead_p4.Pt();       
-    // Exclusive modes cut smoothly on lead pt/M but on straight pt on sublead to save sig eff and avoid HLT turn-on  
-    if(split){   
-            if ( leadpt/m_gamgam < leadPtMin/120. || subleadpt< subleadPtMin ) { continue; }  
-    }else{
-            if( applyPtoverM ) {
-		    if ( leadpt/m_gamgam < leadPtMin/120. || subleadpt/m_gamgam < subleadPtMin/120. ||
-			 leadpt < 100./3. || subleadpt < 100./4.) { continue; }
-            } else {
-		    if ( leadpt < leadPtMin || subleadpt < subleadPtMin ) { continue; }
-            }
-    }
-
-    std::vector<std::vector<bool> > ph_passcut;
-    if( ! cutsbycat.empty() ) {
-            int leadCat = PhotonCategory(lead,2,2);
-            int subleadCat = PhotonCategory(sublead,2,2);
-            LEADCUTLEVEL    = (phoCiCIDLevel)cutsbycat[leadCat];
-            SUBLEADCUTLEVEL = (phoCiCIDLevel)cutsbycat[subleadCat];
-    }
-    if( PhotonCiCSelectionLevel(lead, ivtx, ph_passcut, ncategories, 0, pho_energy_array ) < LEADCUTLEVEL ) { continue; }
-    if( PhotonCiCSelectionLevel(sublead, ivtx, ph_passcut, ncategories, 1, pho_energy_array ) < SUBLEADCUTLEVEL ) { continue; }
-    
-    passing_dipho.push_back(idipho);
-    passing_sumpt.push_back(leadpt+subleadpt);
-  }
-  
-  if( passing_dipho.empty() ) { return -1; }
-  
-  std::vector<int> passing_dipho_places;
-  for (int counting=0;counting<passing_dipho.size();counting++){
-	  passing_dipho_places.push_back(counting); // This is very weird, but needed for later  
-  }
-  std::sort(passing_dipho_places.begin(),passing_dipho_places.end(),
-	    SimpleSorter<float,std::greater<float> >(&passing_sumpt[0]));
-  //std::sort(passing_dipho.begin(),passing_dipho.end(),
-  //    SimpleSorter<float,std::greater<double> >(&passing_sumpt[0]));
-  
-  return passing_dipho[passing_dipho_places[0]];
-
-}
 
 float LoopAll::getDmOverDz(Int_t pho1, Int_t pho2, Float_t* smeared) {
 
@@ -3667,88 +3554,6 @@ int LoopAll::PhotonCiCSelectionLevel( int photon_index, int vertex_index, std::v
 }
 
 
-//Define new selection to have ONLY to electron veto only one photon
-bool LoopAll::PhotonMITPreSelectionEleVeto( int photon_index, int vertex_index, float *pho_energy_array, int applyElectronVeto ) {
-
-  int r9_category = (int) (pho_r9[photon_index] <= 0.9);                                                      
-  int photon_category = r9_category + 2*PhotonEtaCategory(photon_index,2);                                 
-  int photon_cic_category = PhotonCategory(photon_index,2,2);
-   
-  float mitCuts_hoe[4]                 = {0.082,0.075,0.075,0.075};                                        
-  float mitCuts_sieie[4]               = {0.014,0.014,0.034,0.034};                                        
-  float mitCuts_ecaliso[4]             = {50,4,50,4};                                                      
-  float mitCuts_hcaliso[4]             = {50,4,50,4};                                                      
-  float mitCuts_trkiso[4]              = {50,4,50,4};                                                      
-  //float mitCuts_hcalecal[4]            = {3,3,3,3};                                                        
-  //float mitCuts_abstrkiso[4]           = {2.8,2.8,2.8,2.8};                                                
-  //float mitCuts_trkiso_hollow03[4]     = {4,4,4,4};                                                       
-  //float mitCuts_drtotk_25_99[4]  = {0.26,0.029,0.0062,0.0055};
-  float mitCuts_pfiso[4]               = {4,4,4,4}; // WARN if depends on category should change below
-
-  TLorentzVector phop4 = get_pho_p4( photon_index, vertex_index, pho_energy_array);                      
-  //TLorentzVector phop4_badvtx = get_pho_p4( photon_index, pho_tkiso_badvtx_id[photon_index], pho_energy_array  );
-
-  //float rhofac=0.17;
-  float val_hoe        = pho_hoe[photon_index];
-  float val_sieie      = pho_sieie[photon_index];                                                          
-  float val_ecaliso = pho_ecalsumetconedr03[photon_index] - 0.012*phop4.Et();                              
-  float val_hcaliso = pho_hcalsumetconedr03[photon_index] - 0.005*phop4.Et(); 
-  float val_trkiso  = pho_trksumpthollowconedr03[photon_index] - 0.002*phop4.Et();                          \
-
-  //float val_hcalecal   = (pho_ecalsumetconedr03[photon_index]+pho_hcalsumetconedr03[photon_index]-rho_algo1*rhofac);                                             
-  //float val_abstrkiso  = (*pho_tkiso_recvtx_030_002_0000_10_01)[photon_index][vertex_index];                
-  //float val_trkiso_hollow03 = pho_trksumpthollowconedr03[photon_index];                                    
-  //float val_drtotk_25_99 = pho_drtotk_25_99[photon_index];
-  int val_pho_isconv = pho_isconv[photon_index];
-  float val_pfiso02 = (*pho_pfiso_mycharged02)[photon_index][vertex_index];
-
-  /*
-      if (run==170397 && lumis==279 &&event==304405242){
-     
-      std::cout << "rho " << rho <<std::endl;
-      std::cout << "pho_n " << pho_n <<std::endl;
-      std::cout << "pho_index " << photon_index <<std::endl;
-      std::cout << "pho_et " << phop4.Et() <<std::endl;
-      std::cout << "hoe " << val_hoe <<std::endl;
-      std::cout << "sieie " << val_sieie <<std::endl;
-      std::cout << "ecaliso " << val_ecaliso <<std::endl;
-      std::cout << "hcaliso " << val_hcaliso <<std::endl;
-      std::cout << "hcalecal " << val_hcalecal <<std::endl;
-      std::cout << "abstrkiso " << val_abstrkiso <<std::endl;
-      std::cout << "trkiso " << val_trkiso_hollow03 <<std::endl;
-      std::cout << "isconv " << val_pho_isconv <<std::endl;
-     
-      std::cout << "r9 " << pho_r9[photon_index] <<std::endl;
-      std::cout << "r9 categoty " << r9_category <<std::endl;
-      std::cout << "eta scxyz" << fabs(((TVector3*)sc_xyz->At(pho_scind[photon_index]))->Eta()) <<std::endl;
-      std::cout << "category" << photon_category <<std::endl;
-      }
-  */
-  
-  // can't apply cuts in categories at reduction level because of the shape rescaling
-  if( itype[current] == 0 || typerun != kReduce ) {
-    if (val_hoe             >= mitCuts_hoe[photon_category]         ) return false;                                           
-    if (val_sieie           >= mitCuts_sieie[photon_category]       ) return false;
-    if (val_hcaliso         >= mitCuts_hcaliso[photon_category]     ) return false;                                           
-    if (val_trkiso          >= mitCuts_trkiso[photon_category]      ) return false;
-    //if (val_hcalecal        >= mitCuts_hcalecal[photon_category]    ) return false;
-    //if (val_abstrkiso       >= mitCuts_abstrkiso[photon_category]   ) return false;                   
-    //if (val_trkiso_hollow03 >= mitCuts_trkiso_hollow03[photon_category]) return false;                                        
-  }
-  if( typerun != kReduce  ) {
-    // if (val_drtotk_25_99    <  mitCuts_drtotk_25_99[photon_category]   ) return false; // Electron Rejection based on CiC for now
-    if ((!val_pho_isconv && applyElectronVeto==1) || (applyElectronVeto==0 && val_pho_isconv) ) return false; // Electron Rejection based Conversion Safe Veto
-  }
-   
-  // this does not depend on R9
-  if( typerun != kReduce ) {
-    if (val_pfiso02 >= mitCuts_pfiso[photon_category]) return false;            
-
-  }
-   
-  return true;
-}
-
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -4772,9 +4577,11 @@ bool LoopAll::ElectronMediumEGammaID(int electron_index, int vtxind){
     if(thiseta>=2.3 && thiseta<2.4)   Aeff=0.12;
     if(thiseta>=2.4)                  Aeff=0.13;
 
-    
     //EE-EB common cuts
     float overE_overP=fabs((1/el_std_pin[electron_index])-(1/(el_std_pin[electron_index]*el_std_eopin[electron_index])));
+    float thisiso=el_std_pfiso_charged[electron_index]+std::max(el_std_pfiso_neutral[electron_index]+el_std_pfiso_photon[electron_index]-rho*Aeff,0.);
+
+    
     if(vtxind!=-1){
         if(fabs(el_std_D0Vtx[electron_index][vtxind]) > 0.02) return pass;
         if(fabs(el_std_DZVtx[electron_index][vtxind]) > 0.1)  return pass;
@@ -4782,7 +4589,6 @@ bool LoopAll::ElectronMediumEGammaID(int electron_index, int vtxind){
     if(overE_overP>0.05)return pass;    
     if(el_std_hp_expin[electron_index]>1) return pass;
     if(el_std_conv[electron_index]==0) return pass;
-    float thisiso=el_std_pfiso_charged[electron_index]+std::max(el_std_pfiso_neutral[electron_index]+el_std_pfiso_photon[electron_index]-rho*Aeff,0.);
     if (thisiso/thispt >0.15) return pass;  
     
     if(thiseta<1.442) {   // EB cuts
