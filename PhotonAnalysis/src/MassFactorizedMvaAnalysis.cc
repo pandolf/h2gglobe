@@ -875,18 +875,9 @@ bool MassFactorizedMvaAnalysis::AnalyseEvent(LoopAll& l, Int_t jentry, float wei
             if (diPhoSys != 0)
                 name = diPhoSys->name();
 	    
-            if (!isSyst)
-//		fillOpTree(l, lead_p4, sublead_p4, vtxProb, diphoton_index, diphoton_id, phoid_mvaout_lead, phoid_mvaout_sublead, weight, 
-//			   mass, sigmaMrv, sigmaMwv, Higgs, diphobdt_output, category, VBFevent, myVBF_Mjj, myVBFLeadJPt, 
-//			   myVBFSubJPt, nVBFDijetJetCategories, isSyst, "no-syst");
-        fillOpTree(l, lead_p4, sublead_p4, &smeared_pho_energy[0], -2, diphoton_index, diphoton_id, -2, -2, weight, evweight,
-               mass, -1, -1, Higgs, -2, category, VBFevent, myVBF_Mjj, myVBFLeadJPt,
-               myVBFSubJPt, nVBFDijetJetCategories, isSyst, "no-syst");
-            else
-        fillOpTree(l, lead_p4, sublead_p4, &smeared_pho_energy[0], -2, diphoton_index, diphoton_id, -2, -2, weight, evweight,
-               mass, -1, -1, Higgs, -2, category, VBFevent, myVBF_Mjj, myVBFLeadJPt,
-               myVBFSubJPt, nVBFDijetJetCategories, isSyst, name);
-	    
+            if(!isSyst)
+              fillOpTree(l, lead_p4, sublead_p4,  diphoton_index, diphoton_id, weight, evweight, mass, category );
+
         }
 
         if (PADEBUG) std::cout << " Diphoton Category " <<category <<std::endl;
