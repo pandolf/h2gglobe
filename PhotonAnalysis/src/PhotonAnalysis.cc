@@ -4797,8 +4797,9 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
     int muonInd = (muon_indexes.size()>0) ? muon_indexes[0] : -1;
     //vector<int> elIndexes=l.GetIndexesElectronsPassingSelectionMVA2012(myptcut);
     vector<int> elIndexes=l.GetIndexesElectronsPassingSelectionCutBased2012(myptcut);
+
     vector<int> passElePhotonCuts;
-    passElePhotonCuts.resize(elIndexes.size());
+    //passElePhotonCuts.resize(elIndexes.size());
 
 
 
@@ -4830,20 +4831,17 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
          }*/
 
       elVtx=l.FindElectronVertex(elIndexes[iel]);
+      if( FPDEBUGTHQ ) std::cout << "electron vertex: " << elVtx << std::endl;
       if( elVtx!=0 ) continue; //take only first vertex
 
       float leadtHqLepCut=33.;
       float subleadtHqLepCut=25.;
 
       // need to check again for d0 and dZ (couldn't before because we didn't have the vertex)                                                                            
-      if(l.ElectronMVACuts(elIndexes[iel], elVtx)){
-        if(!doApplyEleVeto){
+      if(l.ElectronMediumEGammaID(elIndexes[iel], elVtx)){
+      //if(l.ElectronMVACuts(elIndexes[iel], elVtx)){
           diphotontHqLeptonic_id = l.DiphotonCiCSelection( l.phoSUPERTIGHT, l.phoSUPERTIGHT, leadtHqLepCut,subleadtHqLepCut, 4,
           					    applyPtoverM, &smeared_pho_energy[0], true, -1, veto_indices);
-        }else{
-          diphotontHqLeptonic_id = l.DiphotonCiCSelectionEleVeto( l.phoSUPERTIGHT, l.phoSUPERTIGHT, leadtHqLepCut,subleadtHqLepCut, 4,
-          						   applyPtoverM, &smeared_pho_energy[0], true, -1, veto_indices,true);
-        }
         
         
         if(diphotontHqLeptonic_id!=-1 && elVtx != -1){
@@ -4851,12 +4849,13 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
           TLorentzVector lead = l.get_pho_p4( l.dipho_leadind[diphotontHqLeptonic_id], elVtx, &smeared_pho_energy[0]);
           TLorentzVector sublead = l.get_pho_p4( l.dipho_subleadind[diphotontHqLeptonic_id], elVtx, &smeared_pho_energy[0]);
           //std:cout<<"passed"<<l.ElectronPhotonCuts2012B_2(lead,sublead,*myel,deltaRPholep_cut,false)<<endl;
-          if(l.ElectronPhotonCuts2012B(lead,sublead,*myel,false,deltaRPholep_cut))passElePhotonCuts.push_back(1);
+          if(l.ElectronPhotonCuts2012B(lead,sublead,*myel,true,deltaRPholep_cut))passElePhotonCuts.push_back(1);
+          else passElePhotonCuts.push_back(0);
           //		std::cout<<"passed"<<l.ElectronPhotonCuts2012B_2(lead,sublead,*myel,deltaRPholep_cut,false)<<endl;
           //		std::cout<<"the size"<<passElePhotonCuts.size()<<endl;
         }
       }
-    }
+    } //for iel
 
     if(diphotontHqLeptonic_id==-1) return false;
 
@@ -4939,6 +4938,8 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
       l.el_ind=elIndexes[0];
       lep= (TLorentzVector*) (l.el_std_p4->At(l.el_ind));
       lept_charge = l.el_std_charge[l.el_ind];
+
+
     }
     if(nMuon>0) {
       l.isLep_mu=1;
@@ -4955,10 +4956,12 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
 
     static std::vector<unsigned char> id_flags;
     if( jetid_flags == 0 ) {
-      switchJetIdVertex( l, l.dipho_vtxind[diphotontHqLeptonic_id] );
+      if( FPDEBUGTHQ ) std::cout << "no default jet id flags, computing them." << std::endl;
+      //switchJetIdVertex( l, l.dipho_vtxind[diphotontHqLeptonic_id] );
       id_flags.resize(l.jet_algoPF1_n);
       for(int ijet=0; ijet<l.jet_algoPF1_n; ++ijet ) {
-          id_flags[ijet] = PileupJetIdentifier::passJetId(l.jet_algoPF1_cutbased_wp_level[ijet], PileupJetIdentifier::kLoose);
+          //id_flags[ijet] = PileupJetIdentifier::passJetId(l.jet_algoPF1_cutbased_wp_level[ijet], PileupJetIdentifier::kLoose);
+          id_flags[ijet] = 1;
       }
       jetid_flags = (bool*)&id_flags[0];
     }
@@ -5002,20 +5005,23 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
     for(int ii=0; ii<l.jet_algoPF1_n; ++ii) {
 
       TLorentzVector * p4_jet = (TLorentzVector *) l.jet_algoPF1_p4->At(ii);
+      if( FPDEBUGTHQ ) std::cout<<"ii: " << ii << " pt: "<<p4_jet->Pt()<<" eta: " << p4_jet->Eta() << " csv: " << l.jet_algoPF1_csvBtag[ii] << " jetid_flags: " << jetid_flags[ii] << std::endl;
       if(jetid_flags != 0 && !jetid_flags[ii]) continue; 
       if(fabs(p4_jet->Eta()) > etaJets_thresh) continue;
       if(p4_jet->Pt()<ptJets_thresh) continue;
 
       double dR_jet_PhoLead = p4_jet->DeltaR(lead_p4);
       if( dR_jet_PhoLead<0.5 ) continue;
+      if( FPDEBUGTHQ ) std::cout<<"passed dR pho lead" << std::endl;
 
       double dR_jet_PhoSubLead = p4_jet->DeltaR(sublead_p4);
       if( dR_jet_PhoSubLead<0.5 ) continue;
+      if( FPDEBUGTHQ ) std::cout<<"passed dR pho sublead" << std::endl;
 
       double dR_jet_lep = p4_jet->DeltaR(*lep);
       if( dR_jet_lep<0.5 ) continue;
+      if( FPDEBUGTHQ ) std::cout<<"passed dR pho lep" << std::endl;
 
-      if( FPDEBUGTHQ ) std::cout<<"ii: " << ii << " pt: "<<p4_jet->Pt()<<" csv: " << l.jet_algoPF1_csvBtag[ii] << std::endl;
 
       njets++;
 
@@ -5034,7 +5040,7 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
         }
       }
 
-      if( FPDEBUGTHQ )std::cout<<"pt: "<<p4_jet->Pt()<<" btag_loose "<<njets_btagloose<<" btag_medium "<<njets_btagmedium<<std::endl;
+      if( FPDEBUGTHQ )std::cout<<"^ THIS ONE PASSED" << std::endl;
 
     }
 
@@ -5082,7 +5088,7 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
 
       if( fabs(p4_jet->Eta())<etaAdditionalJet_thresh ) njets_InsideEtaCut++;
 
-    }
+    } //for jets
 
 
     if(FPDEBUGTHQ) std::cout<<"indexBtag: " << indexBtag << " indexQJet: "<< indexQJet << std::endl;
@@ -5096,6 +5102,7 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
     neutrino->SetPtEtaPhiE( l.met_pfmet, 0., l.met_phi_pfmet, l.met_pfmet );
     TLorentzVector* top = new TLorentzVector();
     *top = *bJet + *lep + *neutrino;
+
 
     if(FPDEBUGTHQ) {
       std::cout << "bJet: pt: " << bJet->Pt() << " eta: " << bJet->Eta() << std::endl;
@@ -5117,6 +5124,9 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
     }
 
     l.thqLD_lept = (float)(thqlikeli->computeLikelihood( njets, qJet->Eta(), top->Mt(), lept_charge, deltaEta_lept_qJet ));
+
+    if(FPDEBUGTHQ) 
+      std::cout << "thqLD_lept: " << l.thqLD_lept << std::endl;
 
     delete neutrino;
     delete top;
@@ -5149,7 +5159,8 @@ bool PhotonAnalysis::tHqHadronicTag(LoopAll& l, int diphotontHqHadronic_id, floa
     bool tightIso = true;
     std::vector<int> muon_indexes = l.GetMuonsPassingSelection2012B(myptcut, tightIso);
     int muonInd = (muon_indexes.size()>0) ? muon_indexes[0] : -1;
-    vector<int> elIndexes=l.GetIndexesElectronsPassingSelectionMVA2012(myptcut);
+    //vector<int> elIndexes=l.GetIndexesElectronsPassingSelectionMVA2012(myptcut);
+    vector<int> elIndexes=l.GetIndexesElectronsPassingSelectionCutBased2012(myptcut);
     vector<int> passElePhotonCuts;
     passElePhotonCuts.resize(elIndexes.size());
 
@@ -5185,13 +5196,8 @@ bool PhotonAnalysis::tHqHadronicTag(LoopAll& l, int diphotontHqHadronic_id, floa
 
       // need to check again for d0 and dZ (couldn't before because we didn't have the vertex)                                                                            
       if(l.ElectronMVACuts(elIndexes[iel], elVtx)){
-        if(!doApplyEleVeto){
           diphotontHqHadronic_id = l.DiphotonCiCSelection( l.phoSUPERTIGHT, l.phoSUPERTIGHT, leadtHqHadCut,subleadtHqHadCut, 4,
           					    applyPtoverM, &smeared_pho_energy[0], true, -1, veto_indices);
-        }else{
-          diphotontHqHadronic_id = l.DiphotonCiCSelectionEleVeto( l.phoSUPERTIGHT, l.phoSUPERTIGHT, leadtHqHadCut,subleadtHqHadCut, 4,
-          						   applyPtoverM, &smeared_pho_energy[0], true, -1, veto_indices,true);
-        }
         
         
         if(diphotontHqHadronic_id!=-1 && elVtx != -1){
