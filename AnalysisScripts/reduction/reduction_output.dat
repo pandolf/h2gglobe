@@ -51,6 +51,7 @@ met_significance_pfmetType1
 # Electrons
 el_std_n
 el_std_p4
+el_std_charge
 el_std_sc
 el_std_scind
 el_std_sieie
@@ -429,11 +430,11 @@ jet_algoPF1_csvMvaBtag
 jet_algoPF1_jetProbBtag
 jet_algoPF1_tcheBtag
 
-# QG tagging variables
-jet_algoPF1_ptD_QC
-jet_algoPF1_nCharged_QC
-jet_algoPF1_axis2_QC
-jet_algoPF1_nNeutrals_ptCut
+## QG tagging variables
+#jet_algoPF1_ptD_QC
+#jet_algoPF1_nCharged_QC
+#jet_algoPF1_axis2_QC
+#jet_algoPF1_nNeutrals_ptCut
 
 #jet_algoPF2_n
 #jet_algoPF2_erescale
