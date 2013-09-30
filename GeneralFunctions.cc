@@ -4507,6 +4507,27 @@ int LoopAll::ElectronSelectionMVA2012(float elptcut){
 }
 
     
+std::vector<int> LoopAll::GetIndexesElectronsPassingSelectionCutBased2012(float elptcut){
+    
+  std::vector<int> el_indexes;
+  el_indexes.clear();
+
+    for(int iel=0; iel<el_std_n; iel++){
+        if(ElectronMediumEGammaID(iel)){
+            if(GFDEBUG) std::cout<<"passing medium cutbased "<<std::endl;
+            TLorentzVector* thiselp4 = (TLorentzVector*) el_std_p4->At(iel);
+            if(GFDEBUG) std::cout<<"passing eta "<<thiselp4->Eta()<<std::endl;
+            if(elptcut<thiselp4->Pt()){
+                if(GFDEBUG) std::cout<<"passing pt "<<std::endl;
+		el_indexes.push_back(iel);
+            }
+        }
+    }
+   
+    if(GFDEBUG) std::cout<<"final el_ind "<<el_ind<<std::endl;
+    return el_indexes;
+}
+
 
 
 std::vector<int> LoopAll::GetIndexesElectronsPassingSelectionMVA2012(float elptcut){
