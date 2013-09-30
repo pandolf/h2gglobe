@@ -55,7 +55,8 @@ class Normalization_8TeV {
 	std::map<double,double> XSectionMap_wzh;
 	std::map<double,double> XSectionMap_tth;
       std::map<double,double> XSectionMap_sm;
-      std::map<double,double> XSectionMap_thq;
+      std::map<double,double> XSectionMap_thqLeptonic;
+      std::map<double,double> XSectionMap_thqHadronic;
 
 	std::map<int,std::pair<TString,double > > SignalTypeMap;
 	
