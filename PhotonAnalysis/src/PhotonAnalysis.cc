@@ -160,6 +160,9 @@ PhotonAnalysis::PhotonAnalysis()  :
     combinedmvaVbfSelection=false;
     reweighPt=false;
 
+    _foresteb=0;
+    _forestee=0; 
+
     std::string thqFile_LD = "/afs/cern.ch/work/p/pandolf/public/THq_tHqLeptonic_mH125_8TeV_testtest_presel_isLeptonic_CSV.root";
     std::string tthFile_LD = "/afs/cern.ch/work/p/pandolf/public/THq_TTH_HToGG_M-125_8TeV-pythia6_Summer12-PU_S7_START52_V9-v2_presel_isLeptonic_CSV.root";
     thqlikeli = new THqLeptonicLikelihoodCalculator( thqFile_LD, tthFile_LD );
@@ -5133,6 +5136,7 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
       std::cout << "deltaEta_lept_qJet: " << deltaEta_lept_qJet << std::endl;
       //exit(11);
     }
+
 
     l.thqLD_lept = (float)(thqlikeli->computeLikelihood( njets, qJet->Eta(), top->Mt(), lept_charge, deltaEta_lept_qJet ));
 
