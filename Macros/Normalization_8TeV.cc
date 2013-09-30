@@ -45,7 +45,8 @@ void Normalization_8TeV::Init(bool is2011){
     for (std::map<double, double>::const_iterator iter = XSectionMap_ggh.begin(); iter != XSectionMap_ggh.end(); ++iter)
       XSectionMap_sm[iter->first]=iter->second+XSectionMap_vbf[iter->first]+XSectionMap_wzh[iter->first]+XSectionMap_tth[iter->first];
 
-    XSectionMap_thq[125.0] = 0.0152 * 34.;
+    XSectionMap_thqLeptonic[125.0] = 0.0152 * 0.108 * 3. * 34.;
+    XSectionMap_thqHadronic[125.0] = 0.0152 * ( 1. - 0.108 * 3. ) * 34.;
 
     
 
@@ -123,7 +124,7 @@ void Normalization_8TeV::FillSignalTypes(){
 
   SignalTypeMap[-69]=std::make_pair<TString,double>("ggh",100);
   SignalTypeMap[-70]=std::make_pair<TString,double>("vbf",100);
-  SignalTypeMap[-72]=std::make_pair<TString,double>("wzh",100);
+  //SignalTypeMap[-72]=std::make_pair<TString,double>("wzh",100);
   //SignalTypeMap[-71]=std::make_pair<TString,double>("tth",100);
 
   SignalTypeMap[-81]=std::make_pair<TString,double>("ggh",90);
@@ -140,7 +141,8 @@ void Normalization_8TeV::FillSignalTypes(){
   SignalTypeMap[-177]=std::make_pair<TString,double>("gg_grav",126);
   SignalTypeMap[-178]=std::make_pair<TString,double>("qq_grav",126);
 
-  SignalTypeMap[-71]=std::make_pair<TString,double>("thq",125);
+  SignalTypeMap[-71]=std::make_pair<TString,double>("thqLeptonic",125);
+  SignalTypeMap[-72]=std::make_pair<TString,double>("thqHadronic",125);
 
 
 }
@@ -165,8 +167,10 @@ TGraph * Normalization_8TeV::GetSigmaGraph(TString process)
 		XSectionMap = &XSectionMap_zh;
 	} else if (process.Contains("grav")){
             XSectionMap = &XSectionMap_sm;
-  	} else if (process == "thq"){
-            XSectionMap = &XSectionMap_thq;
+  	} else if (process == "thqLeptonic"){
+            XSectionMap = &XSectionMap_thqLeptonic;
+  	} else if (process == "thqHadronic"){
+            XSectionMap = &XSectionMap_thqHadronic;
   } else {
     std::cout << "Warning ggh, vbf, wh, zh, wzh, tth or grav not found in histname!!!!" << std::endl;
     //exit(1);
@@ -233,8 +237,10 @@ double Normalization_8TeV::GetXsection(double mass, TString HistName) {
     XSectionMap = &XSectionMap_tth;
   } else if (HistName.Contains("grav")) {
     XSectionMap = &XSectionMap_sm;
-  } else if (HistName.Contains("thq")) {
-    XSectionMap = &XSectionMap_thq;
+  } else if (HistName.Contains("thqLeptonic")) {
+    XSectionMap = &XSectionMap_thqLeptonic;
+  } else if (HistName.Contains("thqHadronic")) {
+    XSectionMap = &XSectionMap_thqHadronic;
   } else {
     std::cout << "Warning ggh, vbf, wh, zh, wzh, tth or grav not found in histname!!!!" << std::endl;
     //exit(1);
