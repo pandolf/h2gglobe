@@ -142,6 +142,18 @@ class LoopAll {
 
   TH1D  * pileup;
 
+  int isLep_mu;
+  int isLep_ele;
+
+  int el_ind;
+  int mu_ind;
+
+  float drLepPho;
+  float drGsf;
+
+  int diphoton_id_lep;
+  int diphoton_id_had;
+  float thqLD_lept;
 
   TFile * outputFile;
   TString outputFileName;
@@ -1205,6 +1217,7 @@ int MuonSelection2012(TLorentzVector& pho1, TLorentzVector& pho2, int vtxind);
 bool MuonPhotonCuts2012(TLorentzVector& pho1, TLorentzVector& pho2, TLorentzVector* thismu);
 //HCP2012
 int MuonSelection2012B(float muptcut=20.);
+std::vector<int> GetMuonsPassingSelection2012B(float muptcut=10., bool tightIso=false);
 bool MuonPhotonCuts2012B(TLorentzVector& pho1, TLorentzVector& pho2, TLorentzVector* thismu,float deltaRcut=1.0);
 bool MuonLooseID2012(int indmu);
 bool MuonTightID2012(int indmu, int vtxind=-1);
@@ -1213,13 +1226,17 @@ int FindMuonVertex(int mu_ind);
 
 //Moriond2012
 int ElectronSelection(TLorentzVector& pho1, TLorentzVector& pho2, int vtxind);
+ std::vector<int> GetIndexesElectronsPassingSelectionCutBased2012(float elptcut=20.);
 bool ElectronPhotonCuts(TLorentzVector& pho1, TLorentzVector& pho2, TLorentzVector& ele);
 //ICHEP2012
 int ElectronSelection2012(TLorentzVector& pho1, TLorentzVector& pho2, int vtxind,  bool phodepend=true);
 bool ElectronLooseEGammaID(int electronindex, int vertexindex=-1);
+bool ElectronMediumEGammaID(int electronindex, int vertexindex=-1);
 bool ElectronTightEGammaID(int electronindex, int vertexindex=-1);
 //HCP2012
 int ElectronSelectionMVA2012(float elptcut=20.);
+std::vector<int> GetIndexesElectronsPassingSelectionMVA2012(float elptcut=20.);
+ int GetNelectronsPassingSelectionMVA2012(float elptcut,TLorentzVector& pho1, TLorentzVector& pho2,float deltaRPholep_cut);
 bool ElectronMVACuts(int el_ind, int vtx_ind=-1);
 bool ElectronPhotonCuts2012B(TLorentzVector& pho1, TLorentzVector& pho2, TLorentzVector& ele, bool includeVHlepPlusMet=false,float deltaRcut=1.0);
 int FindElectronVertex(int el_ind);

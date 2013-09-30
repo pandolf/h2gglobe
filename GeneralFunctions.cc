@@ -1,7 +1,9 @@
 #include "LoopAll.h"
 #include "Sorters.h"
 #include "TRandom3.h"
+#include "PhotonAnalysis/interface/PhotonAnalysis.h"
 #define GFDEBUG 0
+#define FMDEBUG 0
 
 float LoopAll::pfTkIsoWithVertex(int phoindex, int vtxInd, float dRmax, float dRvetoBarrel, float dRvetoEndcap, 
                                  float ptMin, float dzMax, float dxyMax, int pfToUse) {
@@ -451,6 +453,7 @@ Float_t LoopAll::diphotonMVA(Int_t leadingPho, Int_t subleadingPho, Int_t vtx, f
   
     return mva;
 }
+
 
 float LoopAll::getDmOverDz(Int_t pho1, Int_t pho2, Float_t* smeared) {
 
@@ -3551,6 +3554,8 @@ int LoopAll::PhotonCiCSelectionLevel( int photon_index, int vertex_index, std::v
 }
 
 
+
+
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 Float_t LoopAll::DeltaRToTrack(Int_t photonind, Int_t vtxind, Float_t PtMin, Float_t dzmax, Float_t dxymax, int maxlosthits){
     int elind = -1;
@@ -4193,6 +4198,37 @@ int LoopAll::MuonSelection2012B(float muptcut){
 }
 
 
+std::vector<int> LoopAll::GetMuonsPassingSelection2012B(float muptcut, bool tightIso){
+
+    TLorentzVector* thismu;
+    float thiseta = -100;
+    float thispt = -100;
+    float thisiso =1000;
+    int passingMu = 0;
+
+    std::vector<int> muon_indexes;
+
+    if(GFDEBUG) std::cout<<"mu_glo_n "<<mu_glo_n<<std::endl;
+    for( int indmu=0; indmu<mu_glo_n; indmu++){
+
+        thismu = (TLorentzVector*) mu_glo_p4->At(indmu);
+        thiseta = fabs(thismu->Eta());
+        thispt = thismu->Pt();
+
+        if(thiseta>2.4) continue;
+        if(thispt<muptcut) continue;
+
+        if(!MuonTightID2012(indmu)) continue;
+        if(!MuonIsolation2012(indmu, thispt, tightIso)) continue;
+    
+        muon_indexes.push_back(indmu);
+    }
+
+    return muon_indexes;
+}
+
+
+
 
 bool LoopAll::MuonPhotonCuts2012B(TLorentzVector& pho1, TLorentzVector& pho2, TLorentzVector* thismu,float deltaRcut){
   //  cout<<"mu:"<<pho1.DeltaR(*thismu)<<" "<<pho2.DeltaR(*thismu)<<endl;
@@ -4201,6 +4237,7 @@ bool LoopAll::MuonPhotonCuts2012B(TLorentzVector& pho1, TLorentzVector& pho2, TL
 
     return true;
 }
+
 
 
 int LoopAll::FindMuonVertex(int mu_ind){
@@ -4312,6 +4349,68 @@ bool LoopAll::ElectronLooseEGammaID(int electron_index, int vtxind){
 
 }
 
+
+
+// medium WP from https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgammaCutBasedIdentification#Electron_ID_Working_Points
+bool LoopAll::ElectronMediumEGammaID(int electron_index, int vtxind){
+
+    bool pass=false;
+
+    if(electron_index<0 || electron_index>=el_std_n){
+        std::cout<<"LoopAll::ElectronMediumEGammaID:  electron_index "<<electron_index<<" is out of bounds."<<std::endl;
+        std::cout<<"el_std_n "<<el_std_n<<std::endl;
+        return pass;
+    }
+
+    TLorentzVector* thisel = (TLorentzVector*) el_std_p4->At(electron_index);
+    TLorentzVector* thissc = (TLorentzVector*) el_std_sc->At(electron_index);
+    
+    float thiseta = fabs(thissc->Eta());
+    float thispt = thisel->Pt();
+
+    double Aeff=0.;
+    if(thiseta<1.0)                   Aeff=0.10;
+    if(thiseta>=1.0 && thiseta<1.479) Aeff=0.12;
+    if(thiseta>=1.479 && thiseta<2.0) Aeff=0.085;
+    if(thiseta>=2.0 && thiseta<2.2)   Aeff=0.11;
+    if(thiseta>=2.2 && thiseta<2.3)   Aeff=0.12;
+    if(thiseta>=2.3 && thiseta<2.4)   Aeff=0.12;
+    if(thiseta>=2.4)                  Aeff=0.13;
+
+    //EE-EB common cuts
+    float overE_overP=fabs((1/el_std_pin[electron_index])-(1/(el_std_pin[electron_index]*el_std_eopin[electron_index])));
+    float thisiso=el_std_pfiso_charged[electron_index]+std::max(el_std_pfiso_neutral[electron_index]+el_std_pfiso_photon[electron_index]-rho*Aeff,0.);
+
+    
+    if(vtxind!=-1){
+        if(fabs(el_std_D0Vtx[electron_index][vtxind]) > 0.02) return pass;
+        if(fabs(el_std_DZVtx[electron_index][vtxind]) > 0.1)  return pass;
+    }
+    if(overE_overP>0.05)return pass;    
+    if(el_std_hp_expin[electron_index]>1) return pass;
+    if(el_std_conv[electron_index]==0) return pass;
+    if (thisiso/thispt >0.15) return pass;  
+    
+    if(thiseta<1.442) {   // EB cuts
+      if(fabs(el_std_detain[electron_index])>=0.004) return pass;
+      if(fabs(el_std_dphiin[electron_index])>=0.06) return pass;
+      if(el_std_sieie[electron_index]>=0.01) return pass;
+      if(el_std_hoe[electron_index]>=0.12) return pass;
+    } else {  // EE cuts
+      if(fabs(el_std_detain[electron_index])>=0.007) return pass;
+      if(fabs(el_std_dphiin[electron_index])>=0.03) return pass;
+      if(el_std_sieie[electron_index]>=0.03) return pass; 
+      if(el_std_hoe[electron_index]>=0.10) return pass;
+      if(thispt<20){
+        if (thisiso/thispt >0.10) return pass;  
+      } 
+    }
+
+    pass=true;
+    return pass;
+}
+
+
 bool LoopAll::ElectronTightEGammaID(int electron_index, int vtxind){
 
     bool pass=false;
@@ -4410,6 +4509,26 @@ int LoopAll::ElectronSelectionMVA2012(float elptcut){
     
 
 
+std::vector<int> LoopAll::GetIndexesElectronsPassingSelectionMVA2012(float elptcut){
+    
+  std::vector<int> el_indexes;
+  el_indexes.clear();
+
+    for(int iel=0; iel<el_std_n; iel++){
+        if(ElectronMVACuts(iel)){
+            if(GFDEBUG) std::cout<<"passing mva "<<std::endl;
+            TLorentzVector* thiselp4 = (TLorentzVector*) el_std_p4->At(iel);
+            if(GFDEBUG) std::cout<<"passing eta "<<thiselp4->Eta()<<std::endl;
+            if(elptcut<thiselp4->Pt()){
+                if(GFDEBUG) std::cout<<"passing pt "<<std::endl;
+		el_indexes.push_back(iel);
+            }
+        }
+    }
+   
+    if(GFDEBUG) std::cout<<"final el_ind "<<el_ind<<std::endl;
+    return el_indexes;
+}
 
 
 
