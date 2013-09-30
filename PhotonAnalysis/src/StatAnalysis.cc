@@ -6,6 +6,7 @@
 #include <stdio.h>
 
 #define PADEBUG 0
+#define FMDEBUG 0
 
 using namespace std;
 
@@ -550,7 +551,9 @@ void StatAnalysis::bookSignalModel(LoopAll& l, Int_t nDataBins)
                 l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_zh_mass_m%d",sig),nDataBins);
             }
             l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_tth_mass_m%d",sig),nDataBins);
-            l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_thq_mass_m%d",sig),nDataBins);
+            //l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_thq_mass_m%d",sig),nDataBins);
+            l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_thqLeptonic_mass_m%d",sig),nDataBins);
+            l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_thqHadronic_mass_m%d",sig),nDataBins);
 
             l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_ggh_mass_m%d_rv",sig),nDataBins);
             l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_vbf_mass_m%d_rv",sig),nDataBins);
@@ -560,7 +563,9 @@ void StatAnalysis::bookSignalModel(LoopAll& l, Int_t nDataBins)
                 l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_zh_mass_m%d_rv",sig),nDataBins);
             }
             l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_tth_mass_m%d_rv",sig),nDataBins);
-            l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_thq_mass_m%d_rv",sig),nDataBins);
+            //l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_thq_mass_m%d_rv",sig),nDataBins);
+            l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_thqLeptonic_mass_m%d_rv",sig),nDataBins);
+            l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_thqHadronic_mass_m%d_rv",sig),nDataBins);
 
             l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_ggh_mass_m%d_wv",sig),nDataBins);
             l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_vbf_mass_m%d_wv",sig),nDataBins);
@@ -570,7 +575,9 @@ void StatAnalysis::bookSignalModel(LoopAll& l, Int_t nDataBins)
                 l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_zh_mass_m%d_wv",sig),nDataBins);
             }
             l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_tth_mass_m%d_wv",sig),nDataBins);
-            l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_thq_mass_m%d_wv",sig),nDataBins);
+            //l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_thq_mass_m%d_wv",sig),nDataBins);
+            l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_thqLeptonic_mass_m%d_wv",sig),nDataBins);
+            l.rooContainer->CreateDataSet("CMS_hgg_mass",Form("sig_thqHadronic_mass_m%d_wv",sig),nDataBins);
         }
         // Spin Analysis Datasets
         else {
@@ -2336,6 +2343,8 @@ void StatAnalysis::fillOpTree(LoopAll& l, const TLorentzVector & lead_p4, const 
     l.FillTree("vtx_pulltoconv", (float)vtxAna_.pulltoconv(0));
     l.FillTree("vtx_prob", (float)vtxAna_.vertexProbability(l.vtx_std_evt_mva->at(diphoton_id), l.vtx_std_n));
 
+
+/*
 // jet variables
     vector<int> jets;
     jets = l.SelectJets_looser(l,diphoton_id,lead_p4, sublead_p4);
@@ -2406,6 +2415,7 @@ void StatAnalysis::fillOpTree(LoopAll& l, const TLorentzVector & lead_p4, const 
 
         l.FillTree("cosThetaStar", (float)abs_cosThetaStar);
 
+*/
         // radion variables
 	/*        TLorentzVector radion = dijet + diphoton;
 	    l.FillTree("RadMass",(float)radion.M());
@@ -2413,6 +2423,7 @@ void StatAnalysis::fillOpTree(LoopAll& l, const TLorentzVector & lead_p4, const 
         l.FillTree("radion_Pt", (float)radion.Pt());
         l.FillTree("radion_Eta", (float)radion.Eta());
         l.FillTree("radion_Phi", (float)radion.Phi());*/
+/*
      } else {
     	l.FillTree("j2_e",(float)-999.);
 	    l.FillTree("j2_pt",(float)-999.);
@@ -2627,11 +2638,12 @@ void StatAnalysis::fillOpTree(LoopAll& l, const TLorentzVector & lead_p4, const 
 	    l.FillTree("j10_dR2Mean", (float)-999.);
 	    l.FillTree("j10_algoPF1_csvBtag", (float)-999.);
     } // if 10 jets
+*/
 
 
     TLorentzVector mylead=lead_p4;
     TLorentzVector mySublead=lead_p4;
-    l.FillTree("nelectrons",l.GetNelectronsPassingSelectionMVA2012(10.,mylead,mySublead,deltaRPholep_cut));
+    //l.FillTree("nelectrons",l.GetNelectronsPassingSelectionMVA2012(10.,mylead,mySublead,deltaRPholep_cut));
     l.FillTree("nmuons",(int)(l.GetMuonsPassingSelection2012B(10.).size()));
 
 
