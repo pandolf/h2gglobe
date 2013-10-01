@@ -26,7 +26,7 @@ sigPointsToBook=125
 
 ## tHq:
 includetHqLeptonic=1
-includetHqHadronic=0
+includetHqHadronic=1
 
 ## Hadronic TTH tag
 includeTTHhad=1
