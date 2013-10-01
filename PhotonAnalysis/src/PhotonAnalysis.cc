@@ -4974,8 +4974,8 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
       //switchJetIdVertex( l, l.dipho_vtxind[diphotontHqLeptonic_id] );
       id_flags.resize(l.jet_algoPF1_n);
       for(int ijet=0; ijet<l.jet_algoPF1_n; ++ijet ) {
-          //id_flags[ijet] = PileupJetIdentifier::passJetId(l.jet_algoPF1_cutbased_wp_level[ijet], PileupJetIdentifier::kLoose);
-          id_flags[ijet] = 1;
+          id_flags[ijet] = PileupJetIdentifier::passJetId(l.jet_algoPF1_cutbased_wp_level[ijet], PileupJetIdentifier::kLoose);
+          //id_flags[ijet] = 1;
       }
       jetid_flags = (bool*)&id_flags[0];
     }
@@ -5210,7 +5210,7 @@ bool PhotonAnalysis::tHqHadronicTag(LoopAll& l, int diphotontHqHadronic_id, floa
       float subleadtHqHadCut=25.;
 
       // need to check again for d0 and dZ (couldn't before because we didn't have the vertex)                                                                            
-      if(l.ElectronMVACuts(elIndexes[iel], elVtx)){
+      if(l.ElectronMediumEGammaID(elIndexes[iel], elVtx)){
           diphotontHqHadronic_id = l.DiphotonCiCSelection( l.phoSUPERTIGHT, l.phoSUPERTIGHT, leadtHqHadCut,subleadtHqHadCut, 4,
           					    applyPtoverM, &smeared_pho_energy[0], true, -1, veto_indices);
         
@@ -5280,7 +5280,7 @@ bool PhotonAnalysis::tHqHadronicTag(LoopAll& l, int diphotontHqHadronic_id, floa
 
     static std::vector<unsigned char> id_flags;
     if( jetid_flags == 0 ) {
-      switchJetIdVertex( l, l.dipho_vtxind[diphotontHqHadronic_id] );
+      //switchJetIdVertex( l, l.dipho_vtxind[diphotontHqHadronic_id] );
       id_flags.resize(l.jet_algoPF1_n);
       for(int ijet=0; ijet<l.jet_algoPF1_n; ++ijet ) {
           id_flags[ijet] = PileupJetIdentifier::passJetId(l.jet_algoPF1_cutbased_wp_level[ijet], PileupJetIdentifier::kLoose);
