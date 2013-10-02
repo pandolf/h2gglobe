@@ -64,7 +64,7 @@ void StatAnalysis::Term(LoopAll& l)
 
     std::string outputfilename = (std::string) l.histFileName;
     // Make Fits to the data-sets and systematic sets
-    std::string postfix=(dataIs2011?"":"_8TeV");
+    std::string postfix=Form("_%dTeV",l.sqrtS);
     l.rooContainer->FitToData("data_pol_model"+postfix,"data_mass");  // Fit to full range of dataset
 
     //    l.rooContainer->WriteSpecificCategoryDataCards(outputfilename,"data_mass","sig_mass","data_pol_model");
@@ -354,14 +354,14 @@ void StatAnalysis::Init(LoopAll& l)
     // SM Model
     for(size_t isig=0; isig<sigPointsToBook.size(); ++isig) {
         int sig = sigPointsToBook[isig];
-        l.rooContainer->AddConstant(Form("XSBR_ggh_%d",sig),l.signalNormalizer->GetXsection(double(sig),"ggh")*l.signalNormalizer->GetBR(double(sig)));
+        l.rooContainer->AddConstant(Form("XSBR_ggh_%d",sig),l.normalizer()->GetXsection(double(sig),"ggh")*l.normalizer()->GetBR(double(sig)));
     }
     
     // -----------------------------------------------------
     // Configurable background model
     // if no configuration was given, set some defaults
-    std::string postfix=(dataIs2011?"":"_8TeV");
-    
+    std::string postfix=Form("_%dTeV",l.sqrtS);
+
     if( bkgPolOrderByCat.empty() ) {
 	for(int i=0; i<nCategories_; i++){
 	        if(i<nInclusiveCategories_) {
@@ -650,8 +650,8 @@ bool StatAnalysis::Analysis(LoopAll& l, Int_t jentry)
     if (l.runZeeValidation) l.runCiC=true;
 
     // make sure that rho is properly set
-    if( dataIs2011 ) {
-	l.version = 12;
+    if( run7TeV4Xanalysis ) {
+        l.version = 12;
     }
     if( l.version >= 13 && forcedRho < 0. ) {
 	l.rho = l.rho_algo1;
@@ -943,7 +943,7 @@ bool StatAnalysis::AnalyseEvent(LoopAll& l, Int_t jentry, float weight, TLorentz
         // lepton tag
         if(includeVHlep){
             //Add tighter cut on dr to tk
-            if(dataIs2011){
+            if(run7TeV4Xanalysis){
                 diphotonVHlep_id = l.DiphotonCiCSelection(l.phoSUPERTIGHT, l.phoSUPERTIGHT, leadEtVHlepCut, subleadEtVHlepCut, 4, false, &smeared_pho_energy[0], true, true );
                 if(l.pho_drtotk_25_99[l.dipho_leadind[diphotonVHlep_id]] < 1 || l.pho_drtotk_25_99[l.dipho_subleadind[diphotonVHlep_id]] < 1) diphotonVHlep_id = -1;
                 VHmuevent=MuonTag2011(l, diphotonVHlep_id, &smeared_pho_energy[0]);
@@ -982,14 +982,14 @@ bool StatAnalysis::AnalyseEvent(LoopAll& l, Int_t jentry, float weight, TLorentz
 	        diphotonVBF_id = l.DiphotonCiCSelection(l.phoSUPERTIGHT, l.phoSUPERTIGHT, leadEtVBFCut, subleadEtVBFCut, 4,false, &smeared_pho_energy[0], true);
 
             if(diphotonVBF_id!=-1){
-	            float eventweight = weight * smeared_pho_weight[l.dipho_leadind[diphotonVBF_id]] * smeared_pho_weight[l.dipho_subleadind[diphotonVBF_id]] * genLevWeight;
-	            float myweight=1.;
-	            if(eventweight*sampleweight!=0) myweight=eventweight/sampleweight;
+                float eventweight = weight * smeared_pho_weight[l.dipho_leadind[diphotonVBF_id]] * smeared_pho_weight[l.dipho_subleadind[diphotonVBF_id]] * genLevWeight;
+                float myweight=1.;
+                if(eventweight*sampleweight!=0) myweight=eventweight/sampleweight;
 
-	            VBFevent= ( dataIs2011 ?
-	        	    VBFTag2011(l, diphotonVBF_id, &smeared_pho_energy[0], true, eventweight, myweight) :
-	        	    VBFTag2012(vbfIjet1, vbfIjet2, l, diphotonVBF_id, &smeared_pho_energy[0], true, eventweight, myweight) )
-	            ;
+                VBFevent= ( run7TeV4Xanalysis ?
+                        VBFTag2011(l, diphotonVBF_id, &smeared_pho_energy[0], true, eventweight, myweight) :
+                        VBFTag2012(vbfIjet1, vbfIjet2, l, diphotonVBF_id, &smeared_pho_energy[0], true, eventweight, myweight) )
+                    ;
                 if (runJetsForSpin) VBFevent=false;
 	        }
         }
@@ -1149,8 +1149,8 @@ bool StatAnalysis::AnalyseEvent(LoopAll& l, Int_t jentry, float weight, TLorentz
 
         // save trees for unbinned datacards
         int inc_cat = l.DiphotonCategory(diphoton_index.first,diphoton_index.second,Higgs.Pt(),nEtaCategories,nR9Categories,R9CatBoundary,nPtCategories,nVtxCategories,l.vtx_std_n);
-        if (!isSyst && cur_type<0 && saveDatacardTrees_ && TMath::Abs(datacardTreeMass-l.signalNormalizer->GetMass(cur_type))<0.001) saveDatCardTree(l,cur_type,category, inc_cat, evweight, diphoton_index.first,diphoton_index.second,l.dipho_vtxind[diphoton_id],lead_p4,sublead_p4,true,GetSignalLabel(cur_type,l));
-        
+        if (!isSyst && cur_type<0 && saveDatacardTrees_ && TMath::Abs(datacardTreeMass-l.normalizer()->GetMass(cur_type))<0.001) saveDatCardTree(l,cur_type,category, inc_cat, evweight, diphoton_index.first,diphoton_index.second,l.dipho_vtxind[diphoton_id],lead_p4,sublead_p4,true,GetSignalLabel(cur_type,l));
+
         float vtx_mva  = l.vtx_std_evt_mva->at(diphoton_id);
         float vtxProb   = 1.-0.49*(vtx_mva+1.0); /// should better use this: vtxAna_.setPairID(diphoton_id); vtxAna_.vertexProbability(vtx_mva); PM
         // save trees for IC spin analysis
@@ -1622,13 +1622,13 @@ void StatAnalysis::computeExclusiveCategory(LoopAll & l, int & category, std::pa
 	    category=nInclusiveCategories_ + ( (int)includeVBF )*nVBFCategories + nMuonCategories;
         if(nElectronCategories>1) category+=VHelevent_cat;
     } else if(VBFevent) {
-	    category=nInclusiveCategories_;
-	    if( mvaVbfSelection ) {
-	        if (!multiclassVbfSelection) {
-		    category += categoryFromBoundaries(mvaVbfCatBoundaries, myVBF_MVA);
-		} else if ( vbfVsDiphoVbfSelection ) {
+	category=nInclusiveCategories_;
+	if( mvaVbfSelection ) {
+	    if (!multiclassVbfSelection) {
+		category += categoryFromBoundaries(mvaVbfCatBoundaries, myVBF_MVA);
+	    } else if ( vbfVsDiphoVbfSelection ) {
 		    category += categoryFromBoundaries2D(multiclassVbfCatBoundaries0, multiclassVbfCatBoundaries1, multiclassVbfCatBoundaries2, myVBF_MVA, diphobdt_output, 1.);
-	        } else {
+	    } else {
 		    category += categoryFromBoundaries2D(multiclassVbfCatBoundaries0, multiclassVbfCatBoundaries1, multiclassVbfCatBoundaries2, myVBF_MVA0, myVBF_MVA1, myVBF_MVA2);
 		}
 	    }
@@ -1655,10 +1655,10 @@ void StatAnalysis::computeSpinCategory(LoopAll &l, int &category, TLorentzVector
     double cosTheta;
     int cosThetaCategory=-1;
     if (cosThetaDef=="CS"){
-        cosTheta = getCosThetaCS(lead_p4,sublead_p4);
+        cosTheta = getCosThetaCS(lead_p4,sublead_p4,l.sqrtS);
     }
     else if (cosThetaDef=="HX"){
-        cosTheta = getCosThetaHX(lead_p4,sublead_p4);
+        cosTheta = getCosThetaHX(lead_p4,sublead_p4,l.sqrtS);
     }
     else {
         cout << "ERROR -- cosThetaDef - " << cosThetaDef << " not recognised" << endl;
@@ -1926,7 +1926,7 @@ double StatAnalysis::GetDifferentialKfactor(double gPT, int Mass)
 
 void StatAnalysis::FillSignalLabelMap(LoopAll & l)
 {
-    std::map<int,std::pair<TString,double > > & signalMap = l.signalNormalizer->SignalType();
+    std::map<int,std::pair<TString,double > > & signalMap = l.normalizer()->SignalType();
 
     for( std::map<int,std::pair<TString,double > >::iterator it=signalMap.begin();
 	 it!=signalMap.end(); ++it ) {
@@ -2027,7 +2027,7 @@ void StatAnalysis::rescaleClusterVariables(LoopAll &l){
     // Data-driven MC scalings
     for (int ipho=0;ipho<l.pho_n;ipho++){
 
-	if (dataIs2011) {
+        if (run7TeV4Xanalysis) {
 
 	    if( scaleR9Only ) {
 		double R9_rescale = (l.pho_isEB[ipho]) ? 1.0048 : 1.00492 ;
