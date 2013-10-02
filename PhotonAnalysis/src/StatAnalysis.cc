@@ -923,6 +923,8 @@ bool StatAnalysis::AnalyseEvent(LoopAll& l, Int_t jentry, float weight, TLorentz
 	diphotonTTHlep_id = -1;
 	diphotonVHlep_id = -1;
 	diphotonVHmet_id = -1; //met at analysis step
+	diphotontHqLeptonic_id = -1;
+	diphotontHqHadronic_id = -1;
         VHmuevent = false;
         VHelevent = false;
         VHlep1event = false;
@@ -935,6 +937,8 @@ bool StatAnalysis::AnalyseEvent(LoopAll& l, Int_t jentry, float weight, TLorentz
 	    TTHhadevent = false;
 	    TTHlepevent = false;
         VHmetevent = false; //met at analysis step
+	    tHqLeptonicevent = false;
+	    tHqHadronicevent = false;
 
         // lepton tag
         if(includeVHlep){
@@ -1003,15 +1007,7 @@ bool StatAnalysis::AnalyseEvent(LoopAll& l, Int_t jentry, float weight, TLorentz
 	}
 
         if(includeTTHlep) {
-	        diphotonTTHlep_id = l.DiphotonCiCSelection(l.phoSUPERTIGHT, l.phoSUPERTIGHT, leadEtTTHlepCut, subleadEtTTHlepCut, 4,false, &smeared_pho_energy[0], true);
-
-            if(diphotonTTHlep_id!=-1){
-	            float eventweight = weight * smeared_pho_weight[l.dipho_leadind[diphotonTTHlep_id]] * smeared_pho_weight[l.dipho_subleadind[diphotonTTHlep_id]] * genLevWeight;
-	            float myweight=1.;
-	            if(eventweight*sampleweight!=0) myweight=eventweight/sampleweight;
-
-	            TTHlepevent = TTHleptonicTag2012(l, diphotonTTHlep_id, &smeared_pho_energy[0], true, eventweight, myweight);
-	        }
+          TTHlepevent = TTHleptonicTag2012(l, diphotonTTHlep_id, &smeared_pho_energy[0]);
 	    }
 
 
