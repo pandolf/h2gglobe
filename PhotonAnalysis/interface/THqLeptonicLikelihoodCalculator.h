@@ -4,6 +4,8 @@
 #include <string>
 
 #include "TH1D.h"
+#include "TTree.h"
+#include "TFile.h"
 
 
 
@@ -23,6 +25,12 @@ class THqLeptonicLikelihoodCalculator {
 
 
  private:
+
+  TFile* file_tHq_;
+  TFile* file_ttH_;
+
+  TTree* tree_tHq_;
+  TTree* tree_ttH_;
 
   TH1D* h1_nJets_ttH_;
   TH1D* h1_eta_qJet_ttH_;

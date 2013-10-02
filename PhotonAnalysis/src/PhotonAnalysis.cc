@@ -175,6 +175,10 @@ PhotonAnalysis::PhotonAnalysis()  :
 PhotonAnalysis::~PhotonAnalysis()
 {
     if( jetHandler_ != 0 ) delete jetHandler_;
+    if( thqlikeli!=0 ) {
+      delete thqlikeli;
+      thqlikeli=0;
+    }
 }
 
 // ----------------------------------------------------------------------------------------------------

@@ -1,31 +1,75 @@
 #include "../interface/THqLeptonicLikelihoodCalculator.h"
 
+#include "TROOT.h"
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
-#include "TFile.h"
-#include "TTree.h"
 
 
 
 
 THqLeptonicLikelihoodCalculator::THqLeptonicLikelihoodCalculator( const std::string& tHqFileName, const std::string& ttHFileName) {
 
-  h1_nJets_tHq_=0;
-  h1_eta_qJet_tHq_=0;
-  h1_mt_top_tHq_=0;
-  h1_lept_charge_tHq_=0;
-  h1_deltaEta_lept_qJet_tHq_=0;
 
-  h1_nJets_ttH_=0;
-  h1_eta_qJet_ttH_=0;
-  h1_mt_top_ttH_=0;
-  h1_lept_charge_ttH_=0;
-  h1_deltaEta_lept_qJet_ttH_=0;
+  file_tHq_ = TFile::Open(tHqFileName.c_str());
+  tree_tHq_ = (TTree*)file_tHq_->Get("tree_passedEvents");
+
+  file_ttH_ = TFile::Open(ttHFileName.c_str());
+  tree_ttH_ = (TTree*)file_ttH_->Get("tree_passedEvents");
 
 
-  this->open_tHqFile(tHqFileName);
-  this->open_ttHFile(ttHFileName);
+  gROOT->cd();
+
+  h1_nJets_tHq_              = new TH1D( "nJets_tHq", "", 9, -0.5, 8.5 );
+  h1_eta_qJet_tHq_           = new TH1D( "eta_qJet_tHq", "", 30, 0., 5. );
+  h1_mt_top_tHq_             = new TH1D( "mt_top_tHq", "", 50, 0., 1000. );
+  h1_lept_charge_tHq_        = new TH1D( "lept_charge_tHq", "", 3, -1.5, 1.5 );
+  h1_deltaEta_lept_qJet_tHq_ = new TH1D( "deltaEta_lept_qJet_tHq", "", 35, 0., 7. );
+
+
+  tree_tHq_->Project("nJets_tHq", "njets", "isLeptonic*eventWeight");
+  tree_tHq_->Project("eta_qJet_tHq", "eta_qJet", "isLeptonic*eventWeight");
+  tree_tHq_->Project("mt_top_tHq", "mt_top", "isLeptonic*eventWeight");
+  tree_tHq_->Project("lept_charge_tHq", "charge_lept", "isLeptonic*eventWeight");
+  tree_tHq_->Project("deltaEta_lept_qJet_tHq", "deltaEta_lept_qJet", "isLeptonic*eventWeight");
+
+
+  h1_nJets_tHq_              ->Scale(1./h1_nJets_tHq_->Integral("width"));
+  h1_eta_qJet_tHq_           ->Scale(1./h1_eta_qJet_tHq_->Integral("width"));
+  h1_mt_top_tHq_             ->Scale(1./h1_mt_top_tHq_->Integral("width"));
+  h1_lept_charge_tHq_        ->Scale(1./h1_lept_charge_tHq_->Integral("width"));
+  h1_deltaEta_lept_qJet_tHq_ ->Scale(1./h1_deltaEta_lept_qJet_tHq_->Integral("width"));
+
+
+
+
+
+
+  h1_nJets_ttH_              = new TH1D( "nJets_ttH", "", 9, -0.5, 8.5 );
+  h1_eta_qJet_ttH_           = new TH1D( "eta_qJet_ttH", "", 30, 0., 5. );
+  h1_mt_top_ttH_             = new TH1D( "mt_top_ttH", "", 50, 0., 1000. );
+  h1_lept_charge_ttH_        = new TH1D( "lept_charge_ttH", "", 3, -1.5, 1.5 );
+  h1_deltaEta_lept_qJet_ttH_ = new TH1D( "deltaEta_lept_qJet_ttH", "", 35, 0., 7. );
+
+
+  tree_ttH_->Project("nJets_ttH", "njets", "isLeptonic*eventWeight");
+  tree_ttH_->Project("eta_qJet_ttH", "eta_qJet", "isLeptonic*eventWeight");
+  tree_ttH_->Project("mt_top_ttH", "mt_top", "isLeptonic*eventWeight");
+  tree_ttH_->Project("lept_charge_ttH", "charge_lept", "isLeptonic*eventWeight");
+  tree_ttH_->Project("deltaEta_lept_qJet_ttH", "deltaEta_lept_qJet", "isLeptonic*eventWeight");
+
+
+  h1_nJets_ttH_              ->Scale(1./h1_nJets_ttH_->Integral("width"));
+  h1_eta_qJet_ttH_           ->Scale(1./h1_eta_qJet_ttH_->Integral("width"));
+  h1_mt_top_ttH_             ->Scale(1./h1_mt_top_ttH_->Integral("width"));
+  h1_lept_charge_ttH_        ->Scale(1./h1_lept_charge_ttH_->Integral("width"));
+  h1_deltaEta_lept_qJet_ttH_ ->Scale(1./h1_deltaEta_lept_qJet_ttH_->Integral("width"));
+
+
+
+
+  file_tHq_->Close();
+  file_ttH_->Close();
 
 
 }
@@ -59,77 +103,13 @@ THqLeptonicLikelihoodCalculator::~THqLeptonicLikelihoodCalculator() {
   h1_deltaEta_lept_qJet_ttH_ = 0;
 
 
-}
+  file_tHq_=0;
+  file_ttH_=0;
 
-
-void THqLeptonicLikelihoodCalculator::open_tHqFile( const std::string& fileName ) {
-
-  TFile* file_tHq = TFile::Open(fileName.c_str());
-  TTree* tree_tHq = (TTree*)file_tHq->Get("tree_passedEvents");
-
-  if( h1_nJets_tHq_!=0 ) delete h1_nJets_tHq_;
-  if( h1_eta_qJet_tHq_!=0 ) delete h1_eta_qJet_tHq_;
-  if( h1_mt_top_tHq_!=0 ) delete h1_mt_top_tHq_;
-  if( h1_lept_charge_tHq_!=0 ) delete h1_lept_charge_tHq_;
-  if( h1_deltaEta_lept_qJet_tHq_!=0 ) delete h1_deltaEta_lept_qJet_tHq_;
-
-  h1_nJets_tHq_              = new TH1D( "nJets_tHq", "", 9, -0.5, 8.5 );
-  h1_eta_qJet_tHq_           = new TH1D( "eta_qJet_tHq", "", 30, 0., 5. );
-  h1_mt_top_tHq_             = new TH1D( "mt_top_tHq", "", 50, 0., 1000. );
-  h1_lept_charge_tHq_        = new TH1D( "lept_charge_tHq", "", 3, -1.5, 1.5 );
-  h1_deltaEta_lept_qJet_tHq_ = new TH1D( "deltaEta_lept_qJet_tHq", "", 35, 0., 7. );
-
-
-  tree_tHq->Project("nJets_tHq", "njets", "isLeptonic*eventWeight");
-  tree_tHq->Project("eta_qJet_tHq", "eta_qJet", "isLeptonic*eventWeight");
-  tree_tHq->Project("mt_top_tHq", "mt_top", "isLeptonic*eventWeight");
-  tree_tHq->Project("lept_charge_tHq", "charge_lept", "isLeptonic*eventWeight");
-  tree_tHq->Project("deltaEta_lept_qJet_tHq", "deltaEta_lept_qJet", "isLeptonic*eventWeight");
-
-
-  h1_nJets_tHq_              ->Scale(1./h1_nJets_tHq_->Integral("width"));
-  h1_eta_qJet_tHq_           ->Scale(1./h1_eta_qJet_tHq_->Integral("width"));
-  h1_mt_top_tHq_             ->Scale(1./h1_mt_top_tHq_->Integral("width"));
-  h1_lept_charge_tHq_        ->Scale(1./h1_lept_charge_tHq_->Integral("width"));
-  h1_deltaEta_lept_qJet_tHq_ ->Scale(1./h1_deltaEta_lept_qJet_tHq_->Integral("width"));
-
+  tree_ttH_=0;
+  tree_tHq_=0;
 
 }
-
-
-void THqLeptonicLikelihoodCalculator::open_ttHFile( const std::string& fileName ) {
-
-  TFile* file_ttH = TFile::Open(fileName.c_str());
-  TTree* tree_ttH = (TTree*)file_ttH->Get("tree_passedEvents");
-
-  if( h1_nJets_ttH_!=0 ) delete h1_nJets_ttH_;
-  if( h1_eta_qJet_ttH_!=0 ) delete h1_eta_qJet_ttH_;
-  if( h1_mt_top_ttH_!=0 ) delete h1_mt_top_ttH_;
-  if( h1_lept_charge_ttH_!=0 ) delete h1_lept_charge_ttH_;
-  if( h1_deltaEta_lept_qJet_ttH_!=0 ) delete h1_deltaEta_lept_qJet_ttH_;
-
-  h1_nJets_ttH_              = new TH1D( "nJets_ttH", "", 9, -0.5, 8.5 );
-  h1_eta_qJet_ttH_           = new TH1D( "eta_qJet_ttH", "", 30, 0., 5. );
-  h1_mt_top_ttH_             = new TH1D( "mt_top_ttH", "", 50, 0., 1000. );
-  h1_lept_charge_ttH_        = new TH1D( "lept_charge_ttH", "", 3, -1.5, 1.5 );
-  h1_deltaEta_lept_qJet_ttH_ = new TH1D( "deltaEta_lept_qJet_ttH", "", 35, 0., 7. );
-
-
-  tree_ttH->Project("nJets_ttH", "njets", "isLeptonic*eventWeight");
-  tree_ttH->Project("eta_qJet_ttH", "eta_qJet", "isLeptonic*eventWeight");
-  tree_ttH->Project("mt_top_ttH", "mt_top", "isLeptonic*eventWeight");
-  tree_ttH->Project("lept_charge_ttH", "charge_lept", "isLeptonic*eventWeight");
-  tree_ttH->Project("deltaEta_lept_qJet_ttH", "deltaEta_lept_qJet", "isLeptonic*eventWeight");
-
-  h1_nJets_ttH_              ->Scale(1./h1_nJets_ttH_->Integral("width"));
-  h1_eta_qJet_ttH_           ->Scale(1./h1_eta_qJet_ttH_->Integral("width"));
-  h1_mt_top_ttH_             ->Scale(1./h1_mt_top_ttH_->Integral("width"));
-  h1_lept_charge_ttH_        ->Scale(1./h1_lept_charge_ttH_->Integral("width"));
-  h1_deltaEta_lept_qJet_ttH_ ->Scale(1./h1_deltaEta_lept_qJet_ttH_->Integral("width"));
-
-
-}
-
 
 
 
