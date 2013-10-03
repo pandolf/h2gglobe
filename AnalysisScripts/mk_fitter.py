@@ -295,6 +295,9 @@ filesToCopy=\"%(files)s\"
 dstFolder=\"%(histdir)s\"
 cp=\"%(cp)s\"
 
+export LANGUAGE=C
+export LC_ALL=C
+
 python %(run)s -i %(job)s.dat %(runopt)s
 retval=$?
 
