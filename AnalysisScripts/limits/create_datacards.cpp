@@ -19,6 +19,7 @@ bool BLINDED=true;
 void createSingleDatacard( const std::string& channel, const std::string& additionalSelection, TTree* tree_data, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_ggh, TTree* tree_vbf, TTree* tree_wzh, TTree* tree_tth, const std::string& suffix="" );
 void createSingleDatacard_twoRegions( const std::string& channel, const std::string& additionalSelection, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_tth);
 void drawMassPlot( const std::string& category, TH1D* h1_data, TH1D* h1_thq, TH1D* h1_ggh, TH1D* h1_vbf, TH1D* h1_wzh, TH1D* h1_tth, const std::string& suffix="" );
+void drawSignalBGData( const std::string& channel, const std::string& var, const std::string& varName, const std::string& units, int nBins, float xMin, float xMax, TTree* tree_sig, TTree* tree_bg, TTree* tree_data, const std::string& fullSelection, const std::string& fullSelection_sidebands, const std::string& suffix="" );
 
 
 int main() {
@@ -54,6 +55,10 @@ int main() {
 void createSingleDatacard( const std::string& channel, const std::string& additionalSelection, TTree* tree_data, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_ggh, TTree* tree_vbf, TTree* tree_wzh, TTree* tree_tth, const std::string& suffix ) {
 
 
+  std::cout << "-> Creating datacard for channel: " << channel;
+  if( suffix!="" ) std::cout << " (" << suffix << ")";
+  std::cout << std::endl;
+
   int category=-1;
   if( channel=="leptonic" ) {
     category=11;
@@ -78,6 +83,9 @@ void createSingleDatacard( const std::string& channel, const std::string& additi
     sprintf( fullSelection_sidebands, "weight*( category==%d       && (PhotonsMass<115. || PhotonsMass>135.) )", category );
   }
 
+
+  TString category_tstr(channel);
+  bool isLeptonic = category_tstr.Contains("leptonic");
 
 
 
@@ -115,13 +123,15 @@ void createSingleDatacard( const std::string& channel, const std::string& additi
   tree_data->Project( "mgg_data_sidebands", "PhotonsMass", fullSelection_sidebands );
 
 
+  std::cout << "Data sideband events: " << h1_mgg_data_sidebands->Integral() << std::endl;
+
   TH1D* h1_mgg_thq = new TH1D(*h1_mgg_thqLeptonic);
   h1_mgg_thq->Add(h1_mgg_thqHadronic);
   h1_mgg_thq->SetName("mgg_thq");
 
   drawMassPlot( channel, h1_mgg_data, h1_mgg_thq, h1_mgg_ggh, h1_mgg_vbf, h1_mgg_wzh, h1_mgg_tth, suffix );
   if( isLeptonic )
-    drawSignalBGData( channel, "thqLD_lept", tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "thqLD_lept", "tHq Leptonic LD", "", 20, 0., 1.00001, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
   
 
   float massWindow = 3.;
@@ -454,25 +464,95 @@ void drawMassPlot( const std::string& category, TH1D* h1_data, TH1D* h1_thq, TH1
 void drawSignalBGData( const std::string& channel, const std::string& var, const std::string& varName, const std::string& units, int nBins, float xMin, float xMax, TTree* tree_sig, TTree* tree_bg, TTree* tree_data, const std::string& fullSelection, const std::string& fullSelection_sidebands, const std::string& suffix ) {
 
 
-   DrawBase* db = new DrawBase("sigbfdata" );
+  DrawBase* db = new DrawBase("sigbfdata" );
 
-   TH1D* h1_data = new TH1D("data", "", nBins, xMin, xMax ); 
-   TH1D* h1_sig = new TH1D("sig", "", nBins, xMin, xMax ); 
-   TH1D* h1_bg = new TH1D("bg", "", nBins, xMin, xMax ); 
+  TH1D* h1_data = new TH1D("data", "", nBins, xMin, xMax ); 
+  TH1D* h1_sig = new TH1D("sig", "", nBins, xMin, xMax ); 
+  TH1D* h1_bg = new TH1D("bg", "", nBins, xMin, xMax ); 
 
-   h1_data->Sumw2();
-   h1_sig->Sumw2();
-   h1_bg->Sumw2();
+  h1_data->Sumw2();
+  h1_sig->Sumw2();
+  h1_bg->Sumw2();
 
-   if( BLINDED )
-     tree_data->Project( var.c_str(), "data", fullSelection_sidebands );
-   else
-     tree_data->Project( var.c_str(), "data", fullSelection );
-   tree_sig->Project( var.c_str(), "sig", fullSelection );
-   tree_bg ->Project( var.c_str(), "bg", fullSelection );
+  h1_sig->SetFillColor(46);
+  h1_bg->SetFillColor(38);
+  h1_sig->SetLineColor(46);
+  h1_bg->SetLineColor(38);
+
+  h1_sig->SetFillStyle(3004);
+  h1_bg->SetFillStyle(3005);
 
 
+  tree_data->Project( "data", var.c_str(), fullSelection_sidebands.c_str() );
+  tree_sig->Project(  "sig",  var.c_str(), fullSelection.c_str() );
+  tree_bg ->Project(  "bg",   var.c_str(), fullSelection.c_str() );
 
 
+  float data_integral = h1_data->Integral();
+  h1_sig->Scale( data_integral/h1_sig->Integral() );
+  h1_bg->Scale( data_integral/h1_bg->Integral() );
+  
+
+
+  TGraphAsymmErrors* gr_data = fitTools::getGraphPoissonErrors( h1_data, false );
+  gr_data->SetMarkerStyle(20);  
+  gr_data->SetMarkerSize(1.3);  
+   
+
+  TString category_tstr(channel);
+  bool isLeptonic = category_tstr.Contains("leptonic");
+
+  std::string channelName_legend = (isLeptonic) ? "Leptonic Channel" : "Hadronic Channel";
+
+
+  TLegend* legend = new TLegend( 0.55, 0.66, 0.9, 0.92, channelName_legend.c_str() );
+  legend->SetTextFont(42);
+  legend->SetFillColor(kWhite);
+  legend->SetTextSize(0.038);
+  legend->SetTextColor(kBlack);
+  legend->AddEntry( gr_data, "Sidebands Data", "P" );
+  legend->AddEntry( h1_sig, "tHq (125)", "F" );
+  legend->AddEntry( h1_bg, "ttH (125)", "F" );
+
+
+  float yMax = 0.;
+  float yMax_data = h1_data->GetMaximum();
+  if( yMax_data>0. ) {
+    if( yMax_data < 1.5 ) yMax=3.5;
+    else if( yMax_data < 2.5 ) yMax=6.;
+    else                       yMax=yMax_data*2.;
+  } else {
+    float yMax_mc = h1_sig->GetMaximum()*1.2;
+    yMax = 1.8*yMax_mc;
+  }
+
+
+  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, 0., yMax);
+  std::string xTitle = varName;
+  if( units!="" ) xTitle = xTitle + " [" + units + "]";
+  h2_axes->SetXTitle(xTitle.c_str());
+  h2_axes->SetYTitle( "Events" );
+
+  TCanvas* c1 = new TCanvas("c1", "", 600, 600);
+  c1->cd();
+
+
+  TPaveText* labelTop = db->get_labelTop();
+
+  h2_axes->Draw();
+  legend->Draw("same");   
+  labelTop->Draw("same");
+  h1_bg->Draw("h same");
+  h1_sig->Draw("h same");
+  gr_data->Draw("p same");
+
+
+  gPad->RedrawAxis();
+
+  std::string canvasName = var + "_SignalBGData_" + channel;
+  if( suffix!="" ) canvasName = canvasName + "_" + suffix;
+  canvasName = canvasName + ".eps";
+
+  c1->SaveAs(canvasName.c_str());
 
 }
