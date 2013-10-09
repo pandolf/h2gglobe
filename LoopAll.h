@@ -156,6 +156,17 @@ class LoopAll {
 
   int diphoton_id_lep;
   int diphoton_id_had;
+  int   lept_charge;
+  int   njets;
+  int   njets_OutsideEtaCut;
+  int   njets_InsideEtaCut;
+  float qJetEta;
+  float qJetPt;
+  float bJetPt;
+  float topMt;
+  float topM;
+  float deltaEta_lept_qJet;
+  float deltaEta_bJet_qJet;
   float thqLD_lept;
 
   TFile * outputFile;

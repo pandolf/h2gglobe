@@ -559,7 +559,7 @@ void PhotonAnalysis::applySinglePhotonSmearings(std::vector<float> & smeared_pho
             if( doEcorrectionSmear )  {
                 eCorrSmearer->smearPhoton(phoInfo,sweight,l.run,0.);
             }
-            eScaleDataSmearer->smearPhoton(phoInfo,sweight,l.run,0.);
+            //eScaleDataSmearer->smearPhoton(phoInfo,sweight,l.run,0.);
             pweight *= sweight;
         }
 	//// phoInfo.dump();
@@ -4547,8 +4547,8 @@ bool PhotonAnalysis::TTHleptonicTag2012(LoopAll& l, int& diphotonTTHlep_id, floa
     //francesco 
     bool tag = false;
 
-    int isLep_mu=0;
-    int isLep_ele=0;
+    l.isLep_mu=0;
+    l.isLep_ele=0;
     int el_ind=-1;
     int mu_ind=-1;
     float diphoton_id_lep=-1;
@@ -4649,14 +4649,14 @@ bool PhotonAnalysis::TTHleptonicTag2012(LoopAll& l, int& diphotonTTHlep_id, floa
 
     if(muonInd != -1 && elInd==-1){
 	if(passMuPhotonCuts){
-	    isLep_mu=1;
+	    l.isLep_mu=1;
 	    mu_ind=muonInd;
 	    el_ind=-1;
 	}
     }
     if(elInd !=- 1 && muonInd ==-1){
 	if(passElePhotonCuts){
-	    isLep_ele=1;
+	    l.isLep_ele=1;
 	    el_ind=elInd;
 	    mu_ind=-1;
 	}
@@ -4667,27 +4667,27 @@ bool PhotonAnalysis::TTHleptonicTag2012(LoopAll& l, int& diphotonTTHlep_id, floa
 	if(passMuPhotonCuts && passElePhotonCuts){
 	    if(el_tag->Pt()<mu_tag->Pt()){
 		diphotonTTHlep_id=diphoton_id;
-		isLep_mu=1;
+		l.isLep_mu=1;
 		mu_ind=muonInd;
 		el_ind=-1;
 	    }else{
-		isLep_ele=1;
+		l.isLep_ele=1;
 		el_ind=elInd;
 		mu_ind=-1;
 	    }
 	}else if(passMuPhotonCuts && !passElePhotonCuts){
 	    diphotonTTHlep_id=diphoton_id;
-	    isLep_mu=1;
+	    l.isLep_mu=1;
 	    mu_ind=muonInd;
 	    el_ind=-1;
 	}else if(passElePhotonCuts && !passMuPhotonCuts){
-	    isLep_ele=1;
+	    l.isLep_ele=1;
 	    el_ind=elInd;
 	    mu_ind=-1;
 	}
     }
 
-    if(isLep_ele!=1 && isLep_mu !=1) return false;
+    if(l.isLep_ele!=1 && l.isLep_mu !=1) return false;
    
 
     static std::vector<unsigned char> id_flags;
@@ -5000,21 +5000,18 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
    if( nLeptons != 1 ) return false;
 
     TLorentzVector* lep;
-    int lept_charge;
 
-    if (nEle>0){
+    if(nEle>0){
       l.isLep_ele=1;
       l.el_ind=elIndexes[0];
       lep= (TLorentzVector*) (l.el_std_p4->At(l.el_ind));
-      lept_charge = l.el_std_charge[l.el_ind];
-
-
+      l.lept_charge = l.el_std_charge[l.el_ind];
     }
     if(nMuon>0) {
       l.isLep_mu=1;
       l.mu_ind=muonInd;
       lep= (TLorentzVector*)(l.mu_glo_p4->At(muonInd));
-      lept_charge = l.mu_glo_charge[muonInd];
+      l.lept_charge = l.mu_glo_charge[muonInd];
     }
 
 
@@ -5182,18 +5179,29 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
 
 
     float deltaEta_lept_qJet = fabs( lep->Eta() - qJet->Eta() );
+    float deltaEta_bJet_qJet = fabs( bJet->Eta() - qJet->Eta() );
 
     if(FPDEBUGTHQ) {
       std::cout << "njets: " << njets << std::endl;
       std::cout << "qJet->Eta(): " << qJet->Eta() << std::endl;
       std::cout << "top->Mt(): " << top->Mt() << std::endl;
-      std::cout << "lept_charge: " << lept_charge << std::endl;
+      std::cout << "lept_charge: " << l.lept_charge << std::endl;
       std::cout << "deltaEta_lept_qJet: " << deltaEta_lept_qJet << std::endl;
       //exit(11);
     }
 
 
-    l.thqLD_lept = (float)(thqlikeli->computeLikelihood( njets, qJet->Eta(), top->Mt(), lept_charge, deltaEta_lept_qJet ));
+    l.njets              = njets;
+    l.njets_OutsideEtaCut  = njets_OutsideEtaCut;
+    l.njets_InsideEtaCut  = njets_InsideEtaCut;
+    l.qJetEta            = qJet->Eta();
+    l.qJetPt             = qJet->Pt();
+    l.bJetPt             = bJet->Pt();
+    l.topMt              = top->Mt();
+    l.deltaEta_lept_qJet = deltaEta_lept_qJet;
+    l.deltaEta_bJet_qJet = deltaEta_bJet_qJet;
+
+    l.thqLD_lept = (float)(thqlikeli->computeLikelihood( njets, qJet->Eta(), top->Mt(), l.lept_charge, deltaEta_lept_qJet ));
 
     if(FPDEBUGTHQ) 
       std::cout << "thqLD_lept: " << l.thqLD_lept << std::endl;
@@ -5561,6 +5569,16 @@ bool PhotonAnalysis::tHqHadronicTag(LoopAll& l, int diphotontHqHadronic_id, floa
       std::cout << "top->M(): " << top->M() << std::endl;
       //exit(11);
     }
+
+
+    l.njets = njets;
+    l.njets_OutsideEtaCut = njets_OutsideEtaCut;
+    l.njets_InsideEtaCut = njets_InsideEtaCut;
+    l.qJetEta = qJet->Eta();
+    l.qJetPt = qJet->Pt();
+    l.topM = top->M();
+    l.bJetPt = bJet->Pt();
+    l.deltaEta_bJet_qJet = fabs( bJet->Eta() - qJet->Eta() );
 
 
     delete W;

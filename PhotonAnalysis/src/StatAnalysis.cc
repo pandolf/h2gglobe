@@ -2650,7 +2650,25 @@ void StatAnalysis::fillOpTree(LoopAll& l, const TLorentzVector & lead_p4, const 
     l.FillTree("drLepPho",(float)l.drLepPho);
     l.FillTree("drGsf",(float)l.drGsf);
 
-    if( includetHqLeptonic ) l.FillTree("thqLD_lept",(float)l.thqLD_lept);
+    if( includetHqLeptonic || includetHqHadronic ) {
+
+      l.FillTree("njets",             (int)l.njets);
+      l.FillTree("qJetEta",           (float)l.qJetEta);
+      l.FillTree("qJetPt",            (float)l.qJetPt);
+      l.FillTree("bJetPt",            (float)l.bJetPt);
+
+      if( includetHqLeptonic ) {
+        l.FillTree("lept_charge",       (int)l.lept_charge);
+        l.FillTree("topMt",             (float)l.topMt);
+        l.FillTree("deltaEta_lept_qJet",(float)l.deltaEta_lept_qJet);
+        l.FillTree("thqLD_lept",                   (float)l.thqLD_lept);
+      } else {
+        l.FillTree("topM",             (float)l.topM);
+        l.FillTree("deltaEta_bJet_qJet",(float)l.deltaEta_bJet_qJet);
+        l.FillTree("njets_OutsideEtaCut",             (int)l.njets_OutsideEtaCut);
+        l.FillTree("njets_InsideEtaCut",             (int)l.njets_InsideEtaCut);
+      }
+    }
 
 };
 
