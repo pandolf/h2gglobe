@@ -25,12 +25,14 @@ void drawSignalBGData( const std::string& channel, const std::string& var, const
 int main() {
 
 
-  TFile* file_thqLept = TFile::Open("../histograms_CMS-HGG_thqLeptonic.root");
-  TFile* file_thqHadr = TFile::Open("../histograms_CMS-HGG_thqHadronic.root");
-  TFile* file = TFile::Open("../batchOutput1/histograms_CMS-HGG.root");
+  //TFile* file_thqLept = TFile::Open("../histograms_CMS-HGG_thqLeptonic.root");
+  //TFile* file_thqHadr = TFile::Open("../histograms_CMS-HGG_thqHadronic.root");
+  std::string fileName = "../batchOutput2/histograms_CMS-HGG.root";
+  TFile* file = TFile::Open(fileName.c_str());
+  std::cout << "-> Opening file: " << fileName << std::endl;
 
-  TTree* tree_thqLept = (TTree*)file_thqLept->Get("thqLeptonic_m125_8TeV");
-  TTree* tree_thqHadr = (TTree*)file_thqHadr->Get("thqHadronic_m125_8TeV");
+  TTree* tree_thqLept = (TTree*)file->Get("thqLeptonic_m125_8TeV");
+  TTree* tree_thqHadr = (TTree*)file->Get("thqHadronic_m125_8TeV");
   TTree* tree_tth     = (TTree*)file->Get("tth_m125_8TeV");
   TTree* tree_wzh     = (TTree*)file->Get("wzh_m125_8TeV");
   TTree* tree_ggh     = (TTree*)file->Get("ggh_m125_8TeV");
@@ -123,6 +125,8 @@ void createSingleDatacard( const std::string& channel, const std::string& additi
   tree_data->Project( "mgg_data_sidebands", "PhotonsMass", fullSelection_sidebands );
 
 
+  float sidebands_yield = h1_mgg_data_sidebands->Integral();
+
   std::cout << "Data sideband events: " << h1_mgg_data_sidebands->Integral() << std::endl;
 
   TH1D* h1_mgg_thq = new TH1D(*h1_mgg_thqLeptonic);
@@ -130,11 +134,21 @@ void createSingleDatacard( const std::string& channel, const std::string& additi
   h1_mgg_thq->SetName("mgg_thq");
 
   drawMassPlot( channel, h1_mgg_data, h1_mgg_thq, h1_mgg_ggh, h1_mgg_vbf, h1_mgg_wzh, h1_mgg_tth, suffix );
-  if( isLeptonic )
+  if( isLeptonic ) {
+    drawSignalBGData( channel, "lept_charge", "Lepton Charge", "", 3, -1.5, 1.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "isLep_mu", "is Muon Event", "", 2, -0.5, 1.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "thqLD_lept_njets", "Jet Multiplicity", "", 8, 1.5, 9.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "thqLD_lept_topMt", "Lepton Charge", "", 3, -1.5, 1.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "thqLD_lept_qJetEta", "qJet Pseudorapidity", "", 25, -5., 5., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "thqLD_lept_deltaEta_lept_qJet", "#Delta#eta (Lepton-qJet)", "", 25, 0.5, 5.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
     drawSignalBGData( channel, "thqLD_lept", "tHq Leptonic LD", "", 20, 0., 1.00001, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "met_pfmet", "Particle Flow Missing E_{T}", "", 20, 0., 200., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+  } else {
+    drawSignalBGData( channel, "met_pfmet", "Particle Flow Missing E_{T}", "", 20, 0., 200., tree_thqHadronic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+  }
   
 
-  float massWindow = 3.;
+  float massWindow = 5.;
 
   int binMin = h1_mgg_thqLeptonic->FindBin( 125.-massWindow );
   int binMax = h1_mgg_thqLeptonic->FindBin( 125.+massWindow );
@@ -147,6 +161,7 @@ void createSingleDatacard( const std::string& channel, const std::string& additi
 
 
 
+  //float k_BG = massWindow*2./70.;
   float k_BG = massWindow*2./60.;
 
 
@@ -159,7 +174,7 @@ void createSingleDatacard( const std::string& channel, const std::string& additi
 
  
   datacard << "imax 1" << std::endl;
-  datacard << "jmax 2 " << std::endl;
+  datacard << "jmax 5 " << std::endl;
   datacard << "kmax *" << std::endl;
   datacard << "    " << std::endl;
   datacard << "    " << std::endl;
@@ -170,22 +185,22 @@ void createSingleDatacard( const std::string& channel, const std::string& additi
   datacard << "bin            1        1       1     1     1     1"       << std::endl;
   datacard << "process        s        b       tth   ggh   vbf   wzh"    << std::endl;
   datacard << "process        0        1       2     3     4     5"       << std::endl;
-  datacard << "rate   " << yield_thq <<  "  0.    " << yield_tth << " " << yield_ggh << " " << yield_vbf << " " << yield_wzh   << std::endl;
+  datacard << "rate   " << yield_thq <<  "  " << sidebands_yield*k_BG << "  " << yield_tth << " " << yield_ggh << " " << yield_vbf << " " << yield_wzh   << std::endl;
   datacard << "      " << std::endl;
   datacard << "      " << std::endl;
   datacard << "#syst " << std::endl;
-  datacard << "lumi       lnN    1.044 - 1.044" << std::endl;
+  datacard << "lumi       lnN    1.044 - 1.044 1.044 1.044 1.044" << std::endl;
 
-  datacard << "bg         gmN 0    - " << k_BG << "   -" << std::endl;
+  datacard << "bg         gmN " << (int)sidebands_yield << "    - " << k_BG << "   - - - -" << std::endl;
 
-  datacard << "PDF_ttH   lnN    -     -         0.922/1.078" << std::endl;
-  datacard << "QCDscale_ttH   lnN    -     -    0.86/1.11" << std::endl;
+  datacard << "PDF_ttH   lnN    -     -         0.922/1.078 - - - " << std::endl;
+  datacard << "QCDscale_ttH   lnN    -     -    0.86/1.11 - - - " << std::endl;
 
-  datacard << "JEC            lnN    -     -    1.0226" << std::endl;
-  datacard << "JER            lnN    -     -    1.0027" << std::endl;
-  datacard << "Btag           lnN    -     -    1.01" << std::endl;
+  datacard << "JEC            lnN    -     -    1.0226 1.0226 1.0226 1.0226" << std::endl;
+  datacard << "JER            lnN    -     -    1.0027 1.0027 1.0027 1.0027" << std::endl;
+  datacard << "Btag           lnN    -     -    1.01  1.01  1.01  1.01  1.01" << std::endl;
   if( channel=="leptonic" )
-    datacard << "leptEff        lnN    -     -    1.025" << std::endl;
+    datacard << "leptEff        lnN    -     -    1.025 1.025 1.025 1.025" << std::endl;
   
 
   datacard.close();
@@ -489,6 +504,7 @@ void drawSignalBGData( const std::string& channel, const std::string& var, const
 
 
   float data_integral = h1_data->Integral();
+  if( data_integral < 2 ) data_integral=3.;
   h1_sig->Scale( data_integral/h1_sig->Integral() );
   h1_bg->Scale( data_integral/h1_bg->Integral() );
   
@@ -531,7 +547,7 @@ void drawSignalBGData( const std::string& channel, const std::string& var, const
   std::string xTitle = varName;
   if( units!="" ) xTitle = xTitle + " [" + units + "]";
   h2_axes->SetXTitle(xTitle.c_str());
-  h2_axes->SetYTitle( "Events" );
+  h2_axes->SetYTitle( "Arbitrary Units" );
 
   TCanvas* c1 = new TCanvas("c1", "", 600, 600);
   c1->cd();
@@ -554,5 +570,14 @@ void drawSignalBGData( const std::string& channel, const std::string& var, const
   canvasName = canvasName + ".eps";
 
   c1->SaveAs(canvasName.c_str());
+
+  delete h1_data;
+  delete h1_sig;
+  delete h1_bg;
+
+  delete h2_axes;
+
+  delete legend;
+  delete c1;
 
 }
