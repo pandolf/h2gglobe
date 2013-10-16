@@ -20,14 +20,17 @@ void createSingleDatacard( const std::string& channel, const std::string& additi
 void createSingleDatacard_twoRegions( const std::string& channel, const std::string& additionalSelection, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_tth);
 void drawMassPlot( const std::string& category, TH1D* h1_data, TH1D* h1_thq, TH1D* h1_ggh, TH1D* h1_vbf, TH1D* h1_wzh, TH1D* h1_tth, const std::string& suffix="" );
 void drawSignalBGData( const std::string& channel, const std::string& var, const std::string& varName, const std::string& units, int nBins, float xMin, float xMax, TTree* tree_sig, TTree* tree_bg, TTree* tree_data, const std::string& fullSelection, const std::string& fullSelection_sidebands, const std::string& suffix="" );
+std::pair<float,float> getJECsyst(const std::string& dataset, char* fullSelection, int binMin, int binMax, TFile* file_jecUp, TFile* file_jecDown, TH1D* h1_mgg_central, int nBins, float xMin, float xMax );
+void compareSystVariable( const std::string& channel, const std::string& dataset, TTree* tree_central, TFile* file_systUp, TFile* file_systDown, const std::string& fullSelection, const std::string& systName, const std::string& varName, const std::string& axisTitle, const std::string& units, int nBins, float xMin, float xMax, const std::string& suffix="");
 
 
 int main() {
 
+  system("mkdir -p plots_dataMC");
 
   //TFile* file_thqLept = TFile::Open("../histograms_CMS-HGG_thqLeptonic.root");
   //TFile* file_thqHadr = TFile::Open("../histograms_CMS-HGG_thqHadronic.root");
-  std::string fileName = "../batchOutput2/histograms_CMS-HGG.root";
+  std::string fileName = "../batchOutput6/histograms_CMS-HGG.root";
   TFile* file = TFile::Open(fileName.c_str());
   std::cout << "-> Opening file: " << fileName << std::endl;
 
@@ -56,6 +59,8 @@ int main() {
 
 void createSingleDatacard( const std::string& channel, const std::string& additionalSelection, TTree* tree_data, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_ggh, TTree* tree_vbf, TTree* tree_wzh, TTree* tree_tth, const std::string& suffix ) {
 
+  std::string mkdir_command = "mkdir -p plots_dataMC/" + channel;
+  system(mkdir_command.c_str());
 
   std::cout << "-> Creating datacard for channel: " << channel;
   if( suffix!="" ) std::cout << " (" << suffix << ")";
@@ -137,14 +142,26 @@ void createSingleDatacard( const std::string& channel, const std::string& additi
   if( isLeptonic ) {
     drawSignalBGData( channel, "lept_charge", "Lepton Charge", "", 3, -1.5, 1.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
     drawSignalBGData( channel, "isLep_mu", "is Muon Event", "", 2, -0.5, 1.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
-    drawSignalBGData( channel, "thqLD_lept_njets", "Jet Multiplicity", "", 8, 1.5, 9.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
-    drawSignalBGData( channel, "thqLD_lept_topMt", "Lepton Charge", "", 3, -1.5, 1.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
-    drawSignalBGData( channel, "thqLD_lept_qJetEta", "qJet Pseudorapidity", "", 25, -5., 5., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
-    drawSignalBGData( channel, "thqLD_lept_deltaEta_lept_qJet", "#Delta#eta (Lepton-qJet)", "", 25, 0.5, 5.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "njets", "Jet Multiplicity", "", 8, 1.5, 9.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "njets_OutsideEtaCut", "Central Jet Multiplicity", "", 8, -0.5, 7.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "njets_InsideEtaCut", "Forward Jet Multiplicity", "", 8, -0.5, 7.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "topMt", "Top Transverse Mass", "", 25, 0., 500., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "qJetEta", "qJet Pseudorapidity", "", 25, -5., 5., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "qJetPt", "qJet p_{T}", "GeV", 25, 0., 250., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "bJetPt", "bJet p_{T}", "GeV", 25, 0., 250., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "deltaEta_lept_qJet", "#Delta#eta (Lepton-qJet)", "", 25, 0.5, 5.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
     drawSignalBGData( channel, "thqLD_lept", "tHq Leptonic LD", "", 20, 0., 1.00001, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
-    drawSignalBGData( channel, "met_pfmet", "Particle Flow Missing E_{T}", "", 20, 0., 200., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "met_pfmet", "Particle Flow Missing E_{T}", "GeV", 20, 0., 200., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
   } else {
-    drawSignalBGData( channel, "met_pfmet", "Particle Flow Missing E_{T}", "", 20, 0., 200., tree_thqHadronic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "met_pfmet", "Particle Flow Missing E_{T}", "GeV", 20, 0., 200., tree_thqHadronic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "njets", "Jet Multiplicity", "", 8, 1.5, 9.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "njets_OutsideEtaCut", "Central Jet Multiplicity", "", 8, -0.5, 7.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "njets_InsideEtaCut", "Forward Jet Multiplicity", "", 8, -0.5, 7.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "topM", "Top Mass", "", 25, 0., 500., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "qJetEta", "qJet Pseudorapidity", "", 25, -5., 5., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "qJetPt", "qJet p_{T}", "GeV", 25, 0., 250., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "bJetPt", "bJet p_{T}", "GeV", 25, 0., 250., tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
+    drawSignalBGData( channel, "deltaEta_bJet_qJet", "#Delta#eta (bJet-qJet)", "", 25, 0.5, 5.5, tree_thqLeptonic, tree_tth, tree_data, fullSelection, fullSelection_sidebands, suffix );
   }
   
 
@@ -154,6 +171,8 @@ void createSingleDatacard( const std::string& channel, const std::string& additi
   int binMax = h1_mgg_thqLeptonic->FindBin( 125.+massWindow );
 
   float yield_thq = h1_mgg_thq->Integral(binMin, binMax-1);
+  float yield_thqLept = h1_mgg_thqLeptonic->Integral(binMin, binMax-1);
+  float yield_thqHadr = h1_mgg_thqHadronic->Integral(binMin, binMax-1);
   float yield_ggh = h1_mgg_ggh->Integral(binMin, binMax-1);
   float yield_vbf = h1_mgg_vbf->Integral(binMin, binMax-1);
   float yield_wzh = h1_mgg_wzh->Integral(binMin, binMax-1);
@@ -174,33 +193,130 @@ void createSingleDatacard( const std::string& channel, const std::string& additi
 
  
   datacard << "imax 1" << std::endl;
-  datacard << "jmax 5 " << std::endl;
+  datacard << "jmax ";
+  if( isLeptonic ) datacard << "3 " << std::endl; // of SMH, only tth and wzh (ignore ggh and vbf)
+  else             datacard << "4 " << std::endl; // of SMH, only tth, ggh, and vbf (ignore wzh)
   datacard << "kmax *" << std::endl;
   datacard << "    " << std::endl;
   datacard << "    " << std::endl;
   datacard << "bin  1" << std::endl;
   datacard << "observation 0" << std::endl;
-  datacard << "" << std::endl;
+  datacard << std::endl;
   datacard << "    " << std::endl;
-  datacard << "bin            1        1       1     1     1     1"       << std::endl;
-  datacard << "process        s        b       tth   ggh   vbf   wzh"    << std::endl;
-  datacard << "process        0        1       2     3     4     5"       << std::endl;
-  datacard << "rate   " << yield_thq <<  "  " << sidebands_yield*k_BG << "  " << yield_tth << " " << yield_ggh << " " << yield_vbf << " " << yield_wzh   << std::endl;
+  datacard << "bin            1        1       1     1"; 
+  if( !isLeptonic ) datacard <<  "    1 ";
+  datacard << std::endl;
+  datacard << "process        s        b       tth  "; 
+  if( isLeptonic ) datacard << " wzh"     << std::endl;
+  else             datacard << " ggh   vbf  "     << std::endl;
+  datacard << "process        0        1       2     3"; 
+  if( !isLeptonic )  datacard << " 4";
+  datacard << std::endl;
+
+
+  datacard << "rate   " << yield_thq <<  "  " << sidebands_yield*k_BG << "  " << yield_tth;
+  if( isLeptonic )
+    datacard << " " << yield_wzh   << std::endl;
+  else
+    datacard << " " << yield_ggh << " " << yield_vbf << std::endl;
   datacard << "      " << std::endl;
   datacard << "      " << std::endl;
   datacard << "#syst " << std::endl;
-  datacard << "lumi       lnN    1.044 - 1.044 1.044 1.044 1.044" << std::endl;
+  datacard << "lumi       lnN    1.044 - 1.044 1.044";
+  if( !isLeptonic ) datacard <<  " 1.044";
+  datacard << std::endl;
 
   datacard << "bg         gmN " << (int)sidebands_yield << "    - " << k_BG << "   - - - -" << std::endl;
 
-  datacard << "PDF_ttH   lnN    -     -         0.922/1.078 - - - " << std::endl;
-  datacard << "QCDscale_ttH   lnN    -     -    0.86/1.11 - - - " << std::endl;
+  datacard << "PDF_ttH   lnN    -     -         0.922/1.078 - -";
+  if( !isLeptonic ) datacard <<  " - ";
+  datacard << std::endl;
+  datacard << "QCDscale_ttH   lnN    -     -    0.86/1.11 - - " << std::endl;
+  if( !isLeptonic ) datacard <<  " - ";
+  datacard << std::endl;
 
-  datacard << "JEC            lnN    -     -    1.0226 1.0226 1.0226 1.0226" << std::endl;
-  datacard << "JER            lnN    -     -    1.0027 1.0027 1.0027 1.0027" << std::endl;
-  datacard << "Btag           lnN    -     -    1.01  1.01  1.01  1.01  1.01" << std::endl;
-  if( channel=="leptonic" )
-    datacard << "leptEff        lnN    -     -    1.025 1.025 1.025 1.025" << std::endl;
+
+  TFile* file_jecUp   = TFile::Open("../thq_jetsyst_v5/jecUp/histograms_CMS-HGG.root");
+  TFile* file_jecDown = TFile::Open("../thq_jetsyst_v5/jecDown/histograms_CMS-HGG.root");
+  TFile* file_jerUp   = TFile::Open("../thq_jetsyst_v7/jerUp/histograms_CMS-HGG.root");
+
+  std::pair<float,float> thqLept_jecsyst = getJECsyst("thqLeptonic_m125_8TeV", fullSelection, binMin, binMax, file_jecUp, file_jecDown, h1_mgg_thqLeptonic, nBins, xMin, xMax);
+  std::pair<float,float> thqHadr_jecsyst = getJECsyst("thqHadronic_m125_8TeV", fullSelection, binMin, binMax, file_jecUp, file_jecDown, h1_mgg_thqHadronic, nBins, xMin, xMax);
+  std::pair<float,float> tth_jecsyst     = getJECsyst("tth_m125_8TeV",         fullSelection, binMin, binMax, file_jecUp, file_jecDown, h1_mgg_tth,         nBins, xMin, xMax);
+  std::pair<float,float> ggh_jecsyst     = getJECsyst("ggh_m125_8TeV",         fullSelection, binMin, binMax, file_jecUp, file_jecDown, h1_mgg_ggh,         nBins, xMin, xMax);
+  std::pair<float,float> vbf_jecsyst     = getJECsyst("vbf_m125_8TeV",         fullSelection, binMin, binMax, file_jecUp, file_jecDown, h1_mgg_vbf,         nBins, xMin, xMax);
+  std::pair<float,float> wzh_jecsyst     = getJECsyst("wzh_m125_8TeV",         fullSelection, binMin, binMax, file_jecUp, file_jecDown, h1_mgg_wzh,         nBins, xMin, xMax);
+
+  std::pair<float,float> thq_jecsyst;
+  thq_jecsyst.first = (yield_thqLept*thqLept_jecsyst.first + yield_thqHadr*thqHadr_jecsyst.first)/(yield_thqLept+yield_thqHadr); 
+  thq_jecsyst.second = (yield_thqLept*thqLept_jecsyst.second + yield_thqHadr*thqHadr_jecsyst.second)/(yield_thqLept+yield_thqHadr); 
+
+  datacard << "JEC            lnN   " << thq_jecsyst.first << "/" << thq_jecsyst.second;
+  datacard << " - "; //BG from sidebands
+  datacard << tth_jecsyst.first << "/" << tth_jecsyst.second << " "; 
+  if( isLeptonic ) {
+    datacard << wzh_jecsyst.first << "/" << wzh_jecsyst.second << " "; 
+  } else {
+    datacard << ggh_jecsyst.first << "/" << ggh_jecsyst.second << " "; 
+    datacard << vbf_jecsyst.first << "/" << vbf_jecsyst.second << " "; 
+  }
+  datacard << std::endl;
+
+
+  std::pair<float,float> thqLept_jersyst = getJECsyst("thqLeptonic_m125_8TeV", fullSelection, binMin, binMax, file_jerUp, 0, h1_mgg_thqLeptonic, nBins, xMin, xMax);
+  std::pair<float,float> thqHadr_jersyst = getJECsyst("thqHadronic_m125_8TeV", fullSelection, binMin, binMax, file_jerUp, 0, h1_mgg_thqHadronic, nBins, xMin, xMax);
+  std::pair<float,float> tth_jersyst     = getJECsyst("tth_m125_8TeV",         fullSelection, binMin, binMax, file_jerUp, 0, h1_mgg_tth,         nBins, xMin, xMax);
+  std::pair<float,float> ggh_jersyst     = getJECsyst("ggh_m125_8TeV",         fullSelection, binMin, binMax, file_jerUp, 0, h1_mgg_ggh,         nBins, xMin, xMax);
+  std::pair<float,float> vbf_jersyst     = getJECsyst("vbf_m125_8TeV",         fullSelection, binMin, binMax, file_jerUp, 0, h1_mgg_vbf,         nBins, xMin, xMax);
+  std::pair<float,float> wzh_jersyst     = getJECsyst("wzh_m125_8TeV",         fullSelection, binMin, binMax, file_jerUp, 0, h1_mgg_wzh,         nBins, xMin, xMax);
+
+  std::pair<float,float> thq_jersyst;
+  thq_jersyst.first  = (yield_thqLept*thqLept_jersyst.first  + yield_thqHadr*thqHadr_jersyst.first) /(yield_thqLept+yield_thqHadr); 
+  thq_jersyst.second = (yield_thqLept*thqLept_jersyst.second + yield_thqHadr*thqHadr_jersyst.second)/(yield_thqLept+yield_thqHadr); 
+
+  datacard << "JER            lnN   " << thq_jersyst.second;
+  datacard << " - "; //BG from sidebands
+  datacard << tth_jersyst.second << " "; 
+  if( isLeptonic ) {
+    datacard << wzh_jersyst.second << " "; 
+  } else {
+    datacard << ggh_jersyst.second << " "; 
+    datacard << vbf_jersyst.second << " "; 
+  }
+  datacard << std::endl;
+
+
+  compareSystVariable( channel, "tth_m125_8TeV", tree_tth, file_jecUp, file_jecDown, fullSelection, "JEC", "bJetPt", "bJet Transverse Momentum", "GeV", 25, 0., 250., suffix);
+  compareSystVariable( channel, "tth_m125_8TeV", tree_tth, file_jecUp, file_jecDown, fullSelection, "JEC", "qJetPt", "qJet Transverse Momentum", "GeV", 25, 0., 250., suffix);
+  compareSystVariable( channel, "tth_m125_8TeV", tree_tth, file_jecUp, file_jecDown, fullSelection, "JEC", "qJetEta", "qJet Pseudorapidity", "", 25, -5., 5., suffix);
+
+  //if( isLeptonic ) {
+  //  compareSystVariable( channel, "thq_m125_8TeV", tree_thqLeptonic, file_jerUp, 0, fullSelection, "JER", "bJetPt", "bJet Transverse Momentum", "GeV", 25, 0., 250., suffix);
+  //  compareSystVariable( channel, "thq_m125_8TeV", tree_thqLeptonic, file_jerUp, 0, fullSelection, "JER", "qJetPt", "qJet Transverse Momentum", "GeV", 25, 0., 250., suffix);
+  //  compareSystVariable( channel, "thq_m125_8TeV", tree_thqLeptonic, file_jerUp, 0, fullSelection, "JER", "qJetEta", "qJet Pseudorapidity", "", 25, -5., 5., suffix);
+  //} else {
+  //  compareSystVariable( channel, "thq_m125_8TeV", tree_thqHadronic, file_jerUp, 0, fullSelection, "JER", "bJetPt", "bJet Transverse Momentum", "GeV", 25, 0., 250., suffix);
+  //  compareSystVariable( channel, "thq_m125_8TeV", tree_thqHadronic, file_jerUp, 0, fullSelection, "JER", "qJetPt", "qJet Transverse Momentum", "GeV", 25, 0., 250., suffix);
+  //  compareSystVariable( channel, "thq_m125_8TeV", tree_thqHadronic, file_jerUp, 0, fullSelection, "JER", "qJetEta", "qJet Pseudorapidity", "", 25, -5., 5., suffix);
+  //}
+
+  compareSystVariable( channel, "tth_m125_8TeV", tree_tth, file_jerUp, 0, fullSelection, "JER", "bJetPt", "bJet Transverse Momentum", "GeV", 25, 0., 250., suffix);
+  compareSystVariable( channel, "tth_m125_8TeV", tree_tth, file_jerUp, 0, fullSelection, "JER", "qJetPt", "qJet Transverse Momentum", "GeV", 25, 0., 250., suffix);
+  compareSystVariable( channel, "tth_m125_8TeV", tree_tth, file_jerUp, 0, fullSelection, "JER", "qJetEta", "qJet Pseudorapidity", "", 25, -5., 5., suffix);
+
+  if( isLeptonic ) {
+    compareSystVariable( channel, "wzh_m125_8TeV", tree_wzh, file_jerUp, 0, fullSelection, "JER", "bJetPt", "bJet Transverse Momentum", "GeV", 25, 0., 250., suffix);
+    compareSystVariable( channel, "wzh_m125_8TeV", tree_wzh, file_jerUp, 0, fullSelection, "JER", "qJetPt", "qJet Transverse Momentum", "GeV", 25, 0., 250., suffix);
+    compareSystVariable( channel, "wzh_m125_8TeV", tree_wzh, file_jerUp, 0, fullSelection, "JER", "qJetEta", "qJet Pseudorapidity", "", 25, -5., 5., suffix);
+  }
+
+  datacard << "Btag           lnN    -     -    1.01  1.01  1.01  1.01 ";
+  if(!isLeptonic ) datacard <<  " 1.01";
+  datacard << std::endl;
+  if(isLeptonic) {
+    datacard << "leptEff        lnN    -     -    1.025 1.025 1.025" << std::endl;
+    datacard << "BG_shape       lnN    -     1.25  - - -" << std::endl;
+  }
   
 
   datacard.close();
@@ -462,11 +578,13 @@ void drawMassPlot( const std::string& category, TH1D* h1_data, TH1D* h1_thq, TH1
   gPad->RedrawAxis();
 
 
-  std::string canvasName = "mggPlot_" + category;
+  std::string canvasName = "plots_dataMC/" + category + "/mggPlot_" + category;
   if( suffix!="" ) canvasName = canvasName + "_" + suffix;
-  canvasName = canvasName + ".eps";
+  std::string canvasName_eps = canvasName + ".eps";
+  std::string canvasName_png = canvasName + ".png";
 
-  c1->SaveAs(canvasName.c_str());
+  c1->SaveAs(canvasName_eps.c_str());
+  c1->SaveAs(canvasName_png.c_str());
 
   delete c1;
   delete h2_axes;
@@ -565,11 +683,13 @@ void drawSignalBGData( const std::string& channel, const std::string& var, const
 
   gPad->RedrawAxis();
 
-  std::string canvasName = var + "_SignalBGData_" + channel;
+  std::string canvasName = "plots_dataMC/" + channel + "/" + var + "_SignalBGData_" + channel;
   if( suffix!="" ) canvasName = canvasName + "_" + suffix;
-  canvasName = canvasName + ".eps";
+  std::string canvasName_eps = canvasName + ".eps";
+  std::string canvasName_png = canvasName + ".png";
 
-  c1->SaveAs(canvasName.c_str());
+  c1->SaveAs(canvasName_eps.c_str());
+  c1->SaveAs(canvasName_png.c_str());
 
   delete h1_data;
   delete h1_sig;
@@ -579,5 +699,138 @@ void drawSignalBGData( const std::string& channel, const std::string& var, const
 
   delete legend;
   delete c1;
+
+}
+
+
+
+std::pair<float,float> getJECsyst(const std::string& dataset, char* fullSelection, int binMin, int binMax, TFile* file_jecUp, TFile* file_jecDown, TH1D* h1_mgg_central, int nBins, float xMin, float xMax ) {
+//std::pair<float,float> getJECsyst(const std::string& dataset, char* fullSelection, int binMin, int binMax, TFile* file_jecUp, TFile* file_jecDown, float yield_central, int nBins, float xMin, float xMax ) {
+
+  TTree* tree_jecUp = (TTree*)file_jecUp->Get(dataset.c_str());
+  TTree* tree_jecDown = (file_jecDown!=0) ? (TTree*)file_jecDown->Get(dataset.c_str()) : 0;
+
+  TH1D* h1_mgg_jecUp = new TH1D("mgg_jecUp", "", nBins, xMin, xMax);
+  TH1D* h1_mgg_jecDown = new TH1D("mgg_jecDown", "", nBins, xMin, xMax);
+  h1_mgg_jecUp->Sumw2();
+  h1_mgg_jecDown->Sumw2();
+
+  tree_jecUp->Project( "mgg_jecUp", "PhotonsMass", fullSelection );
+  if( tree_jecDown!=0 )
+    tree_jecDown->Project( "mgg_jecDown", "PhotonsMass", fullSelection );
+
+  float yield_central = h1_mgg_central->Integral(binMin, binMax-1);
+  float yield_jecUp   = h1_mgg_jecUp->Integral(binMin, binMax-1);
+  float yield_jecDown = (tree_jecDown!=0) ? h1_mgg_jecDown->Integral(binMin, binMax-1) : 0.;
+
+  float systUp = 1.+((yield_jecUp-yield_central)/yield_central);
+  float systDown = (tree_jecDown!=0) ? 1.+((yield_jecDown-yield_central)/yield_central) : 0.;
+
+
+  std::pair<float,float> systPair;
+  systPair.first = systDown;
+  systPair.second = systUp;
+
+  delete h1_mgg_jecUp;
+  delete h1_mgg_jecDown;
+
+  return systPair;
+
+}
+
+
+void compareSystVariable( const std::string& channel, const std::string& dataset, TTree* tree_central, TFile* file_systUp, TFile* file_systDown, const std::string& fullSelection, const std::string& systName, const std::string& varName, const std::string& axisTitle, const std::string& units, int nBins, float xMin, float xMax, const std::string& suffix) {
+
+
+  DrawBase* db = new DrawBase("syst" );
+
+  TTree* tree_systUp = (TTree*)file_systUp->Get(dataset.c_str());
+  TTree* tree_systDown = (file_systDown!=0) ? (TTree*)file_systDown->Get(dataset.c_str()) : 0;
+
+  TH1D* h1_central = new TH1D("central", "", nBins, xMin, xMax);
+  TH1D* h1_systUp = new TH1D("systUp", "", nBins, xMin, xMax);
+  TH1D* h1_systDown = new TH1D("systDown", "", nBins, xMin, xMax);
+
+  h1_central->Sumw2();
+  h1_systUp->Sumw2();
+  h1_systDown->Sumw2();
+
+  tree_central->Project( "central", varName.c_str(), fullSelection.c_str() );
+  tree_systUp->Project( "systUp", varName.c_str(), fullSelection.c_str() );
+  if( tree_systDown!=0 )
+    tree_systDown->Project( "systDown", varName.c_str(), fullSelection.c_str() );
+
+  h1_central ->SetLineColor(kBlack);
+  h1_systUp  ->SetLineColor(kGreen);
+  h1_systDown->SetLineColor(kRed);
+
+  h1_central ->SetLineWidth(2);
+  h1_systUp  ->SetLineWidth(2);
+  h1_systDown->SetLineWidth(2);
+
+  //h1_systUp  ->SetLineStyle(2);
+  //h1_systDown->SetLineStyle(2);
+
+
+  TLegend* legend = new TLegend( 0.6, 0.66, 0.9, 0.92, dataset.c_str() );
+  legend->SetTextFont(42);
+  legend->SetFillColor(kWhite);
+  legend->SetTextSize(0.038);
+  legend->SetTextColor(kBlack);
+  legend->AddEntry( h1_central, "Central", "L" );
+  std::string systUp_text = systName + " +1#sigma";
+  std::string systDown_text = systName + " -1#sigma";
+  legend->AddEntry( h1_systUp, systUp_text.c_str(), "L" );
+  if( tree_systDown!=0 )
+    legend->AddEntry( h1_systDown, systDown_text.c_str(), "L" );
+
+
+  float yMax = 1.6*h1_central->GetMaximum();
+
+
+  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, 0., yMax);
+  std::string xTitle = axisTitle;
+  if( units!="" ) xTitle = xTitle + " [" + units + "]";
+  h2_axes->SetXTitle(xTitle.c_str());
+  h2_axes->SetYTitle( "Events" );
+
+  TCanvas* c1 = new TCanvas("c1", "", 600, 600);
+  c1->cd();
+
+
+  TPaveText* labelTop = db->get_labelTop();
+
+  h2_axes->Draw();
+  legend->Draw("same");   
+  labelTop->Draw("same");
+  h1_central->Draw("h same");
+  h1_systUp->Draw("h same");
+  if( tree_systDown!=0 )
+    h1_systDown->Draw("h same");
+
+
+  gPad->RedrawAxis();
+
+  std::string canvasName = "plots_dataMC/" + channel + "/syst" + systName + "_" + varName + "_" + dataset + "_" + channel;
+  if( suffix!="" ) canvasName = canvasName + "_" + suffix;
+  std::string canvasName_eps = canvasName + ".eps";
+  std::string canvasName_png = canvasName + ".png";
+
+  c1->SaveAs(canvasName_eps.c_str());
+  c1->SaveAs(canvasName_png.c_str());
+
+
+  delete db;
+
+  delete h1_central;
+  delete h1_systUp;
+  delete h1_systDown;
+
+  delete h2_axes;
+
+  delete legend;
+  delete c1;
+
+
 
 }
