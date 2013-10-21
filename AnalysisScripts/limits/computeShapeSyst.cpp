@@ -17,7 +17,7 @@ int main() {
   TF1* flat = new TF1("uniform", "[0]", 10.0, 180.);
   flat->SetParameter(0, 1./80.);
 
-  TF1* expo = getExpoFromFit("../batchOutput4/histograms_CMS-HGG.root");
+  TF1* expo = getExpoFromFit("../batchOutput8/histograms_CMS-HGG.root");
   //TF1* expo = new TF1("expo", "exp([0]+[1]*x)", 100., 180.);
   //expo->SetParameter(0, 8. );
   //expo->SetParameter(1, -0.1 );
@@ -28,6 +28,7 @@ int main() {
   std::cout << "SF: " << std::endl;
   std::cout << "flat: " << sf_flat << std::endl;
   std::cout << "expo: " << sf_expo << std::endl;
+
 
   return 0;
 
@@ -62,7 +63,7 @@ TF1* getExpoFromFit( const std::string& fileName ) {
   tree->SetBranchAddress( "thqLD_lept", &thqLD_lept );
 
   int nentries=tree->GetEntries();
-  TH1D* h1_data = new TH1D( "data", "", 80., 100., 180.);
+  TH1D* h1_data = new TH1D( "data", "", 40, 100., 180.);
 
   for( unsigned ientry=0; ientry<nentries; ++ientry ) {
 
@@ -82,6 +83,14 @@ TF1* getExpoFromFit( const std::string& fileName ) {
   h1_data->SetMarkerStyle(20);
   h1_data->SetMarkerSize(2.);
 
+  float integral = expo->Integral(100., 180.);
+  float c_value = integral/80.;
+
+  TF1* unif = new TF1("unif", "[0]", 100., 180.);
+  unif->SetParameter( 0, c_value );
+  unif->SetLineColor( kMagenta );
+  unif->SetLineStyle( 2 );
+
   TCanvas* c1 = new TCanvas("c1", "", 600, 600);
   c1->cd();
 
@@ -89,8 +98,9 @@ TF1* getExpoFromFit( const std::string& fileName ) {
   
   h2_axes->Draw();
   h1_data->Draw("P same");
+  unif->Draw("same");
 
-  c1->SaveAs("prova.eps");
+  c1->SaveAs("fitData.eps");
 
   return expo;
 
