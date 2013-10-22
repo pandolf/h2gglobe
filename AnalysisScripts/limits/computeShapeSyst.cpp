@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 #include "TCanvas.h"
 #include "TH2D.h"
@@ -6,6 +7,9 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TGraph.h"
+
+
+bool useCS = true;
 
 
 float getScalingFactor(TF1* f1, float deltaM);
@@ -17,10 +21,9 @@ int main() {
   TF1* flat = new TF1("uniform", "[0]", 10.0, 180.);
   flat->SetParameter(0, 1./80.);
 
-  TF1* expo = getExpoFromFit("../batchOutput8/histograms_CMS-HGG.root");
-  //TF1* expo = new TF1("expo", "exp([0]+[1]*x)", 100., 180.);
-  //expo->SetParameter(0, 8. );
-  //expo->SetParameter(1, -0.1 );
+  std::string fileName = (useCS) ? "../batchOutputCS1/histograms_CMS-HGG.root" : "../batchOutput8/histograms_CMS-HGG.root";
+  TF1* expo = getExpoFromFit(fileName.c_str());
+  //TF1* expo = getExpoFromFit("../batchOutput8/histograms_CMS-HGG.root");
 
   float sf_flat = getScalingFactor(flat, 3.);
   float sf_expo = getScalingFactor(expo, 3.);
@@ -28,6 +31,7 @@ int main() {
   std::cout << "SF: " << std::endl;
   std::cout << "flat: " << sf_flat << std::endl;
   std::cout << "expo: " << sf_expo << std::endl;
+  std::cout << "syst: " << fabs((sf_flat-sf_expo)/sf_flat) << std::endl;
 
 
   return 0;
@@ -71,7 +75,8 @@ TF1* getExpoFromFit( const std::string& fileName ) {
 
     if( category!=11 ) continue;
     if( PhotonsMass>115. && PhotonsMass<135. ) continue;
-    if( thqLD_lept>0.25 ) continue; //inverted LD cut
+    if( !useCS )
+      if( thqLD_lept>0.25 ) continue; //inverted LD cut
 
     h1_data->Fill(PhotonsMass);
 
@@ -100,7 +105,8 @@ TF1* getExpoFromFit( const std::string& fileName ) {
   h1_data->Draw("P same");
   unif->Draw("same");
 
-  c1->SaveAs("fitData.eps");
+  std::string plotName = (useCS) ? "fitDataCS.eps" : "fitData.eps";
+  c1->SaveAs(plotName.c_str());
 
   return expo;
 
