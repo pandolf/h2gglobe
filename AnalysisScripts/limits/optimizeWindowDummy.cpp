@@ -71,10 +71,10 @@ int main() {
   }
 
 
-  gr_signif->SetMarkerStyle( 20 );
+  gr_signif->SetMarkerStyle( 24 );
   gr_signif2->SetMarkerStyle( 24 );
   gr_signifexp->SetMarkerStyle( 20 );
-  gr_signifexp2->SetMarkerStyle( 24 );
+  gr_signifexp2->SetMarkerStyle( 20 );
 
   gr_signif->SetMarkerSize( 2. );
   gr_signif2->SetMarkerSize( 2. );
@@ -82,15 +82,17 @@ int main() {
   gr_signifexp2->SetMarkerSize( 2. );
 
   gr_signif->SetMarkerColor( kGray+1 );
-  gr_signif2->SetMarkerColor( kGray+1 );
-  gr_signifexp->SetMarkerColor( 46 );
+  gr_signif2->SetMarkerColor( 46 );
+  gr_signifexp->SetMarkerColor( kGray+1 );
   gr_signifexp2->SetMarkerColor( 46 );
 
 
   TCanvas* c1 = new TCanvas("c1", "", 600, 600);
   c1->cd();
 
-  TH2D* h2_axes = new TH2D("axes", "", 10, 0., 8., 10, 0., 1.3*maxSignif );
+  float yMax = 1.3*maxSignif;
+
+  TH2D* h2_axes = new TH2D("axes", "", 10, 0., 8., 10, 0., yMax );
   h2_axes->SetXTitle( "Signal Counting Window (125#pm#DeltaM) [GeV]");
   h2_axes->SetYTitle( "Significance" );
   h2_axes->Draw();
@@ -98,23 +100,18 @@ int main() {
   TLegend* legend = new TLegend( 0.65, 0.69, 0.92, 0.92 );
   legend->SetTextSize(0.035);
   legend->SetFillColor(0);
-  legend->AddEntry( gr_signif, "s/#sqrt{b} (flat)", "P");
-  legend->AddEntry( gr_signif2, "s/#sqrt{s+b} (flat)", "P");
   legend->AddEntry( gr_signifexp, "s/#sqrt{b} (exp)", "P");
+  legend->AddEntry( gr_signif, "s/#sqrt{b} (flat)", "P");
   legend->AddEntry( gr_signifexp2, "s/#sqrt{s+b} (exp)", "P");
+  legend->AddEntry( gr_signif2, "s/#sqrt{s+b} (flat)", "P");
   legend->Draw("same");
 
   TPaveText* labelTop = db->get_labelTop();
   labelTop->Draw("same");
 
-  gr_signif->Draw("P same");
-  gr_signif2->Draw("P same");
-  gr_signifexp->Draw("P same");
-  gr_signifexp2->Draw("P same");
-
   TPaveText* sig_text    = new TPaveText( 0.16, 0.87, 0.6, 0.92, "brNDC" );
-  TPaveText*  bg_text    = new TPaveText( 0.45, 0.23, 0.9, 0.29, "brNDC" );
-  TPaveText*  bgexp_text = new TPaveText( 0.45, 0.19, 0.9, 0.23, "brNDC" );
+  TPaveText*  bgexp_text = new TPaveText( 0.45, 0.23, 0.9, 0.29, "brNDC" );
+  TPaveText*  bg_text    = new TPaveText( 0.45, 0.19, 0.9, 0.23, "brNDC" );
 
     sig_text->SetTextAlign(12);
      bg_text->SetTextAlign(12);
@@ -128,7 +125,7 @@ int main() {
      bg_text->SetFillColor(0);
   bgexp_text->SetFillColor(0);
   
-  bgexp_text->SetTextColor(46);
+  bg_text->SetTextColor(kGray+1);
 
   char sig_text_char[200];
   sprintf(sig_text_char, "Gaussian signal (#sigma=%.1f GeV)", sigma);
@@ -144,6 +141,18 @@ bgexp_text->AddText( bgexp_text_char);
   sig_text->Draw("same");
    bg_text->Draw("same");
 bgexp_text->Draw("same");
+
+  TLine* choiceLine = new TLine( 3., 0., 3., yMax );
+  choiceLine->SetLineStyle(2);
+  choiceLine->SetLineWidth(2);
+  choiceLine->Draw("same");
+
+
+  gr_signif->Draw("P same");
+  gr_signif2->Draw("P same");
+  gr_signifexp->Draw("P same");
+  gr_signifexp2->Draw("P same");
+
 
   gPad->RedrawAxis();
 
