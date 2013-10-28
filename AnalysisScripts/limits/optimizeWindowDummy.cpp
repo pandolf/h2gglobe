@@ -47,7 +47,7 @@ int main() {
   for( float iGev = 0.5; iGev<8.; iGev+=0.25 ) {
   
     float s = sig->Integral( m-iGev, m+iGev );
-    float b = bg_integral*2.*iGev/60.;
+    float b = bg_integral*2.*iGev/(80.-2.*iGev);
     float bexp = bg_exp->Integral( m-iGev, m+iGev );
   
     float signif = s/sqrt(b);
