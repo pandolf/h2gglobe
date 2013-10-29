@@ -14,7 +14,7 @@
 
 
 bool BLINDED=true;
-bool useCS = true;
+bool useCS = false;
 
 
 void createSingleDatacard( const std::string& dirName, const std::string& channel, const std::string& additionalSelection, TTree* tree_data, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_ggh, TTree* tree_vbf, TTree* tree_wzh, TTree* tree_tth, const std::string& suffix="" );
@@ -37,14 +37,20 @@ int main() {
   if( useCS ) 
     std::cout << "-> Using Control Sample" << std::endl;
 
-  std::string fileName = "../batchOutput8/histograms_CMS-HGG.root";
+  //std::string fileName = "../batchOutput8/histograms_CMS-HGG.root";
+  //std::string fileName = "../thq_jetsyst_v11/jerCentral/histograms_CMS-HGG.root";
+  std::string fileName = "../thq_btagsyst_v9/nominal/histograms_CMS-HGG.root";
   TFile* file   = TFile::Open(fileName.c_str());
   std::cout << "-> Opening file: " << fileName << std::endl;
-  TFile* fileCS;
+  TFile* file_data;
   if( useCS ) {
     std::string fileNameCS = "../batchOutputCS1/histograms_CMS-HGG.root";
-    fileCS = TFile::Open(fileNameCS.c_str());
+    file_data = TFile::Open(fileNameCS.c_str());
     std::cout << "-> Opening CS file: " << fileNameCS << std::endl;
+  } else {
+    std::string fileName_data = "../batchOutput8/histograms_CMS-HGG.root";
+    file_data = TFile::Open(fileName_data.c_str());
+    std::cout << "-> Opening data file: " << fileName_data << std::endl;
   }
 
   TTree* tree_thqLept = (TTree*)file->Get("thqLeptonic_m125_8TeV");
@@ -54,7 +60,7 @@ int main() {
   TTree* tree_ggh     = (TTree*)file->Get("ggh_m125_8TeV");
   TTree* tree_vbf     = (TTree*)file->Get("vbf_m125_8TeV");
 
-  TTree* tree_data    = (useCS) ? (TTree*)fileCS->Get("Data") : (TTree*)file->Get("Data");
+  TTree* tree_data    = (TTree*)file_data->Get("Data");
 
 
   createSingleDatacard( dirName, "leptonic", "", tree_data, tree_thqLept, tree_thqHadr, tree_ggh, tree_vbf, tree_wzh, tree_tth, "noLDcut" );
@@ -129,6 +135,7 @@ void createSingleDatacard( const std::string& dirName, const std::string& channe
   h1_mgg_wzh->Sumw2();
   h1_mgg_tth->Sumw2();
 
+
   tree_thqLeptonic->Project( "mgg_thqLeptonic", "PhotonsMass", fullSelection );
   tree_thqHadronic->Project( "mgg_thqHadronic", "PhotonsMass", fullSelection );
   tree_ggh->Project( "mgg_ggh", "PhotonsMass", fullSelection );
@@ -150,6 +157,7 @@ void createSingleDatacard( const std::string& dirName, const std::string& channe
   TH1D* h1_mgg_thq = new TH1D(*h1_mgg_thqLeptonic);
   h1_mgg_thq->Add(h1_mgg_thqHadronic);
   h1_mgg_thq->SetName("mgg_thq");
+
 
   drawMassPlot( dirName, channel, h1_mgg_data, h1_mgg_thq, h1_mgg_ggh, h1_mgg_vbf, h1_mgg_wzh, h1_mgg_tth, suffix );
   if( isLeptonic ) {
@@ -178,7 +186,7 @@ void createSingleDatacard( const std::string& dirName, const std::string& channe
   }
   
 
-  float massWindow = 3.;
+  float massWindow = 2.5;
 
   int binMin = h1_mgg_thqLeptonic->FindBin( 125.-massWindow );
   int binMax = h1_mgg_thqLeptonic->FindBin( 125.+massWindow );
@@ -195,6 +203,7 @@ void createSingleDatacard( const std::string& dirName, const std::string& channe
 
   //float k_BG = massWindow*2./70.;
   float k_BG = massWindow*2./(80.-massWindow*2.);
+  //float k_BG = 0.10; // for expo BG
 
 
   char datacardName[300];
@@ -235,24 +244,26 @@ void createSingleDatacard( const std::string& dirName, const std::string& channe
   datacard << "      " << std::endl;
   datacard << "      " << std::endl;
   datacard << "#syst " << std::endl;
-  datacard << "lumi       lnN    1.044 - 1.044 1.044";
-  if( !isLeptonic ) datacard <<  " 1.044";
+  datacard << "lumi       lnN    1.026 - 1.026 1.026";
+  if( !isLeptonic ) datacard <<  " 1.026";
   datacard << std::endl;
 
   datacard << "bg         gmN " << (int)sidebands_yield << "    - " << k_BG << "   - - - -" << std::endl;
 
-  datacard << "PDF_ttH   lnN    -     -         0.922/1.078 - -";
-  if( !isLeptonic ) datacard <<  " - ";
+  datacard << "PDF   lnN    -     -         0.922/1.078 ";
+  if( !isLeptonic ) datacard <<  " -  - ";
+  else              datacard << " 0.99/1.01";
   datacard << std::endl;
-  datacard << "QCDscale_ttH   lnN    -     -    0.86/1.11 - - " << std::endl;
-  if( !isLeptonic ) datacard <<  " - ";
+  datacard << "QCDscale   lnN    -     -    0.86/1.11 ";
+  if( !isLeptonic ) datacard <<  " - - ";
+  else              datacard << " 0.977/1.023";
   datacard << std::endl;
 
 
   // JEC
 
-  TFile* file_jecUp   = TFile::Open("../thq_jetsyst_v5/jecUp/histograms_CMS-HGG.root");
-  TFile* file_jecDown = TFile::Open("../thq_jetsyst_v5/jecDown/histograms_CMS-HGG.root");
+  TFile* file_jecUp   = TFile::Open("../thq_jetsyst_v11/jecUp/histograms_CMS-HGG.root");
+  TFile* file_jecDown = TFile::Open("../thq_jetsyst_v11/jecDown/histograms_CMS-HGG.root");
 
   std::pair<float,float> thqLept_jecsyst = getSyst("thqLeptonic_m125_8TeV", fullSelection, binMin, binMax, file_jecUp, file_jecDown, h1_mgg_thqLeptonic);
   std::pair<float,float> thqHadr_jecsyst = getSyst("thqHadronic_m125_8TeV", fullSelection, binMin, binMax, file_jecUp, file_jecDown, h1_mgg_thqHadronic);
@@ -279,27 +290,31 @@ void createSingleDatacard( const std::string& dirName, const std::string& channe
 
   // JER
 
-  TFile* file_jerUp   = TFile::Open("../thq_jetsyst_v7/jerUp/histograms_CMS-HGG.root");
+  TFile* file_jerUp       = TFile::Open("../thq_jetsyst_v11/jerUp/histograms_CMS-HGG.root");
+  TFile* file_jerDown     = TFile::Open("../thq_jetsyst_v11/jerDown/histograms_CMS-HGG.root");
+  TFile* file_jerCentral  = TFile::Open("../thq_jetsyst_v11/jerCentral/histograms_CMS-HGG.root");
 
-  std::pair<float,float> thqLept_jersyst = getSyst("thqLeptonic_m125_8TeV", fullSelection, binMin, binMax, file_jerUp, 0, h1_mgg_thqLeptonic);
-  std::pair<float,float> thqHadr_jersyst = getSyst("thqHadronic_m125_8TeV", fullSelection, binMin, binMax, file_jerUp, 0, h1_mgg_thqHadronic);
-  std::pair<float,float> tth_jersyst     = getSyst("tth_m125_8TeV",         fullSelection, binMin, binMax, file_jerUp, 0, h1_mgg_tth        );
-  std::pair<float,float> ggh_jersyst     = getSyst("ggh_m125_8TeV",         fullSelection, binMin, binMax, file_jerUp, 0, h1_mgg_ggh        );
-  std::pair<float,float> vbf_jersyst     = getSyst("vbf_m125_8TeV",         fullSelection, binMin, binMax, file_jerUp, 0, h1_mgg_vbf        );
-  std::pair<float,float> wzh_jersyst     = getSyst("wzh_m125_8TeV",         fullSelection, binMin, binMax, file_jerUp, 0, h1_mgg_wzh        );
+  std::pair<float,float> thqLept_jersyst = getSyst("thqLeptonic_m125_8TeV", fullSelection, binMin, binMax, file_jerUp, file_jerDown, h1_mgg_thqLeptonic);
+  std::pair<float,float> thqHadr_jersyst = getSyst("thqHadronic_m125_8TeV", fullSelection, binMin, binMax, file_jerUp, file_jerDown, h1_mgg_thqHadronic);
+  std::pair<float,float> tth_jersyst     = getSyst("tth_m125_8TeV",         fullSelection, binMin, binMax, file_jerUp, file_jerDown, h1_mgg_tth        );
+  std::pair<float,float> ggh_jersyst     = getSyst("ggh_m125_8TeV",         fullSelection, binMin, binMax, file_jerUp, file_jerDown, h1_mgg_ggh        );
+  std::pair<float,float> vbf_jersyst     = getSyst("vbf_m125_8TeV",         fullSelection, binMin, binMax, file_jerUp, file_jerDown, h1_mgg_vbf        );
+  std::pair<float,float> wzh_jersyst     = getSyst("wzh_m125_8TeV",         fullSelection, binMin, binMax, file_jerUp, file_jerDown, h1_mgg_wzh        );
 
   std::pair<float,float> thq_jersyst = yieldWeightedMean( thqLept_jersyst, thqHadr_jersyst, yield_thqLept, yield_thqHadr );
 
-  datacard << "JER            lnN   " << thq_jersyst.second;
+
+  datacard << "JER            lnN   " << thq_jersyst.first << "/" << thq_jersyst.second;
   datacard << " - "; //BG from sidebands
-  datacard << tth_jersyst.second << " "; 
+  datacard << tth_jersyst.first << "/" << tth_jersyst.second << " "; 
   if( isLeptonic ) {
-    datacard << wzh_jersyst.second << " "; 
+    datacard << wzh_jersyst.first << "/" << wzh_jersyst.second << " "; 
   } else {
-    datacard << ggh_jersyst.second << " "; 
-    datacard << vbf_jersyst.second << " "; 
+    datacard << ggh_jersyst.first << "/" << ggh_jersyst.second << " "; 
+    datacard << vbf_jersyst.first << "/" << vbf_jersyst.second << " "; 
   }
   datacard << std::endl;
+
 
 
   compareSystVariable( dirName, channel, "tth_m125_8TeV", tree_tth, file_jecUp, file_jecDown, fullSelection, "JEC", "bJetPt", "bJet Transverse Momentum", "GeV", 25, 0., 250., suffix);
@@ -330,10 +345,10 @@ void createSingleDatacard( const std::string& dirName, const std::string& channe
 
   // BTAG
 
-  TFile* file_bcUp   = TFile::Open("../thq_btagsyst_v7/bcUp/histograms_CMS-HGG.root");
-  TFile* file_bcDown = TFile::Open("../thq_btagsyst_v7/bcDown/histograms_CMS-HGG.root");
-  TFile* file_lUp    = TFile::Open("../thq_btagsyst_v7/lUp/histograms_CMS-HGG.root");
-  TFile* file_lDown  = TFile::Open("../thq_btagsyst_v7/lDown/histograms_CMS-HGG.root");
+  TFile* file_bcUp   = TFile::Open("../thq_btagsyst_v9/bcUp/histograms_CMS-HGG.root");
+  TFile* file_bcDown = TFile::Open("../thq_btagsyst_v9/bcDown/histograms_CMS-HGG.root");
+  TFile* file_lUp    = TFile::Open("../thq_btagsyst_v9/lUp/histograms_CMS-HGG.root");
+  TFile* file_lDown  = TFile::Open("../thq_btagsyst_v9/lDown/histograms_CMS-HGG.root"); //for now v7 here
 
   std::pair<float,float> thqLept_btagsyst_b = getSyst("thqLeptonic_m125_8TeV", fullSelection, binMin, binMax, file_bcUp, file_bcDown, h1_mgg_thqLeptonic);
   std::pair<float,float> thqHadr_btagsyst_b = getSyst("thqHadronic_m125_8TeV", fullSelection, binMin, binMax, file_bcUp, file_bcDown, h1_mgg_thqHadronic);
@@ -374,7 +389,7 @@ std::cout << "thqlept: first: " << thqLept_btagsyst.first << " second: " << thqL
   datacard << std::endl;
 
   if(isLeptonic) {
-    datacard << "leptEff        lnN    -     -    1.025 1.025 1.025" << std::endl;
+    datacard << "leptEff        lnN    1.025     -    1.025 1.025 1.025" << std::endl;
     datacard << "BG_shape       lnN    -     1.25  - - -" << std::endl;
   }
   
@@ -919,15 +934,17 @@ std::pair<float,float> yieldWeightedMean( std::pair<float,float> thqLept, std::p
 
 std::pair<float,float> quadratureSum( std::pair<float,float> firstPair, std::pair<float,float> secondPair ) {
 
-  float f1 = fabs(1.-firstPair.first);
-  float f2 = fabs(1.-firstPair.second);
-  float s1 = fabs(1.-secondPair.first);
-  float s2 = fabs(1.-secondPair.second);
+  float f1 = (firstPair.first<1.) ? fabs(1.-firstPair.first) : 0.;
+  float s1 = (secondPair.first<1.) ? fabs(1.-secondPair.first) : 0.;
+  float f2 = (firstPair.second>1.) ? fabs(1.-firstPair.second) : 0.;
+  float s2 = (secondPair.second>1.) ? fabs(1.-secondPair.second) : 0.;
 
   std::pair<float,float> returnPair;
-  returnPair.first  = 1. + sqrt( f1*f1 + s1*s1 );
-  returnPair.second = 1. - sqrt( f2*f2 + s2*s2 );
+  returnPair.first  = 1. - sqrt( f1*f1 + s1*s1 );
+  returnPair.second = 1. + sqrt( f2*f2 + s2*s2 );
 
   return returnPair;
 
 }
+
+
