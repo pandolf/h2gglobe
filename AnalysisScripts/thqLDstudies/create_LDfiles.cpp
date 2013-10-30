@@ -5,7 +5,7 @@
 #include "TTree.h"
 
 
-
+bool use_centralJets = true;
 
 
 
@@ -19,6 +19,9 @@ int main( int argc, char* argv[] ) {
   TTree* tree_tth = (TTree*)file->Get("tth_m125_8TeV");
 
 
+  std::string njetsVar = (use_centralJets) ? "njets_InsideEtaCut" : "njets";
+
+
   //TH1D* h1_nJetsCentral_thq       = new TH1D( "nJetsCentral_thq", "", 9, -0.5, 8.5 );
   TH1D* h1_nJets_thq              = new TH1D( "nJets_thq", "", 11, -0.5, 10.5 );
   TH1D* h1_eta_qJet_thq           = new TH1D( "eta_qJet_thq", "", 30, 0., 5. );
@@ -28,7 +31,7 @@ int main( int argc, char* argv[] ) {
 
 
   //tree_thq->Project("nJetsCentral_thq", "njets_InsideEtaCut", "weight*( category==11 )" );
-  tree_thq->Project("nJets_thq", "njets", "weight*( category==11 )" );
+  tree_thq->Project("nJets_thq", njetsVar.c_str(), "weight*( category==11 )" );
   tree_thq->Project("eta_qJet_thq", "qJetEta", "weight*( category==11 )" );
   tree_thq->Project("mt_top_thq", "topMt", "weight*( category==11 )" );
   tree_thq->Project("lept_charge_thq", "lept_charge", "weight*( category==11 )" );
@@ -53,7 +56,7 @@ int main( int argc, char* argv[] ) {
 
 
   //tree_tth->Project("nJetsCentral_tth", "njets_InsideEtaCut", "weight*( category==11 )" );
-  tree_tth->Project("nJets_tth", "njets", "weight*( category==11 )" );
+  tree_tth->Project("nJets_tth", njetsVar.c_str(), "weight*( category==11 )" );
   tree_tth->Project("eta_qJet_tth", "qJetEta", "weight*( category==11 )" );
   tree_tth->Project("mt_top_tth", "topMt", "weight*( category==11 )" );
   tree_tth->Project("lept_charge_tth", "lept_charge", "weight*( category==11 )" );
@@ -68,7 +71,9 @@ int main( int argc, char* argv[] ) {
   h1_deltaEta_lept_qJet_tth ->Scale(1./h1_deltaEta_lept_qJet_tth->Integral());
 
 
-  std::string outFileName = "tHqLD_leptonic_PDFs.root";
+  std::string outFileName = "tHqLD_leptonic_PDFs";
+  if( use_centralJets ) outFileName = outFileName + "_central";
+  outFileName += ".root";
   if( argc>1 ) {
     std::string outFileName_str(argv[1]);
     outFileName = outFileName_str;
