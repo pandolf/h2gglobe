@@ -18,6 +18,12 @@ EXTRALIBS  :=  -L$(ROOTSYS)/lib -L$(ROOFIT_LIBDIR)/ -L$(CMSSW_BASE)/lib/slc5_amd
 validateLDvars: validateLDvars.cpp DrawBase.o fitTools.o
 	$(CC) -Wall $(INCLUDES) -o validateLDvars validateLDvars.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
+checkLD: checkLD.cpp DrawBase.o fitTools.o
+	$(CC) -Wall $(INCLUDES) -o checkLD checkLD.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
+create_LDfiles: create_LDfiles.cpp DrawBase.o fitTools.o
+	$(CC) -Wall $(INCLUDES) -o create_LDfiles create_LDfiles.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
 
 
 
