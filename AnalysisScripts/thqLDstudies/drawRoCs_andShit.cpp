@@ -30,7 +30,7 @@ int main() {
   compareSingleVariable( db, "lept_charge",        3, -1.5, 1.5,  "Lepton Charge", "" );
   compareSingleVariable( db, "deltaEta_lept_qJet", 35, 0., 7.,    "#Delta#eta(lepton-qJet)", "" );
 
-  compareTaggers( db, "thqLD_lept_2", "thqLD_lept_2_central", "Old LD (all jets)", "New LD (central jets)" );
+  compareTaggers( db, "thqLD_lept_2", "thqLD_lept_2_central", "Old LD", "New LD" );
 
   drawRoc(db);
 
@@ -275,7 +275,88 @@ void compareTaggers( DrawBase* db, const std::string& varName1, const std::strin
   tree_tth->Project( "bg2", varName2.c_str(), "weight*(category==11)" );
 
 
+  h1_signal1->SetFillColor(46);
+  h1_signal1->SetLineColor(46);
+  h1_signal1->SetLineWidth(2);
+  h1_signal1->SetFillStyle(3004);
+
+  h1_bg1->SetFillColor(38);
+  h1_bg1->SetLineColor(38);
+  h1_bg1->SetLineWidth(2);
+  h1_bg1->SetFillStyle(3005);
+
+  h1_signal2->SetLineColor(kRed+1);
+  h1_signal2->SetLineWidth(2);
+  h1_signal2->SetLineStyle(2);
+
+  h1_bg2->SetLineColor(kBlue+1);
+  h1_bg2->SetLineWidth(2);
+  h1_bg2->SetLineStyle(2);
 
 
+
+  TCanvas* c1 = new TCanvas("c1", "", 600, 600);
+  c1->cd();
+
+  std::string legendName_bg1 = "ttH / tt+#gamma#gamma (" + legendName1 + ")";
+  std::string legendName_bg2 = "ttH / tt+#gamma#gamma (" + legendName2 + ")";
+  std::string legendName_signal1 = "tHq (" + legendName1 + ")";
+  std::string legendName_signal2 = "tHq (" + legendName2 + ")";
+
+  TLegend* legend1 = new TLegend( 0.3, 0.6, 0.7, 0.9 );
+  legend1->SetTextSize(0.04);
+  legend1->SetFillColor(0);
+  legend1->AddEntry( h1_bg1, legendName_bg1.c_str(), "F" );
+  legend1->AddEntry( h1_bg2, legendName_bg2.c_str(), "L" );
+  legend1->AddEntry( h1_signal1, legendName_signal1.c_str(), "F" );
+  legend1->AddEntry( h1_signal2, legendName_signal2.c_str(), "L" );
+
+  TLegend* legend2 = new TLegend( 0.55, 0.7, 0.9, 0.9 );
+  legend2->SetTextSize(0.035);
+  legend2->SetFillColor(0);
+  legend2->AddEntry( h1_signal1, legendName_signal1.c_str(), "F" );
+  legend2->AddEntry( h1_signal2, legendName_signal2.c_str(), "L" );
+
+  float yMax = h1_signal1->GetMaximum();
+  if( h1_signal2->GetMaximum()>yMax ) yMax = h1_signal2->GetMaximum();
+  if( h1_bg1->GetMaximum()>yMax ) yMax = h1_bg1->GetMaximum();
+  if( h1_bg2->GetMaximum()>yMax ) yMax = h1_bg2->GetMaximum();
+  yMax *= 1.3;
+
+  TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, 0., yMax );
+  h2_axes->SetXTitle( "Tagger Value" );
+  h2_axes->SetYTitle( "Normalized to Unity" );
+
+  h2_axes->Draw("");
+  legend1->Draw("same");
+  //legend2->Draw("same");
+  
+  TPaveText* labelTop = db->get_labelTop();
+  labelTop->Draw("same");
+
+  h1_bg1->DrawNormalized( "histo same" );  
+  h1_signal1->DrawNormalized( "histo same" );  
+  h1_bg2->DrawNormalized( "histo same" );  
+  h1_signal2->DrawNormalized( "histo same" );  
+
+  gPad->RedrawAxis();
+
+  std::string canvasName = db->get_outputdir() + "/compare_"  + varName1 + "_vs_" + varName2;
+  //if( suffix!="" ) canvasName = canvasName + "_" + suffix;
+  std::string canvasName_eps = canvasName + ".eps";
+  std::string canvasName_png = canvasName + ".png";
+ 
+  c1->SaveAs( canvasName_eps.c_str() );
+  c1->SaveAs( canvasName_png.c_str() );
+
+  delete c1;
+  delete legend1;
+  delete legend2;
+  delete h2_axes;
+  delete h1_signal1;
+  delete h1_signal2;
+  delete h1_bg1;
+  delete h1_bg2;
 
 }
+
