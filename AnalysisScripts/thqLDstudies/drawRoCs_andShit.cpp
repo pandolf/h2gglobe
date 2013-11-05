@@ -16,7 +16,7 @@ int main() {
 
   DrawBase* db = new DrawBase("rocs_and_shit");
 
-  TFile* file = TFile::Open("../batchOutput_provaLD1/histograms_CMS-HGG.root");
+  TFile* file = TFile::Open("../batchOutput_provaLD2/histograms_CMS-HGG.root");
   db->add_mcFile( file, "thefile", "tHq", kBlack, 0);
   db->set_outputdir("RoCs_andShit");
 
@@ -29,6 +29,11 @@ int main() {
   compareSingleVariable( db, "topMt",              50, 0., 1000., "Top Transverse Mass", "GeV" );
   compareSingleVariable( db, "lept_charge",        3, -1.5, 1.5,  "Lepton Charge", "" );
   compareSingleVariable( db, "deltaEta_lept_qJet", 35, 0., 7.,    "#Delta#eta(lepton-qJet)", "" );
+
+  compareSingleVariable( db, "thqLD_lept", 25, 0., 1.0001,    "tHq Leptonic LD" );
+  compareSingleVariable( db, "thqLD_lept_2", 25, 0., 1.0001,    "tHq Leptonic LD" );
+  compareSingleVariable( db, "thqLD_lept_2_central", 25, 0., 1.0001,    "tHq Leptonic LD (central jets)" );
+  compareSingleVariable( db, "thqBDT_lept", 25, -1., 1.0001,    "tHq Leptonic BDT" );
 
   compareTaggers( db, "thqLD_lept_2", "thqLD_lept_2_central", "Old LD", "New LD" );
 
@@ -146,20 +151,25 @@ void drawRoc( DrawBase* db ) {
   TH1F* h1_LD_central_signal = new TH1F("LD_central_signal", "", 100, 0., 1.0001);
   TH1F* h1_LD_central_bg = new TH1F("LD_central_bg", "", 100, 0., 1.0001);
 
+  TH1F* h1_BDT_signal = new TH1F("BDT_signal", "", 100, -1, 1.0001);
+  TH1F* h1_BDT_bg = new TH1F("BDT_bg", "", 100, -1, 1.0001);
+
   tree_thq->Project( "LD_signal", "thqLD_lept", "weight*(category==11)" );
   tree_thq->Project( "LD_new_signal", "thqLD_lept_2", "weight*(category==11)" );
   tree_thq->Project( "LD_central_signal", "thqLD_lept_2_central", "weight*(category==11)" );
+  tree_thq->Project( "BDT_signal", "thqBDT_lept", "weight*(category==11)" );
 
   tree_tth->Project( "LD_bg", "thqLD_lept", "weight*(category==11)" );
   tree_tth->Project( "LD_new_bg", "thqLD_lept_2", "weight*(category==11)" );
   tree_tth->Project( "LD_central_bg", "thqLD_lept_2_central", "weight*(category==11)" );
+  tree_tth->Project( "BDT_bg", "thqBDT_lept", "weight*(category==11)" );
 
 
 
   TGraph* gr_RoC_LD = new TGraph(0);
   TGraph* gr_RoC_LD_new = new TGraph(0);
   TGraph* gr_RoC_LD_central = new TGraph(0);
-  //TGraph* gr_RoC_BDT = new TGraph(0);
+  TGraph* gr_RoC_BDT = new TGraph(0);
 
   int nbins = h1_LD_signal->GetNbinsX();
 
@@ -185,16 +195,17 @@ void drawRoc( DrawBase* db ) {
   
     gr_RoC_LD_central->SetPoint( ibin-1, 1.-eff_b_LD_central, eff_s_LD_central );
 
+    float eff_s_BDT = h1_BDT_signal->Integral( nbins-ibin, nbins )/h1_BDT_signal->Integral( 1, nbins );
+    float eff_b_BDT = h1_BDT_bg->Integral( nbins-ibin, nbins )/h1_BDT_bg->Integral( 1, nbins );
+  
+    gr_RoC_BDT->SetPoint( ibin-1, 1.-eff_b_BDT, eff_s_BDT );
+
   }
 
 
-  //gr_RoC_BDT->SetMarkerSize(1.3);
-  //gr_RoC_BDT->SetMarkerStyle(24);
-  //gr_RoC_BDT->SetMarkerColor(kRed+3);
-
-  gr_RoC_LD->SetMarkerSize(1.3);
-  gr_RoC_LD->SetMarkerStyle(21);
-  gr_RoC_LD->SetMarkerColor(29);
+  //gr_RoC_LD->SetMarkerSize(1.3);
+  //gr_RoC_LD->SetMarkerStyle(21);
+  //gr_RoC_LD->SetMarkerColor(29);
 
   gr_RoC_LD_new->SetMarkerSize(1.3);
   gr_RoC_LD_new->SetMarkerStyle(20);
@@ -203,6 +214,11 @@ void drawRoc( DrawBase* db ) {
   gr_RoC_LD_central->SetMarkerSize(1.3);
   gr_RoC_LD_central->SetMarkerStyle(24);
   gr_RoC_LD_central->SetMarkerColor(kRed+3);
+
+  gr_RoC_BDT->SetMarkerSize(1.3);
+  gr_RoC_BDT->SetMarkerStyle(21);
+  gr_RoC_BDT->SetMarkerColor(29);
+
 
 
   TCanvas* c1 = new TCanvas("c1_roc", "", 600, 600);
@@ -221,11 +237,9 @@ void drawRoc( DrawBase* db ) {
   TLegend* legend = new TLegend( 0.2, 0.2, 0.45, 0.45, "Leptonic Channel" );
   legend->SetFillColor(0);
   legend->SetTextSize(0.04);
-  //if( h1_BDT_signal!=0 && h1_BDT_bg!=0 )
-  //  legend->AddEntry( gr_RoC_BDT, "BDT", "P");
-  legend->AddEntry( gr_RoC_LD, "Old LD", "P");
-  legend->AddEntry( gr_RoC_LD_new, "New LD", "P");
-  legend->AddEntry( gr_RoC_LD_central, "LD Central", "P");
+  legend->AddEntry( gr_RoC_LD_new, "Nominal LD", "P");
+  legend->AddEntry( gr_RoC_LD_central, "New LD (central jets)", "P");
+  legend->AddEntry( gr_RoC_BDT, "BDT", "P");
   legend->Draw("same");
 
   TPaveText* labelTop = db->get_labelTop();
@@ -233,9 +247,8 @@ void drawRoc( DrawBase* db ) {
 
 
   
-  //if( h1_BDT_signal!=0 && h1_BDT_bg!=0 )
-  //  gr_RoC_BDT->Draw("p same");
-  gr_RoC_LD->Draw("p same");
+  gr_RoC_BDT->Draw("p same");
+  //gr_RoC_LD->Draw("p same");
   gr_RoC_LD_new->Draw("p same");
   gr_RoC_LD_central->Draw("p same");
 
