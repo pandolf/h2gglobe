@@ -15,14 +15,14 @@ int main() {
   DrawBase* db = new DrawBase("rocs_and_shit");
   
 
-  TFile* file = TFile::Open("../batchOutput_provaLD1/histograms_CMS-HGG.root");
+  TFile* file = TFile::Open("../batchOutput_provaLD2/histograms_CMS-HGG.root");
   db->add_mcFile( file, "thefile", "tHq", kBlack, 0);
   db->set_outputdir("RoCs_andShit");
 
   findVariableThreshold(db, "thqLD_lept", 0.1);
   findVariableThreshold(db, "thqLD_lept_2", 0.1);
   findVariableThreshold(db, "thqLD_lept_2_central", 0.1);
-  //findVariableThreshold(db, "thqBDT_lept", 0.1);
+  findVariableThreshold(db, "thqBDT_lept", 0.1);
 
   return 0;
 
@@ -88,7 +88,7 @@ void findVariableThreshold( DrawBase* db, const std::string& varName, float frac
   TCanvas* c1 = new TCanvas("c1", "", 600, 600);
   c1->cd();
 
-  TH2D* h2_axes = new TH2D("axes", "", 10, 0., 1.0001, 10, 0., yMax );
+  TH2D* h2_axes = new TH2D("axes", "", 10, xMin, 1.0001, 10, 0., yMax );
   h2_axes->SetYTitle( "ttH Contamination" );
   char xAxisTitle[200];
   sprintf( xAxisTitle, "%s Cut Threshold", taggerName.c_str() );
@@ -96,6 +96,7 @@ void findVariableThreshold( DrawBase* db, const std::string& varName, float frac
 
   h2_axes->Draw();
 
+  h1_fraction_vs_cut->Draw("p same");
 
   TLine* lineThresh = new TLine( xMin, fraction, 1., fraction );
   lineThresh->Draw("same");
@@ -115,7 +116,6 @@ void findVariableThreshold( DrawBase* db, const std::string& varName, float frac
   threshFoundLabel->AddText( threshFoundText );
   threshFoundLabel->Draw("same");
 
-  h1_fraction_vs_cut->Draw("p same");
   
   gPad->RedrawAxis();
 
