@@ -3,9 +3,16 @@
 #include "CommonTools/DrawBase.h"
 
 
+struct LDCutStruct {
+
+  float thresh;
+  float thq;
+  float tth;
+
+};
 
 
-void findVariableThreshold( DrawBase* db, const std::string& varName, float fraction );
+LDCutStruct findVariableThreshold( DrawBase* db, const std::string& varName, float fraction, float tthThresh=-1., float thqThresh=-1. );
 
 
 
@@ -19,10 +26,10 @@ int main() {
   db->add_mcFile( file, "thefile", "tHq", kBlack, 0);
   db->set_outputdir("RoCs_andShit");
 
-  findVariableThreshold(db, "thqLD_lept", 0.1);
-  findVariableThreshold(db, "thqLD_lept_2", 0.1);
-  findVariableThreshold(db, "thqLD_lept_2_central", 0.1);
-  findVariableThreshold(db, "thqBDT_lept", 0.1);
+  LDCutStruct cutStruct_LD = findVariableThreshold(db, "thqLD_lept", 0.1);
+  LDCutStruct cutStruct_LD_2 = findVariableThreshold(db, "thqLD_lept_2", 0.1);
+  LDCutStruct cutStruct_LD_2_central = findVariableThreshold(db, "thqLD_lept_2_central", 0.1);
+  LDCutStruct cutStruct_LD_BDT = findVariableThreshold(db, "thqBDT_lept", -1., cutStruct_LD_2_central.tth );
 
   return 0;
 
@@ -32,7 +39,7 @@ int main() {
 
 
 
-void findVariableThreshold( DrawBase* db, const std::string& varName, float fraction ) {
+LDCutStruct findVariableThreshold( DrawBase* db, const std::string& varName, float fraction, float tthThresh, float thqThresh ) {
 
   TH1F::AddDirectory(kTRUE);
 
@@ -56,9 +63,17 @@ void findVariableThreshold( DrawBase* db, const std::string& varName, float frac
 
 
   TH1D* h1_fraction_vs_cut = new TH1D("fraction_vs_cut", "", nBins, xMin, 1.0001 );
+  TH1D* h1_thq_vs_cut = new TH1D("thq_vs_cut", "", nBins, xMin, 1.0001 );
+  TH1D* h1_tth_vs_cut = new TH1D("tth_vs_cut", "", nBins, xMin, 1.0001 );
+
+
+  LDCutStruct returnStruct;
 
   float foundCut=0.;
   bool firstTime = true;
+  
+  float found_tth=0.;
+  bool firstTime_tth = true;
   
   for( unsigned iBin=1; iBin<nBins+1; ++iBin ) {
 
@@ -68,40 +83,75 @@ void findVariableThreshold( DrawBase* db, const std::string& varName, float frac
     float bgFrac = bgYield/sYield;
 
     h1_fraction_vs_cut->SetBinContent( iBin, bgFrac );
+    h1_thq_vs_cut->SetBinContent( iBin, sYield );
+    h1_tth_vs_cut->SetBinContent( iBin, bgYield );
 
     if( bgFrac<0.1 && firstTime ) {
       foundCut = h1_fraction_vs_cut->GetBinLowEdge(iBin);
+      if( fraction>0. ) {
+        returnStruct.thq = sYield;
+        returnStruct.tth = bgYield;
+        returnStruct.thresh = foundCut;
+      }
       firstTime=false;
+    }
+
+    if( bgYield<tthThresh && firstTime_tth ) {
+      found_tth = h1_tth_vs_cut->GetBinLowEdge(iBin);
+      returnStruct.thq = sYield;
+      returnStruct.tth = bgYield;
+      returnStruct.thresh = found_tth;
+      firstTime_tth=false;
     }
 
   } 
 
 
-  h1_fraction_vs_cut->SetMarkerStyle(20);
+  h1_fraction_vs_cut->SetMarkerStyle(24);
   h1_fraction_vs_cut->SetMarkerSize(1.6);
-  h1_fraction_vs_cut->SetMarkerColor(46);
+  h1_fraction_vs_cut->SetMarkerColor(kRed+3);
 
-  float yMax = h1_LD_bg->Integral()/h1_LD_signal->Integral();
-  yMax *= 1.1;
+  h1_thq_vs_cut->SetMarkerStyle(20);
+  h1_thq_vs_cut->SetMarkerSize(1.6);
+  h1_thq_vs_cut->SetMarkerColor(46);
+
+  h1_tth_vs_cut->SetMarkerStyle(21);
+  h1_tth_vs_cut->SetMarkerSize(1.6);
+  h1_tth_vs_cut->SetMarkerColor(38);
+
+  //float yMax = h1_LD_bg->Integral()/h1_LD_signal->Integral();
+  float yMax = h1_thq_vs_cut->GetMaximum();
+  yMax *= 1.15;
 
 
   TCanvas* c1 = new TCanvas("c1", "", 600, 600);
   c1->cd();
 
   TH2D* h2_axes = new TH2D("axes", "", 10, xMin, 1.0001, 10, 0., yMax );
-  h2_axes->SetYTitle( "ttH Contamination" );
+  //h2_axes->SetYTitle( "ttH Contamination" );
+  h2_axes->SetYTitle( "Arbitrary Units");
   char xAxisTitle[200];
   sprintf( xAxisTitle, "%s Cut Threshold", taggerName.c_str() );
   h2_axes->SetXTitle( xAxisTitle );
 
-  h2_axes->Draw();
+  TLegend* legend = new TLegend( 0.25, 0.4, 0.55, 0.6 );
+  legend->SetFillColor(kWhite);
+  legend->SetTextSize(0.038);
+  legend->AddEntry( h1_thq_vs_cut, "tHq Yield", "P" );
+  legend->AddEntry( h1_tth_vs_cut, "ttH Yield", "P" );
+  legend->AddEntry( h1_fraction_vs_cut, "ttH / tHq", "P" );
 
+  h2_axes->Draw();
+  legend->Draw("same");
+
+  h1_tth_vs_cut->Draw("p same");
+  h1_thq_vs_cut->Draw("p same");
   h1_fraction_vs_cut->Draw("p same");
 
-  TLine* lineThresh = new TLine( xMin, fraction, 1., fraction );
+  TLine* lineThresh = new TLine( xMin, 0.1, 1., 0.1 );
   lineThresh->Draw("same");
 
-  TLine* lineFoundThresh = new TLine( foundCut, 0., foundCut, fraction );
+  TLine* lineFoundThresh = new TLine( foundCut, 0., foundCut, 0.1 );
   lineFoundThresh->Draw("same");
 
   TPaveText* labelTop = db->get_labelTop();
@@ -110,7 +160,7 @@ void findVariableThreshold( DrawBase* db, const std::string& varName, float frac
   char threshFoundText[200];
   sprintf( threshFoundText, "ttH < 10%% tHq requires %s > %.2f", taggerName.c_str(), foundCut );
 
-  TPaveText* threshFoundLabel = new TPaveText( 0.45, 0.5, 0.7, 0.6, "brNDC" );
+  TPaveText* threshFoundLabel = new TPaveText( 0.5, 0.85, 0.8, 0.9, "brNDC" );
   threshFoundLabel->SetTextSize(0.035);
   threshFoundLabel->SetFillColor(0);
   threshFoundLabel->AddText( threshFoundText );
@@ -123,13 +173,19 @@ void findVariableThreshold( DrawBase* db, const std::string& varName, float frac
   sprintf( canvasName, "%s/fractionVsCut_%s.eps", db->get_outputdir().c_str(), varName.c_str() );
   c1->SaveAs(canvasName);
 
-  std::cout << "-> Variable: " << varName << " found threshold: " << foundCut << " (" << 100.*fraction << "% ttH contamination)" << std::endl;
+  if( fraction<0. )
+    std::cout << "-> Variable: " << varName << " found threshold: " << found_tth << " (" << tthThresh << " ttH yield)" << std::endl;
+  else
+    std::cout << "-> Variable: " << varName << " found threshold: " << foundCut << " (" << 100.*fraction << "% ttH contamination)" << std::endl;
 
   delete c1;
   delete h2_axes;
   delete h1_fraction_vs_cut;
   delete h1_LD_bg;
   delete h1_LD_signal;
+  delete legend;
+
+  return returnStruct;
 
 }
 
