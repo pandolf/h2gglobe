@@ -1,13 +1,5 @@
-dict.cc
-dict.h
 *.o
+*.root
+*.pyc
 *.d
-*.so
-*pyc
-*~
-__init__*
-.extraTags
-LoopAllDict.cc
-LoopAllDict.h
-TmpLinkDef.h
-
+~*
