@@ -7,7 +7,7 @@
 
 void compareSingleVariable( DrawBase* db, const std::string& varName, int nBins, float xMin, float xMax, const std::string& axisName, const std::string& units="", const std::string& additionalCuts="", const std::string suffix=""  );
 void drawRoc( DrawBase* db );
-void compareTaggers( DrawBase* db, const std::string& varName1, const std::string& varName2, const std::string& legendName1, const std::string& legendName2, int nBins=0.25, float xMin=0., float xMax=1.0001 );
+void compareTaggers( DrawBase* db, const std::string& varName1, const std::string& varName2, const std::string& legendName1, const std::string& legendName2, int nBins=25, float xMin=0., float xMax=1.0001 );
 
 
 
@@ -16,7 +16,7 @@ int main() {
 
   DrawBase* db = new DrawBase("rocs_and_shit");
 
-  TFile* file = TFile::Open("../batchOutput_provaLD2/histograms_CMS-HGG.root");
+  TFile* file = TFile::Open("../batchOutput_provaLD6/histograms_CMS-HGG.root");
   db->add_mcFile( file, "thefile", "tHq", kBlack, 0);
   db->set_outputdir("RoCs_andShit");
 
@@ -29,13 +29,17 @@ int main() {
   compareSingleVariable( db, "topMt",              50, 0., 1000., "Top Transverse Mass", "GeV" );
   compareSingleVariable( db, "lept_charge",        3, -1.5, 1.5,  "Lepton Charge", "" );
   compareSingleVariable( db, "deltaEta_lept_qJet", 35, 0., 7.,    "#Delta#eta(lepton-qJet)", "" );
+  compareSingleVariable( db, "deltaPhi_top_higgs", 30, 0., 3.15,    "#Delta#phi(top-diphoton)", "rad" );
+  compareSingleVariable( db, "deltaPhi_top_higgs", 30, 0., 3.15,    "#Delta#phi(top-diphoton)", "rad", "thqLD_lept>0.25", "LDcut" );
 
   compareSingleVariable( db, "thqLD_lept", 25, 0., 1.0001,    "tHq Leptonic LD" );
   compareSingleVariable( db, "thqLD_lept_2", 25, 0., 1.0001,    "tHq Leptonic LD" );
   compareSingleVariable( db, "thqLD_lept_2_central", 25, 0., 1.0001,    "tHq Leptonic LD (central jets)" );
   compareSingleVariable( db, "thqBDT_lept", 25, -1., 1.0001,    "tHq Leptonic BDT" );
+  compareSingleVariable( db, "thqBDT_lept_2", 25, -1., 1.0001,    "tHq Leptonic BDT (6 vars)" );
 
   compareTaggers( db, "thqLD_lept_2", "thqLD_lept_2_central", "Old LD", "New LD" );
+  compareTaggers( db, "thqBDT_lept", "thqBDT_lept_2", "BDT 5 vars", "BDT 6 vars", 25, -1., 1. );
 
   drawRoc(db);
 
@@ -154,15 +158,20 @@ void drawRoc( DrawBase* db ) {
   TH1F* h1_BDT_signal = new TH1F("BDT_signal", "", 100, -1, 1.0001);
   TH1F* h1_BDT_bg = new TH1F("BDT_bg", "", 100, -1, 1.0001);
 
+  TH1F* h1_BDT2_signal = new TH1F("BDT2_signal", "", 100, -1, 1.0001);
+  TH1F* h1_BDT2_bg = new TH1F("BDT2_bg", "", 100, -1, 1.0001);
+
   tree_thq->Project( "LD_signal", "thqLD_lept", "weight*(category==11)" );
   tree_thq->Project( "LD_new_signal", "thqLD_lept_2", "weight*(category==11)" );
   tree_thq->Project( "LD_central_signal", "thqLD_lept_2_central", "weight*(category==11)" );
   tree_thq->Project( "BDT_signal", "thqBDT_lept", "weight*(category==11)" );
+  tree_thq->Project( "BDT2_signal", "thqBDT_lept_2", "weight*(category==11)" );
 
   tree_tth->Project( "LD_bg", "thqLD_lept", "weight*(category==11)" );
   tree_tth->Project( "LD_new_bg", "thqLD_lept_2", "weight*(category==11)" );
   tree_tth->Project( "LD_central_bg", "thqLD_lept_2_central", "weight*(category==11)" );
   tree_tth->Project( "BDT_bg", "thqBDT_lept", "weight*(category==11)" );
+  tree_tth->Project( "BDT2_bg", "thqBDT_lept_2", "weight*(category==11)" );
 
 
 
@@ -170,6 +179,7 @@ void drawRoc( DrawBase* db ) {
   TGraph* gr_RoC_LD_new = new TGraph(0);
   TGraph* gr_RoC_LD_central = new TGraph(0);
   TGraph* gr_RoC_BDT = new TGraph(0);
+  TGraph* gr_RoC_BDT2 = new TGraph(0);
 
   int nbins = h1_LD_signal->GetNbinsX();
 
@@ -200,6 +210,11 @@ void drawRoc( DrawBase* db ) {
   
     gr_RoC_BDT->SetPoint( ibin-1, 1.-eff_b_BDT, eff_s_BDT );
 
+    float eff_s_BDT2 = h1_BDT2_signal->Integral( nbins-ibin, nbins )/h1_BDT2_signal->Integral( 1, nbins );
+    float eff_b_BDT2 = h1_BDT2_bg->Integral( nbins-ibin, nbins )/h1_BDT2_bg->Integral( 1, nbins );
+  
+    gr_RoC_BDT2->SetPoint( ibin-1, 1.-eff_b_BDT2, eff_s_BDT2 );
+
   }
 
 
@@ -218,6 +233,10 @@ void drawRoc( DrawBase* db ) {
   gr_RoC_BDT->SetMarkerSize(1.3);
   gr_RoC_BDT->SetMarkerStyle(21);
   gr_RoC_BDT->SetMarkerColor(29);
+
+  gr_RoC_BDT2->SetMarkerSize(1.3);
+  gr_RoC_BDT2->SetMarkerStyle(25);
+  gr_RoC_BDT2->SetMarkerColor(kBlack);
 
 
 
@@ -240,6 +259,7 @@ void drawRoc( DrawBase* db ) {
   legend->AddEntry( gr_RoC_LD_new, "Nominal LD", "P");
   legend->AddEntry( gr_RoC_LD_central, "New LD (central jets)", "P");
   legend->AddEntry( gr_RoC_BDT, "BDT", "P");
+  //legend->AddEntry( gr_RoC_BDT2, "BDT (6 var)", "P");
   legend->Draw("same");
 
   TPaveText* labelTop = db->get_labelTop();
@@ -251,6 +271,7 @@ void drawRoc( DrawBase* db ) {
   //gr_RoC_LD->Draw("p same");
   gr_RoC_LD_new->Draw("p same");
   gr_RoC_LD_central->Draw("p same");
+  //gr_RoC_BDT2->Draw("p same");
 
   gPad->RedrawAxis();
 
@@ -274,11 +295,11 @@ void compareTaggers( DrawBase* db, const std::string& varName1, const std::strin
   TTree* tree_thq = (TTree*)file->Get("thqLeptonic_m125_8TeV");
   TTree* tree_tth = (TTree*)file->Get("tth_m125_8TeV");
 
-  TH1F* h1_signal1 = new TH1F("signal1", "", 25, 0., 1.0001);
-  TH1F* h1_bg1 = new TH1F("bg1", "", 25, 0., 1.0001);
+  TH1F* h1_signal1 = new TH1F("signal1", "", nBins, xMin, xMax );
+  TH1F* h1_bg1 = new TH1F("bg1", "", nBins, xMin, xMax );
 
-  TH1F* h1_signal2 = new TH1F("signal2", "", 25, 0., 1.0001);
-  TH1F* h1_bg2 = new TH1F("bg2", "", 25, 0., 1.0001);
+  TH1F* h1_signal2 = new TH1F("signal2", "", nBins, xMin, xMax );
+  TH1F* h1_bg2 = new TH1F("bg2", "", nBins, xMin, xMax );
 
 
   tree_thq->Project( "signal1", varName1.c_str(), "weight*(category==11)" );
