@@ -134,29 +134,29 @@ void drawPlotsCS( DrawBase* db, const std::string& dataset, TFile* file_invID, T
   TF1* f1_btagLooseInvID = fitHisto( h1_mgg_btagLooseInvID, 39, 2 );
   TF1* f1_btagZeroInvID = fitHisto( h1_mgg_btagZeroInvID, kRed+1, 2 );
 
-  //TH1D* h1_band_invID          = fitTools::getBand( f1_invID, "invID" );
-  //TH1D* h1_band_btagLoose      = fitTools::getBand( f1_btagLoose, "btagLoose" );
-  //TH1D* h1_band_btagZero       = fitTools::getBand( f1_btagZero, "btagZero" );
-  //TH1D* h1_band_btagLooseInvID = fitTools::getBand( f1_btagLooseInvID, "btagLooseInvID" );
-  //TH1D* h1_band_btagZeroInvID  = fitTools::getBand( f1_btagZeroInvID, "btagZeroInvID" );
+  TH1D* h1_band_invID          = fitTools::getBand( f1_invID, "invID" );
+  TH1D* h1_band_btagLoose      = fitTools::getBand( f1_btagLoose, "btagLoose" );
+  TH1D* h1_band_btagZero       = fitTools::getBand( f1_btagZero, "btagZero" );
+  TH1D* h1_band_btagLooseInvID = fitTools::getBand( f1_btagLooseInvID, "btagLooseInvID" );
+  TH1D* h1_band_btagZeroInvID  = fitTools::getBand( f1_btagZeroInvID, "btagZeroInvID" );
 
-  //h1_band_invID          ->SetFillStyle(3003);
-  //h1_band_btagLoose      ->SetFillStyle(3003);
-  //h1_band_btagZero       ->SetFillStyle(3003);
-  //h1_band_btagLooseInvID ->SetFillStyle(3003);
-  //h1_band_btagZeroInvID  ->SetFillStyle(3003);
+  h1_band_invID          ->SetFillStyle(3003);
+  h1_band_btagLoose      ->SetFillStyle(3003);
+  h1_band_btagZero       ->SetFillStyle(3003);
+  h1_band_btagLooseInvID ->SetFillStyle(3003);
+  h1_band_btagZeroInvID  ->SetFillStyle(3003);
 
-  //h1_band_invID          ->SetFillColor(kRed);
-  //h1_band_btagLoose      ->SetFillColor(kGray);
-  //h1_band_btagZero       ->SetFillColor(29);
-  //h1_band_btagLooseInvID ->SetFillColor(39);
-  //h1_band_btagZeroInvID  ->SetFillColor(kRed+1);
+  h1_band_invID          ->SetFillColor(kRed);
+  h1_band_btagLoose      ->SetFillColor(kGray);
+  h1_band_btagZero       ->SetFillColor(29);
+  h1_band_btagLooseInvID ->SetFillColor(39);
+  h1_band_btagZeroInvID  ->SetFillColor(kRed+1);
 
-  //h1_band_invID          ->SetLineColor(kRed);
-  //h1_band_btagLoose      ->SetLineColor(kGray);
-  //h1_band_btagZero       ->SetLineColor(29);
-  //h1_band_btagLooseInvID ->SetLineColor(39);
-  //h1_band_btagZeroInvID  ->SetLineColor(kRed+1);
+  h1_band_invID          ->SetLineColor(kRed);
+  h1_band_btagLoose      ->SetLineColor(kGray);
+  h1_band_btagZero       ->SetLineColor(29);
+  h1_band_btagLooseInvID ->SetLineColor(39);
+  h1_band_btagZeroInvID  ->SetLineColor(kRed+1);
 
   
   TCanvas* c1 = new TCanvas("c1", "", 600, 600);
@@ -202,6 +202,19 @@ void drawPlotsCS( DrawBase* db, const std::string& dataset, TFile* file_invID, T
   //h1_band_btagZeroInvID  ->Draw("c e3 same");
 
 
+  h1_mgg_invID->Rebin(10);
+  //h1_mgg_btagLoose->Rebin(10);
+  //h1_mgg_btagZero->Rebin(10);
+  //h1_mgg_btagLooseInvID->Rebin(10);
+  //h1_mgg_btagZeroInvID->Rebin(10);
+
+  h1_mgg_invID->Scale(          1./h1_mgg_invID->Integral("width") );
+  h1_mgg_btagLoose->Scale(      1./h1_mgg_btagLoose->Integral("width") );
+  h1_mgg_btagZero->Scale(       1./h1_mgg_btagZero->Integral("width") );
+  h1_mgg_btagLooseInvID->Scale( 1./h1_mgg_btagLooseInvID->Integral("width") );
+  h1_mgg_btagZeroInvID->Scale(  1./h1_mgg_btagZeroInvID->Integral("width") );
+
+  //h1_mgg_invID->Draw("p same");
   //h1_mgg_btagLoose->Draw("p same");
   //h1_mgg_btagZero->Draw("p same");
   //h1_mgg_btagLooseInvID->Draw("p same");
@@ -237,7 +250,7 @@ TF1* fitHisto( TH1D* h1, int lineColor, int lineStyle ) {
 
   std::string fName(h1->GetName());
   fName = "f1_" + fName;
-  TF1* f1 = new TF1(fName.c_str(), "exp([0]+[1]*x)", 100., 180.);
+  TF1* f1 = new TF1(fName.c_str(), "exp([0]*x)", 100., 180.);
 
   f1->SetLineColor(lineColor);
   f1->SetLineStyle(lineStyle);
@@ -396,3 +409,4 @@ void compareVariableCS( DrawBase* db, const std::string& dataset, const std::str
   delete h1_btagZeroInvID;
   
 }
+
