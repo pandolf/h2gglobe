@@ -22,9 +22,10 @@ mkdir $dir
 
 #jecUncs=""
 ## jecUncs="jerCentral"
-jecUncs="jecUp jecDown jerUp jerDown jerCentral"
+#jecUncs="jecUp jecDown jerUp"
+jecUncs="btagZero btagLoose btagLooseInvID btagZeroInvID"
 
 for syst in $jecUncs; do
-    ./mk_fitter.py -i jetanalysis/datafiles_cubased_legacy_fp_jec.dat -n 6 -l ${syst} -o batchOutput_${dir}/${syst}/sub && \
+    ./mk_fitter.py -i csAnalysis/datafiles_cubased_legacy_fp_CS.dat -n 250 -l ${syst} -o batchOutput_${dir}/${syst}/sub && \
     ./submit_fitter.py -q 8nh -d ${dir}/${syst}
 done
