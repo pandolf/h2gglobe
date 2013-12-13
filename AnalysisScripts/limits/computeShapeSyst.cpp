@@ -22,9 +22,13 @@ int main() {
   flat->SetParameter(0, 1./80.);
 
   std::string fileName = (useCS) ? "../batchOutputCS1/histograms_CMS-HGG.root" : "../batchOutput8/histograms_CMS-HGG.root";
-  TF1* expo = getExpoFromFit(fileName.c_str());
-  //TF1* expo = getExpoFromFit("../batchOutput8/histograms_CMS-HGG.root");
+  //TF1* expo = getExpoFromFit(fileName.c_str());
+  TF1* expo = new TF1( "expo", "1.*exp([0]+[1]*x)", 100., 180.);
+  expo->SetParameter(0, -3.71371e-01);
+  expo->SetParameter(1, -3.03197e-02);
 
+std::cout << "flat int: " << flat->Integral(100., 180.) << std::endl;
+std::cout << "expo int: " << expo->Integral(100., 180.) << std::endl;
   float sf_flat = getScalingFactor(flat, 3.);
   float sf_expo = getScalingFactor(expo, 3.);
 
@@ -74,13 +78,18 @@ TF1* getExpoFromFit( const std::string& fileName ) {
     tree->GetEntry(ientry);
 
     if( category!=11 ) continue;
-    if( PhotonsMass>115. && PhotonsMass<135. ) continue;
-    if( !useCS )
+    if( useCS ) {
+      if( thqLD_lept<0.25 ) continue;
+    } else {
+      if( PhotonsMass>115. && PhotonsMass<135. ) continue;
       if( thqLD_lept>0.25 ) continue; //inverted LD cut
+    }
 
     h1_data->Fill(PhotonsMass);
 
   }
+
+  std::cout << "-> Found " << h1_data->GetEntries() << " events in the data." << std::endl;
 
   TF1* expo = new TF1("expo", "exp([0]+[1]*x)", 100., 180.);
   h1_data->Fit(expo, "RL");
