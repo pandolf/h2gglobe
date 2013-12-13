@@ -102,7 +102,7 @@ int main( int argc, char* argv[] ) {
   gr_ul    ->SetMarkerColor( kRed+3 );
 
 
-  TLegend* legend = new TLegend( 0.2, 0.5, 0.5, 0.9 );
+  TLegend* legend = new TLegend( 0.2, 0.7, 0.5, 0.9 );
   legend->SetTextSize( 0.038 );
   legend->SetFillColor(0);
   legend->AddEntry( gr_signif, "Expected significance", "P" );
@@ -229,6 +229,7 @@ ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::s
   float yield_b = 5. * yield_tth/yield_tth_noAddSel;
 
   float k_BG = massWindow*2./(80.-massWindow*2.);
+  yield_b *= k_BG;
 
 
   char datacardName[300];
@@ -242,7 +243,7 @@ ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::s
  
   datacard << "imax 1" << std::endl;
   datacard << "jmax ";
-  if( isLeptonic ) datacard << "3 " << std::endl; // of SMH, only tth and wzh (ignore ggh and vbf)
+  if( isLeptonic ) datacard << "2 " << std::endl; // of SMH, only tth (ignore ggh and vbf - ignore also wzh here to speed things up)
   else             datacard << "4 " << std::endl; // of SMH, only tth, ggh, and vbf (ignore wzh)
   datacard << "kmax *" << std::endl;
   datacard << "    " << std::endl;
@@ -251,49 +252,29 @@ ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::s
   datacard << "observation 0" << std::endl;
   datacard << std::endl;
   datacard << "    " << std::endl;
-  datacard << "bin            1        1       1     1"; 
-  if( !isLeptonic ) datacard <<  "    1 ";
-  datacard << std::endl;
-  datacard << "process        s        b       tth  "; 
-  if( isLeptonic ) datacard << " wzh"     << std::endl;
-  else             datacard << " ggh   vbf  "     << std::endl;
-  datacard << "process        0        1       2     3"; 
-  if( !isLeptonic )  datacard << " 4";
-  datacard << std::endl;
+  datacard << "bin            1        1       1    " << std::endl; 
+  datacard << "process        s        b       tth  " << std::endl;
+  datacard << "process        0        1       2    " << std::endl;
 
 
-  datacard << "rate   " << yield_thq <<  "  " << yield_b << "  " << yield_tth;
+  datacard << "rate   " << yield_thq <<  "  " << yield_b << "  " << yield_tth << std::endl;
   //datacard << "rate   " << yield_thq <<  "  " << sidebands_yield*k_BG << "  " << yield_tth;
-  if( isLeptonic )
-    datacard << " " << yield_wzh   << std::endl;
-  else
-    datacard << " " << yield_ggh << " " << yield_vbf << std::endl;
   datacard << "      " << std::endl;
   datacard << "      " << std::endl;
   datacard << "#syst " << std::endl;
-  datacard << "bg_err     lnN    -   1.5 - - ";
-  if( !isLeptonic ) datacard <<  " -";
-  datacard << std::endl;
-  datacard << "lumi       lnN    1.026 - 1.026 1.026";
-  if( !isLeptonic ) datacard <<  " 1.026";
-  datacard << std::endl;
+  datacard << "bg_err     lnN    -   1.5 - " << std::endl;
+  datacard << "lumi       lnN    1.026 - 1.026 " << std::endl;
 
   //datacard << "bg         gmN " << (int)sidebands_yield << "    - " << k_BG << "   - - - -" << std::endl;
 
-  datacard << "PDF   lnN    -     -         0.922/1.078 ";
-  if( !isLeptonic ) datacard <<  " -  - ";
-  else              datacard << " 0.99/1.01";
-  datacard << std::endl;
-  datacard << "QCDscale   lnN    -     -    0.86/1.11 ";
-  if( !isLeptonic ) datacard <<  " - - ";
-  else              datacard << " 0.977/1.023";
-  datacard << std::endl;
+  datacard << "PDF   lnN    -     -         0.922/1.078 " << std::endl;
+  datacard << "QCDscale   lnN    -     -    0.86/1.11 " << std::endl;
 
-  datacard << "JEC            lnN   0.997213/1.00634 - 1.00523/0.992612 1.06054/0.941012 " << std::endl;
-  datacard << "JER            lnN   1.01205/0.998054 - 0.963968/1.04624 1/1.06059 " << std::endl;
-  datacard << "Btag            lnN   1.02 - 1.015 1.001" << std::endl;
-  datacard << "leptEff        lnN    1.025     -    1.025 1.025 " << std::endl;
-  datacard << "BG_shape       lnN    -     1.25  - - " << std::endl;
+  datacard << "JEC            lnN   0.997213/1.00634 - 1.00523/0.992612 " << std::endl;
+  datacard << "JER            lnN   1.01205/0.998054 - 0.963968/1.04624 " << std::endl;
+  datacard << "Btag            lnN   1.02 - 1.015" << std::endl;
+  datacard << "leptEff        lnN    1.025     -    1.025 " << std::endl;
+  datacard << "BG_shape       lnN    -     1.25  - " << std::endl;
 
   
 
@@ -301,8 +282,8 @@ ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::s
   std::cout << "-> Created datacard: " << datacardName << std::endl;
 
 
-  std::string logfile_signif = "logfile_signif_tmp.log";
-  std::string logfile_ul     = "logfile_ul_tmp.log";
+  std::string logfile_signif = bd->get_outputdir() + "/logfile_signif_" + suffix + ".log";
+  std::string logfile_ul     = bd->get_outputdir() + "/logfile_ul_" + suffix + ".log";
 
   std::string combineComand_signif = "combine -M HybridNew " + datacardName_str + " --significance  --expectedFromGrid=0.5  --saveToys --fullBToys --saveHybridResult -T 2000 -i 10 -s13 >& " + logfile_signif;
   std::string combineComand_ul     = "combine -M HybridNew " + datacardName_str + "                 --expectedFromGrid=0.5  --saveToys --fullBToys --saveHybridResult -T 2000 -i 10 -s13 >& " + logfile_ul;
@@ -341,14 +322,19 @@ ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::s
   // then scan UL file
 
   ifstream ifs_ul(logfile_ul);
+  std::cout << "-> Scanning logfile_ul: " << logfile_ul << std::endl;
   
   float ul, ul_err;
+  bool foundLineBefore=false;
 
   while( ifs_ul.good() && !ifs_ul.eof() ) {
 
     std::string line;
     std::getline(ifs_ul, line);
     TString line_tstr(line);
+    if( (line_tstr.BeginsWith( " -- Hybrid New -- " )) ) foundLineBefore = true;
+
+    if( !foundLineBefore ) continue;
     if( !(line_tstr.BeginsWith( "Limit: " )) ) continue;
 
     sscanf( line.c_str(), "Limit: r < %f +/- %f @ 95% CL", &ul, &ul_err );
