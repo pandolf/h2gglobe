@@ -16,7 +16,10 @@
 #include "PhotonFix.h"
 #include <stdio.h>
 
+#include "THqLeptonicLikelihoodCalculatorOld.h"
 #include "THqLeptonicLikelihoodCalculator.h"
+
+#include "TMVA/Reader.h"
 
 // #include "HiggsToGammaGamma/interface/GBRForest.h"
 //#include "../../../../HiggsToGammaGamma/interface/GBRForest.h"
@@ -435,7 +438,23 @@ class PhotonAnalysis : public BaseAnalysis
     float generatorPt_;
     float generatorY_;
 
+    int thqCS_btagLevel;
+    THqLeptonicLikelihoodCalculatorOld *thqlikeli_old;
     THqLeptonicLikelihoodCalculator *thqlikeli;
+    THqLeptonicLikelihoodCalculator *thqlikeli_central;
+    TFile* file_fasaWeights_pt;
+    TFile* file_fasaWeights_eta;
+
+    float njets_bdt;
+    float njets_InsideEtaCut_bdt;
+    float deltaEta_lept_qJet_bdt;
+    float topMt_bdt;
+    float qJetEta_bdt;
+    float lept_charge_bdt;
+    float deltaPhi_top_higgs_bdt;
+ 
+    TMVA::Reader *reader_thqBDT_lept = new TMVA::Reader( "!Color:!Silent" );
+    TMVA::Reader *reader_thqBDT_lept_2 = new TMVA::Reader( "!Color:!Silent" );
 
 
 
