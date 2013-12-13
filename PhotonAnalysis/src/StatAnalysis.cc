@@ -1131,19 +1131,6 @@ bool StatAnalysis::AnalyseEvent(LoopAll& l, Int_t jentry, float weight, TLorentz
 	// if doing the spin analysis calculate new category
 	if (doSpinAnalysis) computeSpinCategory(l, category, lead_p4, sublead_p4);
 	
-	// fill control plots and counters
-	if( ! isSyst ) {
-	    l.FillCounter( "Accepted", weight );
-	    l.FillCounter( "Smeared", evweight );
-	    sumaccept += weight;
-	    sumsmear += evweight;
-	    fillControlPlots(lead_p4, sublead_p4, Higgs, lead_r9, sublead_r9, diphoton_id,
-			     category, isCorrectVertex, evweight, vtx, l, muVtx, mu_ind, elVtx, el_ind );
-        
-        if (fillOptTree) 
-            fillOpTree(l, lead_p4, sublead_p4,  diphoton_index, diphoton_id, weight, evweight, mass, category );
-	    
-	}
         // dump BS trees if requested
         if (!isSyst && cur_type!=0 && saveBSTrees_) saveBSTrees(l, evweight,category,Higgs, vtx, (TVector3*)l.gv_pos->At(0));
 
@@ -1408,17 +1395,34 @@ bool StatAnalysis::AnalyseEvent(LoopAll& l, Int_t jentry, float weight, TLorentz
 	//if needed you can compute btag efficiency 
 	//	computeBtagEff(l);
 
-
-	if(includeTTHlep || includeVHhad){
+	if(includeTTHlep || includeVHhad || includetHqLeptonic || includetHqHadronic){
 	    bool isMC = l.itype[l.current]!=0;
 	    if(isMC && applyBtagSF ){
-		if (category==9 ||category ==10){//tth categories
-		    evweight*=BtagReweight(l,shiftBtagEffUp_bc,shiftBtagEffDown_bc,shiftBtagEffUp_l,shiftBtagEffDown_l,1);
-		}else if (category == 11){//vh categories. loose wp for btag
-		    evweight*=BtagReweight(l,shiftBtagEffUp_bc,shiftBtagEffDown_bc,shiftBtagEffUp_l,shiftBtagEffDown_l,0);
+		if (category==9 ||category ==10 || category==11 || category==12){//tth and thq  categories
+		    float reweight = BtagReweight(l,shiftBtagEffUp_bc,shiftBtagEffDown_bc,shiftBtagEffUp_l,shiftBtagEffDown_l,1);
+            evweight *= reweight;
+            weight *= reweight;
+		//}else if (category == 11){//vh categories. loose wp for btag
+		//    evweight*=BtagReweight(l,shiftBtagEffUp_bc,shiftBtagEffDown_bc,shiftBtagEffUp_l,shiftBtagEffDown_l,0);
 		}
 	    }
 	}
+	
+	// fill control plots and counters
+	if( ! isSyst ) {
+	    l.FillCounter( "Accepted", weight );
+	    l.FillCounter( "Smeared", evweight );
+	    sumaccept += weight;
+	    sumsmear += evweight;
+	    fillControlPlots(lead_p4, sublead_p4, Higgs, lead_r9, sublead_r9, diphoton_id,
+			     category, isCorrectVertex, evweight, vtx, l, muVtx, mu_ind, elVtx, el_ind );
+        
+        if (fillOptTree) 
+            fillOpTree(l, lead_p4, sublead_p4,  diphoton_index, diphoton_id, weight, evweight, mass, category );
+	    
+	}
+
+
           return (category >= 0 && mass>=massMin && mass<=massMax);
     }
 
@@ -2149,6 +2153,8 @@ void StatAnalysis::fillOpTree(LoopAll& l, const TLorentzVector & lead_p4, const 
 	l.FillTree("event",(int)l.event);
 	l.FillTree("weight",(float)weight);
 	l.FillTree("evweight",(float)evweight);
+	l.FillTree("fasaWeight_pt",(float)l.fasaWeight_pt);
+	l.FillTree("fasaWeight_eta",(float)l.fasaWeight_eta);
     float pu_weight = weight/l.sampleContainer[l.current_sample_index].weight(); // contains also the smearings, not only pu
 	l.FillTree("pu_weight",(float)pu_weight);
 	l.FillTree("pu_n",(float)l.pu_n);
@@ -2657,16 +2663,26 @@ void StatAnalysis::fillOpTree(LoopAll& l, const TLorentzVector & lead_p4, const 
       l.FillTree("qJetPt",            (float)l.qJetPt);
       l.FillTree("bJetPt",            (float)l.bJetPt);
 
+      l.FillTree("deltaEta_bJet_qJet",(float)l.deltaEta_bJet_qJet);
+      l.FillTree("njets_OutsideEtaCut",      (int)l.njets_OutsideEtaCut);
+      l.FillTree("njets_InsideEtaCut",       (int)l.njets_InsideEtaCut);
+      l.FillTree("nbjets_loose",             (int)l.nbjets_loose);
+      l.FillTree("nbjets_medium",            (int)l.nbjets_medium);
+
+      l.FillTree("topMt",             (float)l.topMt);
+      l.FillTree("deltaPhi_top_higgs",(float)l.deltaPhi_top_higgs);
+
       if( includetHqLeptonic ) {
         l.FillTree("lept_charge",       (int)l.lept_charge);
-        l.FillTree("topMt",             (float)l.topMt);
         l.FillTree("deltaEta_lept_qJet",(float)l.deltaEta_lept_qJet);
+        l.FillTree("thqLD_lept_old",               (float)l.thqLD_lept_old);
         l.FillTree("thqLD_lept",                   (float)l.thqLD_lept);
-      } else {
+        l.FillTree("thqBDT_lept",                   (float)l.thqBDT_lept);
+        l.FillTree("thqBDT_lept_2",                   (float)l.thqBDT_lept_2);
+      } 
+
+      if( includetHqHadronic ) {
         l.FillTree("topM",             (float)l.topM);
-        l.FillTree("deltaEta_bJet_qJet",(float)l.deltaEta_bJet_qJet);
-        l.FillTree("njets_OutsideEtaCut",             (int)l.njets_OutsideEtaCut);
-        l.FillTree("njets_InsideEtaCut",             (int)l.njets_InsideEtaCut);
       }
     }
 
