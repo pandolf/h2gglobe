@@ -18,8 +18,14 @@ EXTRALIBS  :=  -L$(ROOTSYS)/lib -L$(ROOFIT_LIBDIR)/ -L$(CMSSW_BASE)/lib/slc5_amd
 create_datacards: create_datacards.cpp DrawBase.o fitTools.o
 	$(CC) -Wall $(INCLUDES) -o create_datacards create_datacards.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
+create_datacards_optLD: create_datacards_optLD.cpp DrawBase.o fitTools.o
+	$(CC) -Wall $(INCLUDES) -o create_datacards_optLD create_datacards_optLD.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
 doShapeAnalysis: doShapeAnalysis.cpp
 	$(CC) -Wall $(INCLUDES) -o doShapeAnalysis doShapeAnalysis.cpp $(ROOTFLAG) $(EXTRALIBS)
+
+drawSignif_vs_LD: drawSignif_vs_LD.cpp DrawBase.o fitTools.o StatTools.o
+	$(CC) -Wall $(INCLUDES) -o drawSignif_vs_LD drawSignif_vs_LD.cpp DrawBase.o fitTools.o StatTools.o $(ROOTFLAG) $(EXTRALIBS)
 
 optimizeWindowDummy: optimizeWindowDummy.cpp DrawBase.o fitTools.o
 	$(CC) -Wall $(INCLUDES) -o optimizeWindowDummy optimizeWindowDummy.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
@@ -29,6 +35,15 @@ computeShapeSyst: computeShapeSyst.cpp DrawBase.o fitTools.o
 
 csStudies: csStudies.cpp DrawBase.o fitTools.o
 	$(CC) -Wall $(INCLUDES) -o csStudies csStudies.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
+csStudiesDummy: csStudiesDummy.cpp DrawBase.o fitTools.o
+	$(CC) -Wall $(INCLUDES) -o csStudiesDummy csStudiesDummy.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
+compareJERsyst: compareJERsyst.cpp DrawBase.o fitTools.o
+	$(CC) -Wall $(INCLUDES) -o compareJERsyst compareJERsyst.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
+validateLDvars: validateLDvars.cpp DrawBase.o fitTools.o
+	$(CC) -Wall $(INCLUDES) -o validateLDvars validateLDvars.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
@@ -40,6 +55,9 @@ DrawBase.o: $(CMSSW_BASE)/src/CommonTools/DrawBase.C fitTools.o
 
 fitTools.o: $(CMSSW_BASE)/src/CommonTools/fitTools.C
 	$(CC) $(CFLAGS) $(INCLUDES) $(CMSSW_BASE)/src/CommonTools/fitTools.C $(ROOTFLAG) $(EXTRALIBS)
+
+StatTools.o: $(CMSSW_BASE)/src/CommonTools/StatTools.cc
+	$(CC) $(CFLAGS) $(INCLUDES) $(CMSSW_BASE)/src/CommonTools/StatTools.cc $(ROOTFLAG) $(EXTRALIBS)
 
 
 clean:
