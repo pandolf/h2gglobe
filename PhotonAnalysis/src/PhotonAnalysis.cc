@@ -18,6 +18,7 @@
 #define FMDEBUG 0
 #define FPDEBUGTHQ 0
 
+
 using namespace std;
 
 // Return the cosine of the angle between the momentums of 2 TLorentzVectors
@@ -165,9 +166,57 @@ PhotonAnalysis::PhotonAnalysis()  :
     _foresteb=0;
     _forestee=0; 
 
-    std::string thqFile_LD = "/afs/cern.ch/work/p/pandolf/public/THq_tHqLeptonic_mH125_8TeV_testtest_presel_isLeptonic_CSV.root";
-    std::string tthFile_LD = "/afs/cern.ch/work/p/pandolf/public/THq_TTH_HToGG_M-125_8TeV-pythia6_Summer12-PU_S7_START52_V9-v2_presel_isLeptonic_CSV.root";
-    thqlikeli = new THqLeptonicLikelihoodCalculator( thqFile_LD, tthFile_LD );
+    thqCS_btagLevel = 2;  // 2: nominal (CSVM); 1: CSVL; 0: no threshold (actually, 0)
+
+    std::string thqFile_LD_old = "/afs/cern.ch/work/p/pandolf/public/THq_tHqLeptonic_mH125_8TeV_testtest_presel_isLeptonic_CSV.root";
+    std::string tthFile_LD_old = "/afs/cern.ch/work/p/pandolf/public/THq_TTH_HToGG_M-125_8TeV-pythia6_Summer12-PU_S7_START52_V9-v2_presel_isLeptonic_CSV.root";
+    thqlikeli_old = new THqLeptonicLikelihoodCalculatorOld( thqFile_LD_old, tthFile_LD_old );
+
+    //std::string fileName_thq = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/AnalysisScripts/thqLDstudies/tHqLD_leptonic_PDFs.root";
+    std::string fileName_thq = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/PhotonAnalysis/data/tHqLD_leptonic_PDFs.root";
+    thqlikeli = new THqLeptonicLikelihoodCalculator( fileName_thq );
+
+    //std::string fileName_thq_central = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/AnalysisScripts/thqLDstudies/tHqLD_leptonic_PDFs_central.root";
+    //thqlikeli_central = new THqLeptonicLikelihoodCalculator( fileName_thq_central );
+
+ 
+    reader_thqBDT_lept = new TMVA::Reader( "!Color:!Silent" );
+
+
+    reader_thqBDT_lept->AddVariable("njets", &njets_bdt );
+    reader_thqBDT_lept->AddVariable("deltaEta_lept_qJet", &deltaEta_lept_qJet_bdt );
+    reader_thqBDT_lept->AddVariable("topMt", &topMt_bdt );
+    reader_thqBDT_lept->AddVariable("qJetEta", &qJetEta_bdt );
+    reader_thqBDT_lept->AddVariable("lept_charge", &lept_charge_bdt );
+ 
+    TString methodName = "BDTG method";
+    TString weightfile = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/AnalysisScripts/thqLDstudies/TMVA/weights/thqBDTlept_v1_BDTG.weights.xml";
+    
+    std::cout << "-> Booking BDT" << std::endl;
+    reader_thqBDT_lept->BookMVA( methodName, weightfile ); 
+
+
+
+    reader_thqBDT_lept_2 = new TMVA::Reader( "!Color:!Silent" );
+
+    reader_thqBDT_lept_2->AddVariable("njets", &njets_bdt );
+    reader_thqBDT_lept_2->AddVariable("njets_InsideEtaCut", &njets_InsideEtaCut_bdt );
+    reader_thqBDT_lept_2->AddVariable("deltaEta_lept_qJet", &deltaEta_lept_qJet_bdt );
+    reader_thqBDT_lept_2->AddVariable("topMt", &topMt_bdt );
+    reader_thqBDT_lept_2->AddVariable("qJetEta", &qJetEta_bdt );
+    reader_thqBDT_lept_2->AddVariable("lept_charge", &lept_charge_bdt );
+    reader_thqBDT_lept_2->AddVariable("deltaPhi_top_higgs", &deltaPhi_top_higgs_bdt );
+ 
+    TString methodName_2 = "BDTG method";
+    TString weightfile_2 = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/AnalysisScripts/thqLDstudies/TMVA/weights/thqBDT2lept_v1_BDTG.weights.xml";
+    
+    std::cout << "-> Booking BDT2" << std::endl;
+    reader_thqBDT_lept_2->BookMVA( methodName_2, weightfile_2 ); 
+
+
+
+    //file_fasaWeights_pt = TFile::Open(  "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/AnalysisScripts/scales/scales_2D_pt_data_moriond.root" );
+    //file_fasaWeights_eta = TFile::Open( "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/AnalysisScripts/scales/scales_2D_eta_data_moriond.root" );
 
 }
 
@@ -179,6 +228,10 @@ PhotonAnalysis::~PhotonAnalysis()
       delete thqlikeli;
       thqlikeli=0;
     }
+    //file_fasaWeights_pt->Close();
+    //file_fasaWeights_eta->Close();
+    //file_fasaWeights_pt = 0;
+    //file_fasaWeights_eta = 0;
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -559,7 +612,7 @@ void PhotonAnalysis::applySinglePhotonSmearings(std::vector<float> & smeared_pho
             if( doEcorrectionSmear )  {
                 eCorrSmearer->smearPhoton(phoInfo,sweight,l.run,0.);
             }
-            //eScaleDataSmearer->smearPhoton(phoInfo,sweight,l.run,0.);
+            //eScaleDataSmearer->smearPhoton(phoInfo,sweight,l.run,0.); //xxx
             pweight *= sweight;
         }
 	//// phoInfo.dump();
@@ -1928,6 +1981,9 @@ void PhotonAnalysis::postProcessJets(LoopAll & l, int vtx)
     }
     if( vtx == -1 || vtx == 0 ) {
 	for(int ijet=0; ijet<l.jet_algoPF1_n; ++ijet) {
+        TLorentzVector * p4 = (TLorentzVector*)l.jet_algoPF1_p4->At(ijet);
+        double ptCor = p4->Pt();
+        if( ptCor<1. ) continue;
 	    if( recorrectJets ) {
 		jetHandler_->recomputeJec(ijet, true);
 	    }
@@ -1937,6 +1993,9 @@ void PhotonAnalysis::postProcessJets(LoopAll & l, int vtx)
 	    if( applyJer ) {
 		jetHandler_->applyJerUncertainty(ijet, jerShift);
 	    }
+        TLorentzVector * p4_new = (TLorentzVector*)l.jet_algoPF1_p4->At(ijet);
+        double ptCor_new = p4_new->Pt();
+        if( ptCor_new<1. ) continue;
 	    if( applyJecUnc ) {
 		jetHandler_->applyJecUncertainty(ijet, jecShift);
 	    }
@@ -1944,6 +2003,9 @@ void PhotonAnalysis::postProcessJets(LoopAll & l, int vtx)
     }
     for(int ivtx=minv;ivtx<maxv; ++ivtx) {
 	for(int ijet=0; ijet<l.jet_algoPF1_n; ++ijet) {
+        TLorentzVector * p4 = (TLorentzVector*)l.jet_algoPF1_p4->At(ijet);
+        double ptCor = p4->Pt();
+        if( ptCor<1. ) continue;
 	    if( recomputeBetas || (l.typerun != l.kFill && l.version > 14 && ivtx >= l.jet_algoPF1_nvtx) ) {
 		/// std::cout << "recomputeBetas " << ivtx << " " << l.jet_algoPF1_nvtx << std::endl;
 		jetHandler_->computeBetas(ijet, ivtx);
@@ -4829,6 +4891,8 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
 
     if(diphotontHqLeptonic_id==-1) return false;
 
+    //TH2D* h2_fasaWeights_pt  = (TH2D*)file_fasaWeights_pt ->Get("h2D_pt_data");
+    //TH2D* h2_fasaWeights_eta = (TH2D*)file_fasaWeights_eta->Get("h2D_eta_data");
 
     //
     //if(diphotontHqLeptonic_id !=-1 && elVtx != -1){
@@ -5064,6 +5128,9 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
     int indexBtag=-1;
     int indexQJet=-1;
 
+    float csvThresh_loose = 0.244;
+    float csvThresh_medium = 0.679;
+
     if( FPDEBUGTHQ ) std::cout<<"jets:" << std::endl;
 
 
@@ -5074,7 +5141,7 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
       if( FPDEBUGTHQ ) std::cout<<"ii: " << ii << " pt: "<<p4_jet->Pt()<<" eta: " << p4_jet->Eta() << " csv: " << l.jet_algoPF1_csvBtag[ii] << " jetid_flags: " << jetid_flags[ii] << std::endl;
       if(jetid_flags != 0 && !jetid_flags[ii]) continue; 
       if(fabs(p4_jet->Eta()) > etaJets_thresh) continue;
-      if(p4_jet->Pt()<ptJets_thresh) continue;
+      if(p4_jet->Pt()<20.) continue; // 20 gev is OK for bjet
 
       double dR_jet_PhoLead = p4_jet->DeltaR(lead_p4);
       if( dR_jet_PhoLead<0.5 ) continue;
@@ -5091,12 +5158,24 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
 
       njets++;
 
-      if(l.jet_algoPF1_csvBtag[ii]>0.244) {
+ 
+      if(l.jet_algoPF1_csvBtag[ii]>csvThresh_loose) {
         njets_btagloose++;
       }
 
-      if(l.jet_algoPF1_csvBtag[ii]>0.679) {
+      if(l.jet_algoPF1_csvBtag[ii]>csvThresh_medium) {
         njets_btagmedium++;
+      }
+
+
+      float csvThresh_thq = csvThresh_medium;
+      if( thqCS_btagLevel==1 )
+        csvThresh_thq = csvThresh_loose;
+      else if( thqCS_btagLevel==0 )
+        csvThresh_thq = 0.;
+
+
+      if( l.jet_algoPF1_csvBtag[ii]>csvThresh_thq && fabs(p4_jet->Eta())<2.5 ) {
         if(indexBtag<0) {
           indexBtag=ii;
         } else {
@@ -5105,6 +5184,7 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
             indexBtag=ii;
         }
       }
+      
 
       if( FPDEBUGTHQ )std::cout<<"^ THIS ONE PASSED" << std::endl;
 
@@ -5122,7 +5202,7 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
 
       TLorentzVector * p4_jet = (TLorentzVector *) l.jet_algoPF1_p4->At(ii);
       if(jetid_flags != 0 && !jetid_flags[ii]) continue; 
-      if(fabs(p4_jet->Eta()) > etaJets_thresh) continue;
+      if(fabs(p4_jet->Eta()) > etaJets_thresh) continue; 
       if(p4_jet->Pt()<ptJets_thresh) continue;
 
       double dR_jet_PhoLead = p4_jet->DeltaR(lead_p4);
@@ -5141,17 +5221,18 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
       if( dR_jet_bJet<0.5 ) continue;
 
 
-      if( fabs(p4_jet->Eta())>etaAdditionalJet_thresh ) {
-        njets_OutsideEtaCut++;
-        if(indexQJet<0) {
+      // simply define qJet as hardest jet in event which is not bJet
+      // require |eta|>1 AFTER loop
+      if(indexQJet<0) {
+        indexQJet=ii;
+      } else {
+        TLorentzVector * qjet_old  = (TLorentzVector *) l.jet_algoPF1_p4->At(indexQJet);
+        if( p4_jet->Pt()>qjet_old->Pt() )
           indexQJet=ii;
-        } else {
-          TLorentzVector * qjet_old  = (TLorentzVector *) l.jet_algoPF1_p4->At(indexQJet);
-          if( p4_jet->Pt()>qjet_old->Pt() )
-            indexQJet=ii;
-        }
       }
 
+
+      if( fabs(p4_jet->Eta())>etaAdditionalJet_thresh ) njets_OutsideEtaCut++;
       if( fabs(p4_jet->Eta())<etaAdditionalJet_thresh ) njets_InsideEtaCut++;
 
     } //for jets
@@ -5162,6 +5243,7 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
     if( indexQJet<0 ) return false;
 
     TLorentzVector* qJet = (TLorentzVector*) (l.jet_algoPF1_p4->At(indexQJet));
+    if( fabs(qJet->Eta()) < etaAdditionalJet_thresh ) return false;
  
 
     TLorentzVector* neutrino = new TLorentzVector();
@@ -5200,8 +5282,39 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
     l.topMt              = top->Mt();
     l.deltaEta_lept_qJet = deltaEta_lept_qJet;
     l.deltaEta_bJet_qJet = deltaEta_bJet_qJet;
+    l.deltaPhi_top_higgs = top->DeltaPhi(diphoton);
+
+
+    l.thqLD_lept_old = (float)(thqlikeli_old->computeLikelihood( njets, qJet->Eta(), top->Mt(), l.lept_charge, deltaEta_lept_qJet ));
 
     l.thqLD_lept = (float)(thqlikeli->computeLikelihood( njets, qJet->Eta(), top->Mt(), l.lept_charge, deltaEta_lept_qJet ));
+
+    l.thqLD_lept_central = (float)(thqlikeli_central->computeLikelihood( njets_InsideEtaCut, qJet->Eta(), top->Mt(), l.lept_charge, deltaEta_lept_qJet ));
+
+    l.thqLD_lept_central = (float)(thqlikeli_central->computeLikelihood( njets_InsideEtaCut, qJet->Eta(), top->Mt(), l.lept_charge, deltaEta_lept_qJet ));
+
+
+    njets_bdt = njets;
+    njets_InsideEtaCut_bdt = l.njets_InsideEtaCut;
+    deltaEta_lept_qJet_bdt = deltaEta_lept_qJet;
+    topMt_bdt = top->Mt();
+    qJetEta_bdt = qJet->Eta();
+    lept_charge_bdt = l.lept_charge;
+
+    l.thqBDT_lept = reader_thqBDT_lept->EvaluateMVA( "BDTG method" );
+
+    deltaPhi_top_higgs_bdt = top->DeltaPhi(diphoton);
+    //l.thqBDT_lept_2 = reader_thqBDT_lept_2->EvaluateMVA( "BDTG method" );
+
+
+    //int bin_pt1 = h2_fasaWeights_pt->GetYaxis()->FindBin(lead_p4.Pt());
+    //int bin_pt2 = h2_fasaWeights_pt->GetXaxis()->FindBin(sublead_p4.Pt());
+    //l.fasaWeight_pt = h2_fasaWeights_pt->GetBinContent( bin_pt2, bin_pt1 );
+
+    //int bin_eta1 = h2_fasaWeights_eta->GetYaxis()->FindBin(lead_p4.Eta());
+    //int bin_eta2 = h2_fasaWeights_eta->GetXaxis()->FindBin(sublead_p4.Eta());
+    //l.fasaWeight_eta = h2_fasaWeights_eta->GetBinContent( bin_eta2, bin_eta1 );
+
 
     if(FPDEBUGTHQ) 
       std::cout << "thqLD_lept: " << l.thqLD_lept << std::endl;
@@ -5382,6 +5495,9 @@ bool PhotonAnalysis::tHqHadronicTag(LoopAll& l, int diphotontHqHadronic_id, floa
     int indexBtag=-1;
     int indexQJet=-1;
 
+    float csvThresh_loose = 0.244;
+    float csvThresh_medium = 0.679;
+
     if( FPDEBUGTHQ ) std::cout<<"jets:" << std::endl;
 
 
@@ -5403,11 +5519,11 @@ bool PhotonAnalysis::tHqHadronicTag(LoopAll& l, int diphotontHqHadronic_id, floa
 
       njets++;
 
-      if(l.jet_algoPF1_csvBtag[ii]>0.244) {
+      if(l.jet_algoPF1_csvBtag[ii]>csvThresh_loose) {
         njets_btagloose++;
       }
 
-      if(l.jet_algoPF1_csvBtag[ii]>0.679) {
+      if(l.jet_algoPF1_csvBtag[ii]>csvThresh_medium) {
         njets_btagmedium++;
         if(indexBtag<0) {
           indexBtag=ii;
@@ -5577,6 +5693,7 @@ bool PhotonAnalysis::tHqHadronicTag(LoopAll& l, int diphotontHqHadronic_id, floa
     l.qJetEta = qJet->Eta();
     l.qJetPt = qJet->Pt();
     l.topM = top->M();
+    l.topMt = top->Mt();
     l.bJetPt = bJet->Pt();
     l.deltaEta_bJet_qJet = fabs( bJet->Eta() - qJet->Eta() );
 
@@ -5731,7 +5848,7 @@ float PhotonAnalysis::BtagReweight(LoopAll &l, bool shiftBtagEffUp_bc, bool shif
 
 		for(int ijet=0; ijet<l.jet_algoPF1_n; ++ijet) {
 		    TLorentzVector* jet1 = (TLorentzVector*)l.jet_algoPF1_p4->At(ijet);
-		    if(fabs(jet1->Eta()) > 2.4) continue;
+		    //if(fabs(jet1->Eta()) > 2.4) continue;
 		    if(fabs(jet1->Pt()) < 25.) continue;
 		    //		    cout<<"jet1 preso"<<endl;
 		    double dr_jet=jet1->DeltaR(*jet_mc);
@@ -5753,6 +5870,7 @@ float PhotonAnalysis::BtagReweight(LoopAll &l, bool shiftBtagEffUp_bc, bool shif
 
 
 	    w= b.weight(nBjets,nCjets,nLjets,SFb,SFc,SFl,1);
+
 	    /*
 	      float wbcp= b.weight(ib,ic,il,1,1,1.1,1);
 	      float wbcm= b.weight(ib,ic,il,0.8,0.8,1.1,1);
