@@ -5,6 +5,8 @@ type=0 name=lumis
 type=0 name=event
 type=2 name=weight
 type=2 name=evweight
+type=2 name=fasaWeight_pt
+type=2 name=fasaWeight_eta
 type=2 name=pu_weight
 type=2 name=pu_n
 type=2 name=nvtx
@@ -251,6 +253,8 @@ type=0 name=lept_charge
 type=0 name=njets
 type=0 name=njets_OutsideEtaCut
 type=0 name=njets_InsideEtaCut
+type=0 name=nbjets_loose
+type=0 name=nbjets_medium
 type=2 name=qJetEta
 type=2 name=qJetPt
 type=2 name=bJetPt
@@ -258,4 +262,8 @@ type=2 name=topMt
 type=2 name=topM
 type=2 name=deltaEta_lept_qJet
 type=2 name=deltaEta_bJet_qJet
+type=2 name=deltaPhi_top_higgs
+type=2 name=thqLD_lept_old
 type=2 name=thqLD_lept
+type=2 name=thqLD_lept_central
+type=2 name=thqBDT_lept
