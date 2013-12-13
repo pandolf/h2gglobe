@@ -16,15 +16,25 @@ LDCutStruct findVariableThreshold( DrawBase* db, const std::string& varName, flo
 
 
 
-int main() {
 
+int main( int argc, char* argv[] ) {
+
+
+  std::string batchProd = "qJetEtaFix_v3";
+  if( argc>1 ) {
+    std::string batchProd_str(argv[1]);
+    batchProd = batchProd_str;
+  }
+    
 
   DrawBase* db = new DrawBase("rocs_and_shit");
   
 
-  TFile* file = TFile::Open("../batchOutput_provaLD2/histograms_CMS-HGG.root");
+  std::string fileName = "../batchOutput_" + batchProd + "/histograms_CMS-HGG.root";
+  TFile* file = TFile::Open(fileName.c_str());
   db->add_mcFile( file, "thefile", "tHq", kBlack, 0);
-  db->set_outputdir("RoCs_andShit");
+  std::string outputdir = "RoCs_andShit_" + batchProd;
+  db->set_outputdir(outputdir);
 
   LDCutStruct cutStruct_LD = findVariableThreshold(db, "thqLD_lept", 0.1);
   LDCutStruct cutStruct_LD_2 = findVariableThreshold(db, "thqLD_lept_2", 0.1);
