@@ -13,11 +13,8 @@ class THqLeptonicLikelihoodCalculator {
 
  public:
 
-  THqLeptonicLikelihoodCalculator( const std::string& tHqFileName, const std::string& ttHFileName );
+  THqLeptonicLikelihoodCalculator( const std::string& fileName );
    ~THqLeptonicLikelihoodCalculator();
-
-  void open_tHqFile( const std::string& fileName );
-  void open_ttHFile( const std::string& fileName );
 
 
   double computeLikelihood( int nJets, float eta_qJet, float mt_top, int lept_charge, float deltaEta_lept_qJet ); 
@@ -25,12 +22,6 @@ class THqLeptonicLikelihoodCalculator {
 
 
  private:
-
-  TFile* file_tHq_;
-  TFile* file_ttH_;
-
-  TTree* tree_tHq_;
-  TTree* tree_ttH_;
 
   TH1D* h1_nJets_ttH_;
   TH1D* h1_eta_qJet_ttH_;
