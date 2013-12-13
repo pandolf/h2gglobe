@@ -160,6 +160,8 @@ class LoopAll {
   int   njets;
   int   njets_OutsideEtaCut;
   int   njets_InsideEtaCut;
+  int   nbjets_loose;
+  int   nbjets_medium;
   float qJetEta;
   float qJetPt;
   float bJetPt;
@@ -167,7 +169,19 @@ class LoopAll {
   float topM;
   float deltaEta_lept_qJet;
   float deltaEta_bJet_qJet;
+  int njets_bdt;
+  int njets_InsideEtaCut_bdt;
+  float deltaEta_lept_qJet_bdt;
+  float deltaPhi_top_higgs;
+  float topMt_bdt;
+  float qJetEta_bdt;
+  int lept_charge_bdt;
+  float thqLD_lept_old;
   float thqLD_lept;
+  float thqBDT_lept;
+  float thqBDT_lept_2;
+  float fasaWeight_pt;
+  float fasaWeight_eta;
 
   TFile * outputFile;
   TString outputFileName;
