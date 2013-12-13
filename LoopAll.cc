@@ -627,7 +627,7 @@ void bookGlobalCounters( TTree * intree, TTree * outTree,
 
 // ------------------------------------------------------------------------------------
 void LoopAll::Loop(Int_t a) {
-  
+
   //makeOutputTree = makeOutputTree;
   if (makeOutputTree) {
     // outputTree = outputTree;
@@ -683,6 +683,7 @@ void LoopAll::Loop(Int_t a) {
   if(checkBench > 0) {
 	  stopWatch.Start();
   }
+
   for (Int_t jentry=0; jentry<nentries;jentry++) {
     
     if(jentry%10000==0) {
@@ -722,10 +723,12 @@ void LoopAll::Loop(Int_t a) {
 
     if(LDEBUG) 
       cout<<"Call FillandReduce "<<endl;
+
       
     hasoutputfile = this->FillAndReduce(jentry);
     if(LDEBUG) 
       cout<<"Called FillandReduce "<<endl;
+
   }
   tfileend = time(0);
   std::cout << "Average time per event: " << (float) difftime(tfileend,tfilestart)/nentries << std::endl;
@@ -771,6 +774,9 @@ void LoopAll::Loop(Int_t a) {
       outputParReductions = reductions;
       outputParRed_Events[reductions] += (int)countersred[3];
     }
+
+
+
   }
   
   int oldnentries=nentries;
@@ -1106,6 +1112,8 @@ int LoopAll::FillAndReduce(int jentry) {
       analyses[i]->FillReductionVariables(*this, jentry);
     }
     
+
+
     // (pre-)select events
     for (size_t i=0; i<analyses.size(); i++) {
       if( ! analyses[i]->SelectEventsReduction(*this, jentry) ) {
@@ -1150,6 +1158,7 @@ int LoopAll::FillAndReduce(int jentry) {
     }
   }
   
+
   return hasoutputfile;
 }
 
