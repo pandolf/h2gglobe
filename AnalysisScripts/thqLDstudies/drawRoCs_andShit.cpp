@@ -5,41 +5,66 @@
 
 
 
-void compareSingleVariable( DrawBase* db, const std::string& varName, int nBins, float xMin, float xMax, const std::string& axisName, const std::string& units="", const std::string& additionalCuts="", const std::string suffix=""  );
+void compareSingleVariable( DrawBase* db, int channel, const std::string& varName, int nBins, float xMin, float xMax, const std::string& axisName, const std::string& units="", const std::string& additionalCuts="", const std::string suffix=""  );
 void drawRoc( DrawBase* db );
-void compareTaggers( DrawBase* db, const std::string& varName1, const std::string& varName2, const std::string& legendName1, const std::string& legendName2, int nBins=25, float xMin=0., float xMax=1.0001 );
+void compareTaggersLeptonic( DrawBase* db, const std::string& varName1, const std::string& varName2, const std::string& legendName1, const std::string& legendName2, int nBins=25, float xMin=0., float xMax=1.0001 );
 
 
 
-int main() {
+int main( int argc, char* argv[] ) {
 
+
+  std::string batchProd = "qJetEtaFix_newLD_v1";
+  if( argc>1 ) {
+    std::string batchProd_str(argv[1]);
+    batchProd = batchProd_str;
+  }
+    
 
   DrawBase* db = new DrawBase("rocs_and_shit");
 
-  TFile* file = TFile::Open("../batchOutput_provaLD6/histograms_CMS-HGG.root");
+  std::string fileName = "../batchOutput_" + batchProd + "/histograms_CMS-HGG.root";
+  TFile* file = TFile::Open(fileName.c_str());
+  //TFile* file = TFile::Open("../batchOutput_provaLD6_withBDT2/histograms_CMS-HGG.root");
   db->add_mcFile( file, "thefile", "tHq", kBlack, 0);
-  db->set_outputdir("RoCs_andShit");
+  TFile* fileBG = TFile::Open("../batchOutputBG2/histograms_CMS-HGG.root");
+  db->add_mcFile( fileBG, "thefileBG", "diphoton", kBlack, 0);
+  std::string outputdir = "RoCs_andShit_" + batchProd;
+  db->set_outputdir(outputdir);
 
   
 
-  compareSingleVariable( db, "njets_InsideEtaCut", 9, -0.5, 8.5,  "Central Jet Multiplicity (|#eta|<1)", "" );
-  compareSingleVariable( db, "njets_InsideEtaCut", 9, -0.5, 8.5,  "Central Jet Multiplicity (|#eta|<1)", "", "thqLD_lept>0.25", "LDcut" );
-  compareSingleVariable( db, "njets",              9, -0.5, 8.5,  "Jet Multiplicity", "" );
-  compareSingleVariable( db, "qJetEta",            30, 0., 5.,    "qJet Pseudorapidity", "" );
-  compareSingleVariable( db, "topMt",              50, 0., 1000., "Top Transverse Mass", "GeV" );
-  compareSingleVariable( db, "lept_charge",        3, -1.5, 1.5,  "Lepton Charge", "" );
-  compareSingleVariable( db, "deltaEta_lept_qJet", 35, 0., 7.,    "#Delta#eta(lepton-qJet)", "" );
-  compareSingleVariable( db, "deltaPhi_top_higgs", 30, 0., 3.15,    "#Delta#phi(top-diphoton)", "rad" );
-  compareSingleVariable( db, "deltaPhi_top_higgs", 30, 0., 3.15,    "#Delta#phi(top-diphoton)", "rad", "thqLD_lept>0.25", "LDcut" );
+  // hadronic channel (12)
+  compareSingleVariable( db, 12, "njets_InsideEtaCut", 9, -0.5, 8.5,  "Central Jet Multiplicity (|#eta|<2)", "" );
+  compareSingleVariable( db, 12, "njets",              9, -0.5, 8.5,  "Jet Multiplicity", "" );
+  compareSingleVariable( db, 12, "qJetPt",             50, 20., 120.,    "qJet p_{T}", "GeV" );
+  compareSingleVariable( db, 12, "qJetEta",            30, 0., 5.,    "qJet |#eta|", "" );
+  compareSingleVariable( db, 12, "topM",               50, 0., 1000., "Top Transverse Mass", "GeV" );
+  compareSingleVariable( db, 12, "deltaEta_bJet_qJet", 35, 0., 7.,    "|#Delta#eta| (bJet-qJet)", "" );
+  compareSingleVariable( db, 12, "deltaPhi_top_higgs", 30, 0., 3.15,    "#Delta#phi(top-diphoton)", "rad" );
 
-  compareSingleVariable( db, "thqLD_lept", 25, 0., 1.0001,    "tHq Leptonic LD" );
-  compareSingleVariable( db, "thqLD_lept_2", 25, 0., 1.0001,    "tHq Leptonic LD" );
-  compareSingleVariable( db, "thqLD_lept_2_central", 25, 0., 1.0001,    "tHq Leptonic LD (central jets)" );
-  compareSingleVariable( db, "thqBDT_lept", 25, -1., 1.0001,    "tHq Leptonic BDT" );
-  compareSingleVariable( db, "thqBDT_lept_2", 25, -1., 1.0001,    "tHq Leptonic BDT (6 vars)" );
 
-  compareTaggers( db, "thqLD_lept_2", "thqLD_lept_2_central", "Old LD", "New LD" );
-  compareTaggers( db, "thqBDT_lept", "thqBDT_lept_2", "BDT 5 vars", "BDT 6 vars", 25, -1., 1. );
+  // leptonic channel (11)
+  compareSingleVariable( db, 11, "njets_InsideEtaCut", 9, -0.5, 8.5,  "Central Jet Multiplicity (|#eta|<1)", "" );
+  compareSingleVariable( db, 11, "njets_InsideEtaCut", 9, -0.5, 8.5,  "Central Jet Multiplicity (|#eta|<1)", "", "thqLD_lept>0.25", "LDcut" );
+  compareSingleVariable( db, 11, "njets_OutsideEtaCut", 9, -0.5, 8.5,  "Central Jet Multiplicity (|#eta|>1)", "" );
+  compareSingleVariable( db, 11, "njets",              9, -0.5, 8.5,  "Jet Multiplicity", "" );
+  compareSingleVariable( db, 11, "bJetPt",             50, 20., 320., "bJet p_{T}", "GeV" );
+  compareSingleVariable( db, 11, "qJetEta",            30, 0., 5.,    "qJet |#eta|", "" );
+  compareSingleVariable( db, 11, "topMt",              50, 0., 1000., "Top Transverse Mass", "GeV" );
+  compareSingleVariable( db, 11, "lept_charge",        3, -1.5, 1.5,  "Lepton Charge", "" );
+  compareSingleVariable( db, 11, "deltaEta_lept_qJet", 35, 0., 7.,    "|#Delta#eta| (lepton-qJet)", "" );
+  compareSingleVariable( db, 11, "deltaPhi_top_higgs", 30, 0., 3.15,    "#Delta#phi(top-diphoton)", "rad" );
+  compareSingleVariable( db, 11, "deltaPhi_top_higgs", 30, 0., 3.15,    "#Delta#phi(top-diphoton)", "rad", "thqLD_lept>0.25", "LDcut" );
+
+  compareSingleVariable( db, 11, "thqLD_lept", 25, 0., 1.0001,    "tHq Leptonic LD" );
+  compareSingleVariable( db, 11, "thqLD_lept_2", 25, 0., 1.0001,    "tHq Leptonic LD" );
+  compareSingleVariable( db, 11, "thqLD_lept_2_central", 25, 0., 1.0001,    "tHq Leptonic LD (central jets)" );
+  compareSingleVariable( db, 11, "thqBDT_lept", 25, -1., 1.0001,    "tHq Leptonic BDT" );
+  compareSingleVariable( db, 11, "thqBDT_lept_2", 25, -1., 1.0001,    "tHq Leptonic BDT (6 vars)" );
+
+  compareTaggersLeptonic( db, "thqLD_lept_2", "thqLD_lept_2_central", "Old LD", "New LD" );
+  compareTaggersLeptonic( db, "thqBDT_lept", "thqBDT_lept_2", "BDT 5 vars", "BDT 6 vars", 25, -1., 1. );
 
   drawRoc(db);
 
@@ -49,12 +74,14 @@ int main() {
 
 
 
-void compareSingleVariable( DrawBase* db, const std::string& varName, int nBins, float xMin, float xMax, const std::string& axisName, const std::string& units, const std::string& additionalCuts, const std::string suffix  ) {
+void compareSingleVariable( DrawBase* db, int channel, const std::string& varName, int nBins, float xMin, float xMax, const std::string& axisName, const std::string& units, const std::string& additionalCuts, const std::string suffix  ) {
 
   TFile* file = db->get_mcFile("thefile").file;
+  TFile* fileBG = db->get_mcFile("thefileBG").file;
 
   TTree* tree_thq = (TTree*)file->Get("thqLeptonic_m125_8TeV");
   TTree* tree_tth = (TTree*)file->Get("tth_m125_8TeV");
+  if( channel==12) tree_tth = (TTree*)fileBG->Get("diphojet_sherpa_8TeV");
 
   TH1D* h1_thq = new TH1D( "thq", "", nBins, xMin, xMax );
   TH1D* h1_tth = new TH1D( "tth", "", nBins, xMin, xMax );
@@ -62,12 +89,14 @@ void compareSingleVariable( DrawBase* db, const std::string& varName, int nBins,
   h1_thq->Sumw2();
   h1_tth->Sumw2();
 
-  std::string fullSelection;
-  if( additionalCuts=="" ) fullSelection = "weight*( category==11 )";
-  else                     fullSelection = "weight*( category==11 && " + additionalCuts + ")";
+  char fullSelection[500];
+  if( additionalCuts=="" ) 
+    sprintf( fullSelection, "weight*( category==%d )", channel );
+  else
+    sprintf( fullSelection, "weight*( category==%d && %s)", channel,  additionalCuts.c_str() );
 
-  tree_thq->Project("thq", varName.c_str(), fullSelection.c_str() );
-  tree_tth->Project("tth", varName.c_str(), fullSelection.c_str() );
+  tree_thq->Project("thq", varName.c_str(), fullSelection );
+  tree_tth->Project("tth", varName.c_str(), fullSelection );
 
   h1_thq->Scale(1./h1_thq->Integral());
   h1_tth->Scale(1./h1_tth->Integral());
@@ -96,12 +125,16 @@ void compareSingleVariable( DrawBase* db, const std::string& varName, int nBins,
   TCanvas* c1 = new TCanvas("c1", "", 600, 600);
   c1->cd();
 
+  std::string legendTitle = (channel==11) ? "Leptonic Channel" : "Hadronic Channel";
 
   TLegend* legend = new TLegend( 0.55, 0.7, 0.9, 0.9, "Leptonic Channel" );
   legend->SetTextSize(0.040);
   legend->SetFillColor(0);
   legend->AddEntry( h1_thq, "tHq", "F" );
-  legend->AddEntry( h1_tth, "ttH / tt+#gamma#gamma", "F" );
+  if( channel==11 )
+    legend->AddEntry( h1_tth, "ttH / tt+#gamma#gamma", "F" );
+  else
+    legend->AddEntry( h1_tth, "Diphoton", "F" );
 
   TH2D* h2_axes = new TH2D("axes", "", 10, xMin, xMax, 10, 0., yMax );
   h2_axes->SetXTitle( fullAxisTitle.c_str() );
@@ -120,6 +153,8 @@ void compareSingleVariable( DrawBase* db, const std::string& varName, int nBins,
 
   std::string canvasName = db->get_outputdir() + "/"  + varName;
   if( suffix!="" ) canvasName = canvasName + "_" + suffix;
+  if( channel==11 ) canvasName += "_leptonic";
+  if( channel==12 ) canvasName += "_hadronic";
   std::string canvasName_eps = canvasName + ".eps";
   std::string canvasName_png = canvasName + ".png";
  
@@ -287,7 +322,7 @@ void drawRoc( DrawBase* db ) {
 
 
 
-void compareTaggers( DrawBase* db, const std::string& varName1, const std::string& varName2, const std::string& legendName1, const std::string& legendName2, int nBins, float xMin, float xMax ) {
+void compareTaggersLeptonic( DrawBase* db, const std::string& varName1, const std::string& varName2, const std::string& legendName1, const std::string& legendName2, int nBins, float xMin, float xMax ) {
 
 
   TFile* file = db->get_mcFile("thefile").file;
