@@ -3,10 +3,12 @@ import sys
 import re
 import logging
 
+ROOT.gSystem.Load("libHiggsAnalysisCombinedLimit")
+
 # Things in the map below get summed, so do not put qq_grav and gg_grav on the BSM line unless you want their sum.
 procMap={
     'SM':('ggh', 'vbf', 'wzh', 'wh', 'zh', 'tth'),
-    'BSM':('gg_grav',), 
+    'BSM':('thqLeptonic','thqHadronic'), 
     }
 
 types = ('baseline','massfact','spin')
@@ -24,6 +26,10 @@ def makeLabels():
         "Muon-tagged class",
         "Electron-tagged class",
         "MET-tagged class",
+        "ttH Leptonic class",
+        "ttH Hadronic class",
+        "tHq Leptonic class",
+        "tHq Hadronic class",
     )
     aDict['baseline7TeV'] = (
         "Both photons in barrel, min(R_{9}) > 0.94",
