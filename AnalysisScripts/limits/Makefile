@@ -30,6 +30,9 @@ doShapeAnalysis: doShapeAnalysis.cpp
 drawSignif_vs_LD: drawSignif_vs_LD.cpp DrawBase.o fitTools.o StatTools.o
 	$(CC) -Wall $(INCLUDES) -o drawSignif_vs_LD drawSignif_vs_LD.cpp DrawBase.o fitTools.o StatTools.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawThqMC: drawThqMC.cpp DrawBase.o fitTools.o StatTools.o
+	$(CC) -Wall $(INCLUDES) -o drawThqMC drawThqMC.cpp DrawBase.o fitTools.o StatTools.o $(ROOTFLAG) $(EXTRALIBS)
+
 optimizeWindowDummy: optimizeWindowDummy.cpp DrawBase.o fitTools.o
 	$(CC) -Wall $(INCLUDES) -o optimizeWindowDummy optimizeWindowDummy.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
