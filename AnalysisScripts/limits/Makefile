@@ -21,6 +21,9 @@ create_datacards: create_datacards.cpp DrawBase.o fitTools.o
 create_datacards_optLD: create_datacards_optLD.cpp DrawBase.o fitTools.o
 	$(CC) -Wall $(INCLUDES) -o create_datacards_optLD create_datacards_optLD.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
+createDrawBaseFiles: createDrawBaseFiles.cpp 
+	$(CC) -Wall $(INCLUDES) -o createDrawBaseFiles createDrawBaseFiles.cpp $(ROOTFLAG) $(EXTRALIBS)
+
 doShapeAnalysis: doShapeAnalysis.cpp
 	$(CC) -Wall $(INCLUDES) -o doShapeAnalysis doShapeAnalysis.cpp $(ROOTFLAG) $(EXTRALIBS)
 
