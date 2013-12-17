@@ -2,7 +2,7 @@
 
 export DISPLAY=""
 
-dir="qJetEtaFix_newLD_v1"
+dir="batchOutput_qJetEtaFix_newLD_v1"
 mkdir $dir
 
 #tunes="TuneD6T TuneD6TUEOFF TuneP0 TuneP0UEOFF TuneProPT0 TuneProPT0UEOFF TuneProQ20 TuneProQ20UEOFF TuneUEOFF TuneZ2Star"
@@ -23,9 +23,9 @@ mkdir $dir
 #jecUncs=""
 ## jecUncs="jerCentral"
 #jecUncs="jecUp jecDown jerUp"
-jecUncs="btagZero btagLoose btagLooseInvID btagZeroInvID"
+jecUncs="csNominal btagZero btagLoose btagLooseInvID btagZeroInvID"
 
 for syst in $jecUncs; do
-    ./mk_fitter.py -i csAnalysis/datafiles_cubased_legacy_fp_CS.dat -n 250 -l ${syst} -o batchOutput_${dir}/${syst}/sub && \
+    ./mk_fitter.py -i csAnalysis/datafiles_cubased_legacy_fp_CS.dat -n 320 -l ${syst} -o ${dir}/${syst}/sub && \
     ./submit_fitter.py -q 8nh -d ${dir}/${syst}
 done
