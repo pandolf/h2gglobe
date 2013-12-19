@@ -312,8 +312,8 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
   h1_band_btagZeroInvID  ->SetLineColor(kRed+1);
 
   
-  TCanvas* c1 = new TCanvas("c1", "", 600, 600);
-  c1->cd();
+  TCanvas* c2 = new TCanvas("c2", "", 600, 600);
+  c2->cd();
 
   TH2D* h2_axes = new TH2D( "axes", "", 10, 100., 180., 10, 0., 0.4);
   h2_axes->SetXTitle( "Diphoton Mass [GeV]");
@@ -383,11 +383,11 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
   std::string canvasName = db->get_outputdir() + "/mgg_" + datasetName + "_" + saveName;
   std::string canvasName_eps = canvasName + ".eps";
   std::string canvasName_png = canvasName + ".png";
-  c1->SaveAs(canvasName_eps.c_str());
-  c1->SaveAs(canvasName_png.c_str());
+  c2->SaveAs(canvasName_eps.c_str());
+  c2->SaveAs(canvasName_png.c_str());
 
 
-  delete c1;
+  delete c2;
   delete legend;
   delete h2_axes;
   //delete h1_mgg_invID;
