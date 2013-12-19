@@ -49,6 +49,8 @@ int main( int argc, char* argv[] ) {
     batchProd = batchProd_str;
   }
 
+  std::cout << "-> Using batchProd: " << batchProd << std::endl;
+
   DrawBase* db_data = new DrawBase("csStudies");
   std::string outputdir = "csStudiesPlots_" + batchProd;
   db_data->set_outputdir(outputdir);
@@ -271,12 +273,13 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
     tree_btagZeroInvID->Project(  "mgg_btagZeroInvID", "PhotonsMass", fullSelection );
   }
 
-  std::cout << "Sideband Events: " << std::endl;
-  //std::cout << "InvID: " << h1_mgg_invID->GetEntries() << std::endl;
-  std::cout << "btagLoose: " << h1_mgg_btagLoose->GetEntries() << std::endl;
-  std::cout << "btagZero: " << h1_mgg_btagZero->GetEntries() << std::endl;
-  std::cout << "btagLooseInvID: " << h1_mgg_btagLooseInvID->GetEntries() << std::endl;
-  std::cout << "btagZeroInvID: " << h1_mgg_btagZeroInvID->GetEntries() << std::endl;
+
+  ofstream ofs(Form("%s/events_%s_%s.txt", db->get_outputdir().c_str(), datasetName.c_str(), saveName.c_str()) );
+  ofs << "btagLoose: " << h1_mgg_btagLoose->GetEntries() << std::endl;
+  ofs << "btagZero: " << h1_mgg_btagZero->GetEntries() << std::endl;
+  ofs << "btagLooseInvID: " << h1_mgg_btagLooseInvID->GetEntries() << std::endl;
+  ofs << "btagZeroInvID: " << h1_mgg_btagZeroInvID->GetEntries() << std::endl;
+  ofs.close();
 
   //TF1* f1_invID = fitHisto( h1_mgg_invID, kRed, 1 );
   TF1* f1_btagLoose = fitHisto( h1_mgg_btagLoose, kBlack, 1 );
