@@ -25,7 +25,7 @@ struct  ULSignif_struct {
 
 
 
-ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::string& channel, const std::string& additionalSelection, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_ggh, TTree* tree_vbf, TTree* tree_wzh, TTree* tree_tth, const std::string& suffix="" );
+ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::string& channel, const std::string& additionalSelection, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_ggh, TTree* tree_vbf, TTree* tree_wzh, TTree* tree_tth, std::string suffix="", bool extraTTH=false );
 
 
 int main( int argc, char* argv[] ) {
@@ -40,7 +40,7 @@ int main( int argc, char* argv[] ) {
 
   DrawBase* db = new DrawBase("optLD");
 
-  std::string fileName = "../batchOutput_" + batchProd + "/nominal/histograms_CMS-HGG.root";
+  std::string fileName = "../batchOutput_" + batchProd + "/histograms_CMS-HGG.root";
   TFile* file   = TFile::Open(fileName.c_str());
   std::cout << "-> Opening file: " << fileName << std::endl;
 
@@ -62,8 +62,12 @@ int main( int argc, char* argv[] ) {
   TGraphAsymmErrors* gr_signif = new TGraphAsymmErrors(0);
   TGraphAsymmErrors* gr_ul     = new TGraphAsymmErrors(0);
 
+  TGraphAsymmErrors* gr_signif_extraTTH = new TGraphAsymmErrors(0);
+  TGraphAsymmErrors* gr_ul_extraTTH     = new TGraphAsymmErrors(0);
+
   int iPoint=0;
 
+  //for( float iCut = 0.; iCut < 0.1; iCut += 0.05 ) {
   for( float iCut = 0.; iCut < 1.; iCut += 0.05 ) {
     char ldcut[100];
     sprintf( ldcut, "thqLD_lept>=%f", iCut );
@@ -72,14 +76,23 @@ int main( int argc, char* argv[] ) {
     sprintf( ldcutName, "LD%.0f", iCut*100 );
     std::string ldcutNameString(ldcutName);
     ULSignif_struct thisStruct = createSingleDatacard( batchProd, "leptonic", ldcutString, tree_thqLept, tree_thqHadr, tree_ggh, tree_vbf, tree_wzh, tree_tth, ldcutNameString );
+    ULSignif_struct thisStruct_extraTTH = createSingleDatacard( batchProd, "leptonic", ldcutString, tree_thqLept, tree_thqHadr, tree_ggh, tree_vbf, tree_wzh, tree_tth, ldcutNameString, true );
 
     gr_signif->SetPoint( iPoint, iCut, thisStruct.signif );
     gr_signif->SetPointEYhigh( iPoint, thisStruct.s_err_plus );
     gr_signif->SetPointEYlow( iPoint, -thisStruct.s_err_minus );
 
-    gr_ul ->SetPoint( iPoint, iCut, thisStruct.ul );
+    gr_ul->SetPoint( iPoint, iCut, thisStruct.ul );
     gr_ul->SetPointEYhigh( iPoint, thisStruct.ul_err );
     gr_ul->SetPointEYlow( iPoint, thisStruct.ul_err );
+
+    gr_signif_extraTTH->SetPoint( iPoint, iCut, thisStruct_extraTTH.signif );
+    gr_signif_extraTTH->SetPointEYhigh( iPoint, thisStruct_extraTTH.s_err_plus );
+    gr_signif_extraTTH->SetPointEYlow( iPoint, -thisStruct_extraTTH.s_err_minus );
+
+    gr_ul_extraTTH->SetPoint( iPoint, iCut, thisStruct_extraTTH.ul );
+    gr_ul_extraTTH->SetPointEYhigh( iPoint, thisStruct_extraTTH.ul_err );
+    gr_ul_extraTTH->SetPointEYlow( iPoint,  thisStruct_extraTTH.ul_err );
 
     iPoint++;
 
@@ -94,23 +107,36 @@ int main( int argc, char* argv[] ) {
   h2_axes->Draw("");
 
   gr_signif->SetMarkerSize( 1.6 );
-  gr_signif->SetMarkerStyle( 20 );
+  gr_signif->SetMarkerStyle( 24 );
   gr_signif->SetMarkerColor( 46 );
+
+  gr_signif_extraTTH->SetMarkerSize( 1.6 );
+  gr_signif_extraTTH->SetMarkerStyle( 20 );
+  gr_signif_extraTTH->SetMarkerColor( 46 );
 
   gr_ul    ->SetMarkerSize( 1.6 );
   gr_ul    ->SetMarkerStyle( 24 );
-  gr_ul    ->SetMarkerColor( kRed+3 );
+  gr_ul    ->SetMarkerColor( kGray );
+
+  gr_ul_extraTTH    ->SetMarkerSize( 1.6 );
+  gr_ul_extraTTH    ->SetMarkerStyle( 20 );
+  gr_ul_extraTTH    ->SetMarkerColor( kGray );
 
 
-  TLegend* legend = new TLegend( 0.2, 0.7, 0.5, 0.9 );
+  TLegend* legend = new TLegend( 0.2, 0.65, 0.5, 0.9 );
   legend->SetTextSize( 0.038 );
   legend->SetFillColor(0);
-  legend->AddEntry( gr_signif, "Expected significance", "P" );
-  legend->AddEntry( gr_ul, "Expected 95% Upper Limit", "P" );
+  legend->AddEntry( gr_ul, "Exp. 95% UL", "P" );
+  legend->AddEntry( gr_ul_extraTTH, "Exp. 95% UL (extra ttH)", "P" );
+  legend->AddEntry( gr_signif, "Exp. signif.", "P" );
+  legend->AddEntry( gr_signif_extraTTH, "Exp. signif. (extra ttH)", "P" );
   legend->Draw("same");
 
   gr_signif->Draw("p same");
   gr_ul->Draw("p same");
+
+  gr_signif_extraTTH->Draw("p same");
+  gr_ul_extraTTH->Draw("p same");
 
   gPad->RedrawAxis();
 
@@ -126,7 +152,7 @@ int main( int argc, char* argv[] ) {
 
 
 
-ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::string& channel, const std::string& additionalSelection, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_ggh, TTree* tree_vbf, TTree* tree_wzh, TTree* tree_tth, const std::string& suffix ) {
+ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::string& channel, const std::string& additionalSelection, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_ggh, TTree* tree_vbf, TTree* tree_wzh, TTree* tree_tth, std::string suffix, bool extraTTH ) {
 
 
   std::cout << "-> Creating datacard for channel: " << channel;
@@ -220,6 +246,11 @@ ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::s
   float yield_tth = h1_mgg_tth->Integral(binMin, binMax-1);
   float yield_tth_noAddSel = h1_mgg_tth_noAddSel->Integral(binMin, binMax-1);
 
+  if( extraTTH ) {
+    // add extra tth to singal
+    yield_thq += 1.4*yield_tth;
+    suffix += "_extraTTH";
+  }
 
   // assume that those 5 sideband events
   // have same thqLD distribution as tth
@@ -262,7 +293,7 @@ ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::s
   datacard << "      " << std::endl;
   datacard << "      " << std::endl;
   datacard << "#syst " << std::endl;
-  datacard << "bg_err     lnN    -   1.5 - " << std::endl;
+  //datacard << "bg_err     lnN    -   1.5 - " << std::endl;
   datacard << "lumi       lnN    1.026 - 1.026 " << std::endl;
 
   //datacard << "bg         gmN " << (int)sidebands_yield << "    - " << k_BG << "   - - - -" << std::endl;
@@ -274,7 +305,7 @@ ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::s
   datacard << "JER            lnN   1.01205/0.998054 - 0.963968/1.04624 " << std::endl;
   datacard << "Btag            lnN   1.02 - 1.015" << std::endl;
   datacard << "leptEff        lnN    1.025     -    1.025 " << std::endl;
-  datacard << "BG_shape       lnN    -     1.25  - " << std::endl;
+  //datacard << "BG_shape       lnN    -     1.25  - " << std::endl;
 
   
 
@@ -282,11 +313,11 @@ ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::s
   std::cout << "-> Created datacard: " << datacardName << std::endl;
 
 
-  std::string logfile_signif = bd->get_outputdir() + "/logfile_signif_" + suffix + ".log";
-  std::string logfile_ul     = bd->get_outputdir() + "/logfile_ul_" + suffix + ".log";
+  std::string logfile_signif = "datacards_optLD_" + batchProd + "/logfile_signif_" + suffix + ".log";
+  std::string logfile_ul     = "datacards_optLD_" + batchProd + "/logfile_ul_" + suffix + ".log";
 
-  std::string combineComand_signif = "combine -M HybridNew " + datacardName_str + " --significance  --expectedFromGrid=0.5  --saveToys --fullBToys --saveHybridResult -T 2000 -i 10 -s13 >& " + logfile_signif;
-  std::string combineComand_ul     = "combine -M HybridNew " + datacardName_str + "                 --expectedFromGrid=0.5  --saveToys --fullBToys --saveHybridResult -T 2000 -i 10 -s13 >& " + logfile_ul;
+  std::string combineComand_signif = "combine -M HybridNew " + datacardName_str + " --significance  --expectedFromGrid=0.5  --saveToys --fullBToys --saveHybridResult -T 1000 -i 10 -s13 >& " + logfile_signif;
+  std::string combineComand_ul     = "combine -M HybridNew " + datacardName_str + "                 --expectedFromGrid=0.5  --saveToys --fullBToys --saveHybridResult -T 1000 -i 10 -s13 >& " + logfile_ul;
 
   std::cout << "-> combine: computing significance" << std::endl;
   system( combineComand_signif.c_str() );
