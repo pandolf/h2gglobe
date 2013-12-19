@@ -12,7 +12,11 @@ void printYields( DrawBase* db,  const std::string& additionalSelection, const s
 int main( int argc, char* argv[] ) {
 
 
-  std::string batchProd = "qJetEtaFix_newLD_v1";
+  std::string batchProd = "preNatal_v1";
+  if( argc>1 ) {
+    std::string batchProd_str(argv[1]);
+    batchProd = batchProd_str;
+  }
 
   
   DrawBase* db = new DrawBase("THq");
@@ -54,15 +58,15 @@ int main( int argc, char* argv[] ) {
   std::string wzhFileName = inputDir + "wzh_m125_8TeV.root";
   TFile* file_wzh = TFile::Open( wzhFileName.c_str() );
   db->add_mcFile( file_wzh, "wzh", "VH (125)", 28 );
-  //db->set_mcWeight( "wzh", 2.4 ); //extra contribution for Ct=-1
+  db->set_mcWeight( "wzh", 2.4 ); //extra contribution for Ct=-1
 
-  std::string diphojet_sherpa_8TeVFileName = inputDir + "diphojet_sherpa_8TeV_m125_8TeV.root";
+  std::string diphojet_sherpa_8TeVFileName = inputDir + "diphojet_sherpa_8TeV.root";
   TFile* file_diphojet_sherpa_8TeV = TFile::Open( diphojet_sherpa_8TeVFileName.c_str() );
   db->add_mcFile( file_diphojet_sherpa_8TeV, "diphojet_sherpa_8TeV", "Diphoton", 39 );
 
-  std::string gjet_40_8TeV_pfFileName = inputDir + "gjet_40_8TeV_pf_m125_8TeV.root";
-  TFile* file_gjet_40_8TeV_pf = TFile::Open( gjet_40_8TeV_pfFileName.c_str() );
-  db->add_mcFile( file_gjet_40_8TeV_pf, "gjet_40_8TeV_pf", "#gamma + Jet", kMagenta );
+  //std::string gjet_40_8TeV_pfFileName = inputDir + "gjet_40_8TeV_pf.root";
+  //TFile* file_gjet_40_8TeV_pf = TFile::Open( gjet_40_8TeV_pfFileName.c_str() );
+  //db->add_mcFile( file_gjet_40_8TeV_pf, "gjet_40_8TeV_pf", "#gamma + Jet", kMagenta );
 
   std::string tggFileName = inputDir + "tgg.root";
   TFile* file_tgg = TFile::Open( tggFileName.c_str() );
