@@ -276,9 +276,9 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
   datacard << "triggerEff   lnN  0.999499/1.0005  - 0.999499/1.0005  0.999499/1.0005" << std::endl;
   datacard << "vtxEff       lnN  0.998904/1.0011  - 0.998904/1.0011  0.998904/1.0011" << std::endl;
 
-  // pileup syst taken from ./drawEffVsPU
-  datacard << "pileup       lnN    1.05 - 1.10 1.10";
-  if( !isLeptonic ) datacard << " 1.10";
+  // pileup syst taken from ./computePUIDsyst
+  datacard << "pileup       lnN    1.02 - 1.005 1.02";
+  if( !isLeptonic ) datacard << " 1.02";
   datacard << std::endl;;
 
 
