@@ -9,7 +9,7 @@
 
 
 
-void computeSingleSyst( const std::string& batchProd, TFile* weightsFile, TTree* tree, const std::string& dataset );
+void computeSingleSyst( const std::string& batchProd, TFile* weightsFile, const std::string& dataset );
 float getWeight( float qJetPt, TH1D* h1_weights );
 
 
@@ -24,22 +24,21 @@ int main( int argc, char* argv[] ) {
 
   TFile* weightsFile = TFile::Open("../../AnalysisScripts/aux/JetIdScaleFactor_ZmumuJets_legacypaper.root");
 
-  TFile* thqFile = TFile::Open(Form("dbFiles_%s/thqLeptonic_m125_8TeV.root", batchProd.c_str()));
-  TFile* tthFile = TFile::Open(Form("dbFiles_%s/tth_m125_8TeV.root", batchProd.c_str()));
 
-  TTree* thqTree = (TTree*)thqFile->Get("tree_passedEvents");
-  TTree* tthTree = (TTree*)tthFile->Get("tree_passedEvents");
-
-  computeSingleSyst( batchProd, weightsFile, thqTree, "thqLeptonic_m125_8TeV" );
-  computeSingleSyst( batchProd, weightsFile, tthTree, "tth_m125_8TeV" );
+  computeSingleSyst( batchProd, weightsFile, "thqLeptonic_m125_8TeV" );
+  computeSingleSyst( batchProd, weightsFile, "tth_m125_8TeV" );
+  computeSingleSyst( batchProd, weightsFile, "wzh_m125_8TeV" );
 
   return 0;
 
 }
 
 
-void computeSingleSyst( const std::string& batchProd, TFile* weightsFile, TTree* tree, const std::string& dataset ) {
+void computeSingleSyst( const std::string& batchProd, TFile* weightsFile, const std::string& dataset ) {
 
+  TFile* file = TFile::Open(Form("dbFiles_%s/%s.root", batchProd.c_str(), dataset.c_str()));
+
+  TTree* tree = (TTree*)file->Get("tree_passedEvents");
 
   Int_t category;
   tree->SetBranchAddress("category", &category);
