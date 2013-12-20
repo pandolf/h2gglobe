@@ -39,6 +39,9 @@ drawThqDataMC: drawThqDataMC.cpp DrawBase.o fitTools.o StatTools.o
 drawEffVsPU: drawEffVsPU.cpp DrawBase.o fitTools.o StatTools.o
 	$(CC) -Wall $(INCLUDES) -o drawEffVsPU drawEffVsPU.cpp DrawBase.o fitTools.o StatTools.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawSandB_vs_LDcut: drawSandB_vs_LDcut.cpp DrawBase.o fitTools.o StatTools.o
+	$(CC) -Wall $(INCLUDES) -o drawSandB_vs_LDcut drawSandB_vs_LDcut.cpp DrawBase.o fitTools.o StatTools.o $(ROOTFLAG) $(EXTRALIBS)
+
 optimizeWindowDummy: optimizeWindowDummy.cpp DrawBase.o fitTools.o
 	$(CC) -Wall $(INCLUDES) -o optimizeWindowDummy optimizeWindowDummy.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
@@ -56,6 +59,9 @@ compareJERsyst: compareJERsyst.cpp DrawBase.o fitTools.o
 
 validateLDvars: validateLDvars.cpp DrawBase.o fitTools.o
 	$(CC) -Wall $(INCLUDES) -o validateLDvars validateLDvars.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
+computePUIDsyst: computePUIDsyst.cpp DrawBase.o fitTools.o
+	$(CC) -Wall $(INCLUDES) -o computePUIDsyst computePUIDsyst.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
