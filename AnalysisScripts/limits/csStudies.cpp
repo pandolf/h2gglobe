@@ -61,7 +61,7 @@ int main( int argc, char* argv[] ) {
   DrawBase* db = new DrawBase("csStudies");
   db->set_outputdir(Form("csStudiesPlots_%s", batchProd.c_str()));
 
-  TFile* file_nominal        = TFile::Open(Form("../batchOutput_%s/csNominal/histograms_CMS-HGG.root", batchProd.c_str()) );
+  TFile* file_nominal        = TFile::Open(Form("../batchOutput_%s/histograms_CMS-HGG.root", batchProd.c_str()) );
 //TFile* file_invID_data     = TFile::Open(Form("../batchOutput_%s/histograms_CMS-HGG.root");
 //TFile* file_invID          = TFile::Open(Form("../batchOutput_%s/histograms_CMS-HGG.root");
   TFile* file_btagZero       = TFile::Open(Form("../batchOutput_%s/btagZero/histograms_CMS-HGG.root", batchProd.c_str()) );
@@ -678,6 +678,15 @@ void fitTreeWithExponential( DrawBase* db, const std::string& name, TTree* tree,
 RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar& mgg_roo, bool blind, bool LDsidebands ) {
 
 
+  if( tree==0 ) {
+
+    std::cout << std::endl;
+    std::cout << "-> ERROR!! Emtpy tree. Please check: " << name << std::endl;
+    exit(11);
+  
+  }
+
+
   int run;
   tree->SetBranchAddress( "run", &run );
   int event;
@@ -692,8 +701,8 @@ RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar
   tree->SetBranchAddress( "thqLD_lept", &thqLD );
 
   std::string weightName = "weight"+name;
-  RooRealVar newweight("newweight", "weight", 1., 0., 10.);
-  RooArgSet aset(mgg_roo, newweight, "argset");
+  RooRealVar weight_roo("weight_roo", "weight", 1., 0., 10.);
+  RooArgSet aset(mgg_roo, weight_roo, "argset");
   RooDataSet* dataset = new RooDataSet(name.c_str(), name.c_str(), aset);
 
   int nentries = tree->GetEntries();
@@ -715,18 +724,18 @@ RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar
     //if( mgg<115. ) weight = 1000.;
 
     mgg_roo.setVal(mgg);
-    newweight.setVal(weight);
+    weight_roo.setVal(weight);
     aset.setRealValue("mgg_roo", mgg);
-    aset.setRealValue("newweight", weight);
+    aset.setRealValue("weight_roo", weight);
 
     dataset->add(aset);
 
   }
 
-  RooDataSet* wdata = new RooDataSet(dataset->GetName(),dataset->GetTitle(),dataset,*dataset->get());//,0,w->GetName()) ;
+  //RooDataSet* wdata = new RooDataSet(dataset->GetName(),dataset->GetTitle(),dataset,*dataset->get(), 0, "weight");
 
-  return wdata;
-  //return dataset;
+  //return wdata;
+  return dataset;
 
 }
 
