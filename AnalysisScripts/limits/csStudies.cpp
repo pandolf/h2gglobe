@@ -22,6 +22,7 @@
 
 
 bool BLINDED=true;
+bool FASAWEIGHTS=true;
 
 
 struct ValAndErr {
@@ -32,12 +33,12 @@ struct ValAndErr {
 };
 
 
-void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase* db_data, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands=false );
-TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const std::string& saveName, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands=false );
+void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase* db_data, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands=false, TH2D* h2_fasaWeights_pt=0, TH2D* h2_fasaWeights_eta=0 );
+TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const std::string& saveName, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands=false, TH2D* h2_fasaWeights_pt=0, TH2D* h2_fasaWeights_eta=0 );
 TF1* fitHisto( TH1D* h1, int lineColor, int lineStyle=1 );
 //void compareVariableCS( DrawBase* db, const std::string& datasetName, const std::string& varName, int nBins, float xMin, float xMax, const std::string& axisName, const std::string& units, TFile* file_invID, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID );
-RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar& mgg_roo, bool blind, bool LDsidebands=false );
-void fitTreeWithExponential( DrawBase* db, const std::string& name, TTree* tree, RooWorkspace* w, const std::string& varName, bool blind, bool LDsidebands=false );
+RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar& mgg_roo, bool blind, bool LDsidebands=false, TH2D* h2_fasaWeights_pt=0, TH2D* h2_fasaWeights_eta=0 );
+void fitTreeWithExponential( DrawBase* db, const std::string& name, TTree* tree, RooWorkspace* w, const std::string& varName, bool blind, bool LDsidebands=false, TH2D* h2_fasaWeights_pt=0, TH2D* h2_fasaWeights_eta=0 );
 
 
 int main( int argc, char* argv[] ) {
@@ -81,8 +82,14 @@ int main( int argc, char* argv[] ) {
 //compareVariableCS( db, "diphojet_sherpa_8TeV", "ph2_eta", 25, -2.5, 2.5, "Sublead Pseudorapidity", "", file_invID, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID );
 
 
-  doPlotForOneSelection( "LDcut", db, db_data, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, false );
-  doPlotForOneSelection( "LDsidebands", db, db_data, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, true );
+  TFile* file_fasaWeights_pt  = TFile::Open( "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/AnalysisScripts/scales/scales_2D_pt_data_moriond.root" );
+  TFile* file_fasaWeights_eta = TFile::Open( "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/AnalysisScripts/scales/scales_2D_eta_data_moriond.root" );
+  TH2D* h2_fasaWeights_pt  = (TH2D*)file_fasaWeights_pt ->Get("h2D_pt_data");
+  TH2D* h2_fasaWeights_eta = (TH2D*)file_fasaWeights_eta->Get("h2D_eta_data");
+
+
+  doPlotForOneSelection( "LDcut", db, db_data, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, false, h2_fasaWeights_pt, h2_fasaWeights_eta );
+  doPlotForOneSelection( "LDsidebands", db, db_data, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, true, h2_fasaWeights_pt, h2_fasaWeights_eta );
 
   return 0;
 
@@ -90,11 +97,11 @@ int main( int argc, char* argv[] ) {
 
 
 
-void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase* db_data, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands ) {
+void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase* db_data, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta ) {
 
 
-  TGraphErrors* gr_p0_data = drawPlotsCS( db_data,            "Data", saveName, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, LDsidebands );
-  TGraphErrors* gr_p0_mc   = drawPlotsCS( db, "diphojet_sherpa_8TeV", saveName, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, LDsidebands );
+  TGraphErrors* gr_p0_data = drawPlotsCS( db_data,            "Data", saveName, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
+  TGraphErrors* gr_p0_mc   = drawPlotsCS( db, "diphojet_sherpa_8TeV", saveName, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
 
   TCanvas* c2 = new TCanvas("c2", "c2", 600, 600);
   c2->cd();
@@ -169,7 +176,7 @@ void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase*
 
 
 
-TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const std::string& saveName, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands ) {
+TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const std::string& saveName, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta ) {
 
 
 
@@ -200,8 +207,8 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
   //fitTreeWithExponential( db, datasetName + "_" + saveName + "_invID",         tree_invID,          w, "mgg_roo", blindFit, fullThqSelection );
   fitTreeWithExponential( db, datasetName + "_" + saveName + "_btagLoose",     tree_btagLoose,      w, "mgg_roo", blindFit, LDsidebands );
   fitTreeWithExponential( db, datasetName + "_" + saveName + "_btagZero",      tree_btagZero,       w, "mgg_roo", blindFit, LDsidebands );
-  fitTreeWithExponential( db, datasetName + "_" + saveName + "_btagLooseInvID",tree_btagLooseInvID, w, "mgg_roo", blindFit, LDsidebands );
-  fitTreeWithExponential( db, datasetName + "_" + saveName + "_btagZeroInvID", tree_btagZeroInvID,  w, "mgg_roo", blindFit, LDsidebands );
+  fitTreeWithExponential( db, datasetName + "_" + saveName + "_btagLooseInvID",tree_btagLooseInvID, w, "mgg_roo", blindFit, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
+  fitTreeWithExponential( db, datasetName + "_" + saveName + "_btagZeroInvID", tree_btagZeroInvID,  w, "mgg_roo", blindFit, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
 
 
   //RooRealVar* p0_invID          = (RooRealVar*)w->var( Form("p0_%s_%s_invID",         saveName.c_str(), datasetName.c_str()) );
@@ -609,12 +616,12 @@ void compareVariableCS( DrawBase* db, const std::string& datasetName, const std:
 
 
 
-void fitTreeWithExponential( DrawBase* db, const std::string& name, TTree* tree, RooWorkspace* w, const std::string& varName, bool blind, bool LDsidebands ) {
+void fitTreeWithExponential( DrawBase* db, const std::string& name, TTree* tree, RooWorkspace* w, const std::string& varName, bool blind, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta ) {
 
 
   RooRealVar* mgg_roo = w->var(varName.c_str());
 
-  RooDataSet* dataset = getDatasetFromTree( name, tree, *mgg_roo, blind, LDsidebands );
+  RooDataSet* dataset = getDatasetFromTree( name, tree, *mgg_roo, blind, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
 
   dataset->Print();
   //stringstream weight;
@@ -675,7 +682,7 @@ void fitTreeWithExponential( DrawBase* db, const std::string& name, TTree* tree,
 
 
 
-RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar& mgg_roo, bool blind, bool LDsidebands ) {
+RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar& mgg_roo, bool blind, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta ) {
 
 
   if( tree==0 ) {
@@ -691,6 +698,14 @@ RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar
   tree->SetBranchAddress( "run", &run );
   int event;
   tree->SetBranchAddress( "event", &event );
+  float ph1_pt;
+  tree->SetBranchAddress( "ph1_pt", &ph1_pt );
+  float ph2_pt;
+  tree->SetBranchAddress( "ph2_pt", &ph2_pt );
+  float ph1_eta;
+  tree->SetBranchAddress( "ph1_eta", &ph1_eta );
+  float ph2_eta;
+  tree->SetBranchAddress( "ph2_eta", &ph2_eta );
   float mgg;
   tree->SetBranchAddress( "PhotonsMass", &mgg );
   int category;
@@ -700,8 +715,7 @@ RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar
   float thqLD;
   tree->SetBranchAddress( "thqLD_lept", &thqLD );
 
-  std::string weightName = "weight"+name;
-  RooRealVar weight_roo("weight_roo", "weight", 1., 0., 10.);
+  RooRealVar weight_roo("weight_roo", "weight_roo", 1., 0., 10.);
   RooArgSet aset(mgg_roo, weight_roo, "argset");
   RooDataSet* dataset = new RooDataSet(name.c_str(), name.c_str(), aset);
 
@@ -724,18 +738,38 @@ RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar
     //if( mgg<115. ) weight = 1000.;
 
     mgg_roo.setVal(mgg);
-    weight_roo.setVal(weight);
+
+    float corrweight = weight;
+    if( FASAWEIGHTS ) {
+      if( h2_fasaWeights_pt!=0 ) {
+        int bin_pt1 = h2_fasaWeights_pt->GetYaxis()->FindBin(ph1_pt);
+        int bin_pt2 = h2_fasaWeights_pt->GetXaxis()->FindBin(ph2_pt);
+        float fasaWeight_pt = h2_fasaWeights_pt->GetBinContent( bin_pt2, bin_pt1 );
+        corrweight *= fasaWeight_pt;
+      }
+      if( h2_fasaWeights_eta!=0 ) {
+        int bin_eta1 = h2_fasaWeights_eta->GetYaxis()->FindBin(ph1_eta);
+        int bin_eta2 = h2_fasaWeights_eta->GetXaxis()->FindBin(ph2_eta);
+        float fasaWeight_eta = h2_fasaWeights_eta->GetBinContent( bin_eta2, bin_eta1 );
+        corrweight *= fasaWeight_eta;
+      }
+    }
+
+
+    weight_roo.setVal(corrweight);
     aset.setRealValue("mgg_roo", mgg);
-    aset.setRealValue("weight_roo", weight);
+    aset.setRealValue("weight_roo", corrweight);
 
     dataset->add(aset);
 
   }
 
-  //RooDataSet* wdata = new RooDataSet(dataset->GetName(),dataset->GetTitle(),dataset,*dataset->get(), 0, "weight");
+  char w_datasetName[500];
+  sprintf( w_datasetName, "w_%s", dataset->GetName());
+  RooDataSet* wdata = new RooDataSet(w_datasetName, w_datasetName, dataset, *dataset->get(), 0, "weight_roo");
 
-  //return wdata;
-  return dataset;
+  return wdata;
+  //return dataset;
 
 }
 
