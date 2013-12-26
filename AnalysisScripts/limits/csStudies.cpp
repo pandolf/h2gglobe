@@ -107,7 +107,7 @@ void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase*
   c2->cd();
 
   //TH2D* h2_axes = new TH2D("axes2", "", 5, 0., 5., 10, -0.1, 0.1);
-  TH2D* h2_axes = new TH2D("axes2", "", 4, 0., 4., 10, -0.1, 0.05);
+  TH2D* h2_axes = new TH2D("axes2", "", 4, 0., 4., 10, -0.12, 0.05);
   //h2_axes->GetXaxis()->SetBinLabel( 1, "InvID" );
   h2_axes->GetXaxis()->SetBinLabel( 1, "CSVL" );
   h2_axes->GetXaxis()->SetBinLabel( 2, "CSV0" );
@@ -142,7 +142,7 @@ void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase*
   //legend->AddEntry( gr_p0_data, dataText, "P" );
   //legend->AddEntry( gr_p0_mc,   mcText, "P" );
   legend->AddEntry( gr_p0_data, "Data", "P" );
-  legend->AddEntry( gr_p0_mc,   "Sherpa Diphoton MC", "P" );
+  legend->AddEntry( gr_p0_mc,   "Simulation", "P" );
   legend->Draw("same");
 
   TPaveText* labelTop = db->get_labelTop();
@@ -422,22 +422,13 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
   gr_p0->SetPointError( 1, 0., p0_btagZero      ->getError() );
   gr_p0->SetPointError( 2, 0., p0_btagLooseInvID->getError() );
   gr_p0->SetPointError( 3, 0., p0_btagZeroInvID ->getError() );
-  //gr_p0->SetPoint( 0, 0.5, p0_invID.val );
-  //gr_p0->SetPoint( 1, 1.5, p0_btagLoose.val );
-  //gr_p0->SetPoint( 2, 2.5, p0_btagZero.val );
-  //gr_p0->SetPoint( 3, 3.5, p0_btagLooseInvID.val );
-  //gr_p0->SetPoint( 4, 4.5, p0_btagZeroInvID.val );
-  //gr_p0->SetPointError( 0, 0., p0_invID.err );
-  //gr_p0->SetPointError( 1, 0., p0_btagLoose.err );
-  //gr_p0->SetPointError( 2, 0., p0_btagZero.err );
-  //gr_p0->SetPointError( 3, 0., p0_btagLooseInvID.err );
-  //gr_p0->SetPointError( 4, 0., p0_btagZeroInvID.err );
 
-  //std::cout << "p0_invID.val           : " << p0_invID.val << " +- " <<               p0_invID.err  << std::endl;
-  //std::cout << "p0_btagLoose.val       : " << p0_btagLoose.val << " +- " <<           p0_btagLoose.err << std::endl;
-  //std::cout << "p0_btagZero.val        : " << p0_btagZero.val << " +- " <<            p0_btagZero.err   << std::endl;
-  //std::cout << "p0_btagLooseInvID.val  : " << p0_btagLooseInvID.val << " +- " <<      p0_btagLooseInvID.err << std::endl;
-  //std::cout << "p0_btagZeroInvID.val   : " << p0_btagZeroInvID.val << " +- " <<       p0_btagZeroInvID.err  << std::endl;
+  ofstream ofs_p0(Form("%s/p0_%s_%s.txt", db->get_outputdir().c_str(), datasetName.c_str(), saveName.c_str()) );
+  ofs_p0 << "btagLoose: " << p0_btagLoose->getVal() << " +- " << p0_btagLoose->getError() << std::endl;
+  ofs_p0 << "btagZero: " << p0_btagZero->getVal() << " +- " << p0_btagZero->getError() << std::endl;
+  ofs_p0 << "btagLooseInvID: " << p0_btagLooseInvID->getVal() << " +- " << p0_btagLooseInvID->getError() << std::endl;
+  ofs_p0 << "btagZeroInvID: " << p0_btagZeroInvID->getVal() << " +- " << p0_btagZeroInvID->getError() << std::endl;
+  ofs_p0.close();
 
   return gr_p0;
 
