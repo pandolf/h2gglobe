@@ -1,0 +1,19 @@
+	CLs = 0.04 +/- 0.0138564
+	CLs = 0.0375 +/- 0.00949918
+	CLs = 0.04 +/- 0.008
+	CLs = 0.03875 +/- 0.00682353
+	CLs = 0.036 +/- 0.00589101
+	CLs = 0.0341667 +/- 0.00524399
+	CLs      = 0.0341667 +/- 0.00524399
+	CLb      = 1 +/- 0
+	CLsplusb = 0.0341667 +/- 0.00524399
+
+Hybrid result saved as HypoTestResult_mh120_r3.25206_2681917304 in higgsCombineTest.HybridNew.mH120.13.quant0.025.root : higgsCombineTest.HybridNew.mH120.13.quant0.025.root:/toys
+
+ -- HybridNew, before fit -- 
+Limit: r < 3.17099 +/- 2.59444 [2.52237, 3.25206]
+Fit to 4 points: 2.91252 +/- 0.049406
+
+ -- Hybrid New -- 
+Limit: r < 2.91252 +/- 0.049406 @ 95% CL
+Done in 0.00 min (cpu), 0.64 min (real)

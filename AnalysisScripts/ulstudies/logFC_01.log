@@ -1,0 +1,4 @@
+./combine: /usr/lib64/libxml2.so.2: no version information available (required by /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_5/external/slc5_amd64_gcc462/lib/libXMLParser.so)
+Invalid options: unknown option expectedFromGrid
+Invalid options: unknown option expectedFromGrid
+Use combine --help to get a list of all the allowed options

@@ -1,0 +1,102 @@
+
+ -- Profile Likelihood -- 
+Limit: r < 1.92074 @ 95% CL
+Search for upper limit to the limit
+  r = 5.76222 +/- 0
+	CLs = 0.00601202 +/- 0.00244704
+	CLs = 0.00450902 +/- 0.00149963
+	CLs = 0.00434057 +/- 0.00120125
+	CLs = 0.00425745 +/- 0.00103039
+	CLs = 0.00420589 +/- 0.000915873
+	CLs = 0.00383909 +/- 0.000798973
+	CLs = 0.0037196 +/- 0.000728119
+	CLs = 0.00338049 +/- 0.000649479
+	CLs = 0.00345019 +/- 0.000618607
+	CLs = 0.00340579 +/- 0.000583096
+	CLs      = 0.00340579 +/- 0.000583096
+	CLb      = 0.9983 +/- 0.00041196
+	CLsplusb = 0.0034 +/- 0.000582103
+
+Hybrid result saved as HypoTestResult_mh120_r5.76222_1947549666 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+Search for lower limit to the limit
+  r = 0.576222 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs      = 1 +/- 0
+	CLb      = 1 +/- 0
+	CLsplusb = 1 +/- 0
+
+Hybrid result saved as HypoTestResult_mh120_r0.576222_2842891081 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+Now doing proper bracketing & bisection
+  r = 3.31031 +/- 2.593
+	CLs = 0.035 +/- 0.00581163
+	CLs = 0.0365 +/- 0.00419331
+	CLs      = 0.0365 +/- 0.00419331
+	CLb      = 1 +/- 0
+	CLsplusb = 0.0365 +/- 0.00419331
+
+Hybrid result saved as HypoTestResult_mh120_r3.31031_251309215 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+  r = 3.05039 +/- 1.36704
+	CLs = 0.048048 +/- 0.00676682
+	CLs = 0.0445356 +/- 0.00461467
+	CLs      = 0.0445356 +/- 0.00461467
+	CLb      = 0.999201 +/- 0.000799041
+	CLsplusb = 0.0445 +/- 0.00461084
+
+Hybrid result saved as HypoTestResult_mh120_r3.05039_2025473426 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+Trying to move the interval edges closer
+  r = 1.81331 +/- 0
+	CLs = 0.175 +/- 0.0120156
+	CLs      = 0.175 +/- 0.0120156
+	CLb      = 1 +/- 0
+	CLsplusb = 0.175 +/- 0.0120156
+
+Hybrid result saved as HypoTestResult_mh120_r1.81331_2134621653 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+  r = 2.43185 +/- 0
+	CLs = 0.086 +/- 0.00886589
+	CLs      = 0.086 +/- 0.00886589
+	CLb      = 1 +/- 0
+	CLsplusb = 0.086 +/- 0.00886589
+
+Hybrid result saved as HypoTestResult_mh120_r2.43185_1916698698 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+  r = 2.74112 +/- 0
+	CLs = 0.0570571 +/- 0.00733907
+	CLs = 0.0670536 +/- 0.00559539
+	CLs      = 0.0670536 +/- 0.00559539
+	CLb      = 0.999201 +/- 0.000799041
+	CLsplusb = 0.067 +/- 0.00559066
+
+Hybrid result saved as HypoTestResult_mh120_r2.74112_1492849943 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+  r = 2.89576 +/- 0
+	CLs = 0.047047 +/- 0.00669947
+	CLs = 0.0590472 +/- 0.00527315
+	CLs = 0.0533689 +/- 0.00410528
+	CLs      = 0.0533689 +/- 0.00410528
+	CLb      = 0.999334 +/- 0.000665557
+	CLsplusb = 0.0533333 +/- 0.00410239
+
+Hybrid result saved as HypoTestResult_mh120_r2.89576_1539031883 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+  r = 3.18035 +/- 0
+	CLs = 0.0400802 +/- 0.00620945
+	CLs = 0.0460737 +/- 0.00469202
+	CLs      = 0.0460737 +/- 0.00469202
+	CLb      = 0.998401 +/- 0.00112956
+	CLsplusb = 0.046 +/- 0.00468423
+
+Hybrid result saved as HypoTestResult_mh120_r3.18035_3104697120 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+
+ -- HybridNew, before fit -- 
+Limit: r < 3.05039 +/- 1.36704 [2.74112, 3.31031]
+Fit to 5 points: 2.99846 +/- 0.0428809
+
+ -- Hybrid New -- 
+Limit: r < 2.99846 +/- 0.0428809 @ 95% CL
+Done in 0.00 min (cpu), 0.35 min (real)

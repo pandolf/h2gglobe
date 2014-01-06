@@ -1,0 +1,10 @@
+
+ -- Profile Likelihood -- 
+Significance: 0
+       (p-value = 0.5)
+Hybrid result saved as HypoTestResult_mh120_r1_2608511150 in higgsCombineTest.HybridNew.mH120.13.root : higgsCombineTest.HybridNew.mH120.13.root:/toys
+
+ -- Hybrid New -- 
+Significance: 1.31058  -0.11399/+0.134153
+Null p-value: 0.095 +/- 0.0207334
+Done in 0.00 min (cpu), 0.01 min (real)

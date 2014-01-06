@@ -1,0 +1,207 @@
+./combine: /usr/lib64/libxml2.so.2: no version information available (required by /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_5/external/slc5_amd64_gcc462/lib/libXMLParser.so)
+>>> including systematics
+>>> using the Profile Likelihood test statistics modified for upper limits (Q_LHC)
+>>> method used to compute upper limit is HybridNew
+>>> Using OpenSSL to get a really random seed 
+>>> Used OpenSSL to get a really random seed -1298605212
+Adding /afs/cern.ch/work/p/pandolf/CMSSW_5_2_5/src to include path
+Adding /afs/cern.ch/cms/slc5_amd64_gcc462/lcg/roofit/5.32.00-cms6//include to include path
+Input workspace 'w': 
+
+RooWorkspace(w) w contents
+
+variables
+---------
+(MH,bg_lept,bg_lept_In,n_obs_binbin1,r)
+
+p.d.f.s
+-------
+RooPoisson::bg_lept_Pdf[ x=bg_lept_In mean=bg_lept ] = 0.367879
+RooProdPdf::modelObs_b[ pdf_binbin1_bonly ] = 0.367879
+RooProdPdf::modelObs_s[ pdf_binbin1 ] = 0.135335
+RooProdPdf::model_b[ modelObs_b * nuisancePdf ] = 0.135335
+RooProdPdf::model_s[ modelObs_s * nuisancePdf ] = 0.0497871
+RooProdPdf::nuisancePdf[ bg_lept_Pdf ] = 0.367879
+RooPoisson::pdf_binbin1[ x=n_obs_binbin1 mean=n_exp_binbin1 ] = 0.135335
+RooPoisson::pdf_binbin1_bonly[ x=n_obs_binbin1 mean=n_exp_binbin1_bonly ] = 0.367879
+
+functions
+--------
+RooAddition::n_exp_binbin1[ n_exp_binbin1_proc_s + n_exp_binbin1_proc_b ] = 2
+RooAddition::n_exp_binbin1_bonly[ n_exp_binbin1_proc_b ] = 1
+ProcessNormalization::n_exp_binbin1_proc_b[ thetaList=() asymmThetaList=() otherFactorList=(bg_lept) ] = 1
+ProcessNormalization::n_exp_binbin1_proc_s[ thetaList=() asymmThetaList=() otherFactorList=(r) ] = 1
+
+datasets
+--------
+RooDataSet::data_obs(n_obs_binbin1)
+
+named sets
+----------
+ModelConfig_GlobalObservables:(bg_lept_In)
+ModelConfig_NuisParams:(bg_lept)
+ModelConfig_Observables:(n_obs_binbin1)
+ModelConfig_POI:(r)
+ModelConfig_bonly_GlobalObservables:(bg_lept_In)
+ModelConfig_bonly_NuisParams:(bg_lept)
+ModelConfig_bonly_Observables:(n_obs_binbin1)
+ModelConfig_bonly_POI:(r)
+POI:(r)
+globalObservables:(bg_lept_In)
+nuisances:(bg_lept)
+observables:(n_obs_binbin1)
+
+generic objects
+---------------
+RooStats::ModelConfig::ModelConfig
+RooStats::ModelConfig::ModelConfig_bonly
+
+Setting variable 'MH' in workspace to the higgs mass 120
+Workspace has a ModelConfig for signal called 'ModelConfig', with contents:
+
+=== Using the following for ModelConfig ===
+Observables:             RooArgSet:: = (n_obs_binbin1)
+Parameters of Interest:  RooArgSet:: = (r)
+Nuisance Parameters:     RooArgSet:: = (bg_lept)
+Global Observables:      RooArgSet:: = (bg_lept_In)
+PDF:                     RooProdPdf::model_s[ modelObs_s * nuisancePdf ] = 0.0497871
+
+Input ModelConfig 'ModelConfig': 
+
+=== Using the following for ModelConfig ===
+Observables:             RooArgSet:: = (n_obs_binbin1)
+Parameters of Interest:  RooArgSet:: = (r)
+Nuisance Parameters:     RooArgSet:: = (bg_lept)
+Global Observables:      RooArgSet:: = (bg_lept_In)
+PDF:                     RooProdPdf::model_s[ modelObs_s * nuisancePdf ] = 0.0497871
+
+[#1] INFO:ObjectHandling -- RooWorkspace::import(w) importing RooUniform::prior
+Computing limit starting from observation
+  1) RooRealVar:: n_obs_binbin1 = 0
+Set default minimizer to Minuit2
+  r = 10 +/- 0
+[#1] INFO:Minization --  Including the following contraint terms in minimization: (nuisancePdf)
+[#1] INFO:Fitting -- RooAddition::defaultErrorLevel(nll_model_s_data_obs_with_constr) Summation contains a RooNLLVar, using its error level
+[#1] INFO:Minization -- RooMinimizer::optimizeConst: activating const optimization
+/afs/cern.ch/work/p/pandolf/CMSSW_5_2_5/bin/slc5_amd64_gcc462/combine: /usr/lib64/libxml2.so.2: no version information available (required by /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_5/external/slc5_amd64_gcc462/lib/libXMLParser.so)
+Minuit2Minimizer: Minimize with max-calls 500 convergence for edm < 1 strategy 1
+[#1] INFO:NumericIntegration -- RooRealIntegral::init(bg_lept_Pdf_Int[bg_lept]) using numeric integrator RooIntegrator1D to calculate Int(bg_lept)
+MnSeedGenerator: for initial parameters FCN = 2
+MnSeedGenerator: Initial state:   - FCN =   2.000000012864 Edm =      2.06678 NCalls =      3
+VariableMetric: start iterating until Edm is < 0.001
+VariableMetric: Initial state   - FCN =   2.000000012864 Edm =      2.06678 NCalls =      3
+VariableMetric: Iteration #   1 - FCN = 0.003989375311945 Edm =   0.00425552 NCalls =      6
+VariableMetric: Iteration #   2 - FCN = 1.678745149487e-06 Edm =  1.69999e-06 NCalls =      9
+VariableMetric: After Hessian   - FCN = 1.678745149487e-06 Edm =  1.66588e-06 NCalls =     14
+Minuit2Minimizer : Valid minimum - status = 0
+FVAL  = 1.67874514948706607e-06
+Edm   = 1.66588086623531343e-06
+Nfcn  = 14
+bg_lept	  = 8.3294e-07	 +/-  0.249349	(limited)
+[#1] INFO:Minization -- RooMinimizer::optimizeConst: deactivating const optimization
+Zero signal fit
+   0) bg_lept                        = 8.3294e-07
+
+Fitting of the background hypothesis done in 0.998233 s
+[#1] INFO:Minization --  Including the following contraint terms in minimization: (nuisancePdf)
+[#1] INFO:Fitting -- RooAddition::defaultErrorLevel(nll_model_s_data_obs_with_constr) Summation contains a RooNLLVar, using its error level
+[#1] INFO:Minization -- RooMinimizer::optimizeConst: activating const optimization
+Minuit2Minimizer: Minimize with max-calls 500 convergence for edm < 1 strategy 1
+MnSeedGenerator: for initial parameters FCN = 10
+MnSeedGenerator: Initial state:   - FCN =   10.00000167875 Edm =  1.66588e-06 NCalls =      5
+VariableMetric: start iterating until Edm is < 0.001
+VariableMetric: Initial state   - FCN =   10.00000167875 Edm =  1.66588e-06 NCalls =      5
+VariableMetric: Iteration #   1 - FCN =   10.00000001286 Edm =  7.72114e-22 NCalls =      8
+VariableMetric: After Hessian   - FCN =   10.00000001286 Edm =  7.87791e-22 NCalls =     13
+Minuit2Minimizer : Valid minimum - status = 0
+FVAL  = 10.000000012864307
+Edm   = 7.87791018767308764e-22
+Nfcn  = 13
+bg_lept	  = 0	 +/-  0.249349	(limited)
+[#1] INFO:Minization -- RooMinimizer::optimizeConst: deactivating const optimization
+Reference signal fit
+   0) bg_lept                        =         0
+
+Fitting of the signal-plus-background hypothesis done in 0.00221801 s
+      Evaluation of p-values done in  1.80657 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.67586 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.49495 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.6981 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.53002 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.51133 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.6817 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.61319 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  2.07342 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.68678 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.72217 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.6456 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.60837 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.79851 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.56274 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.77217 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.9534 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.76374 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.72427 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.73943 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.82466 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.78277 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.87627 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  3.42194 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.73384 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.90434 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.79639 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.73514 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.77451 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.82137 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.78707 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  2.16584 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.75282 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.84089 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.92429 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.79934 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.86108 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.89104 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.85714 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.92731 s
+	CLs = 0 +/- 0
+      Evaluation of p-values done in  1.92736 s
+	CLs = 0 +/- 0

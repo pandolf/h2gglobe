@@ -1,0 +1,112 @@
+
+ -- Profile Likelihood -- 
+Limit: r < 1.92074 @ 95% CL
+Search for upper limit to the limit
+  r = 5.76222 +/- 0
+	CLs = 0.00601202 +/- 0.00244704
+	CLs = 0.00450902 +/- 0.00149963
+	CLs = 0.00434057 +/- 0.00120125
+	CLs = 0.00425745 +/- 0.00103039
+	CLs = 0.00420589 +/- 0.000915873
+	CLs = 0.00383909 +/- 0.000798973
+	CLs = 0.0037196 +/- 0.000728119
+	CLs = 0.00338049 +/- 0.000649479
+	CLs = 0.00345019 +/- 0.000618607
+	CLs = 0.00340579 +/- 0.000583096
+	CLs      = 0.00340579 +/- 0.000583096
+	CLb      = 0.9983 +/- 0.00041196
+	CLsplusb = 0.0034 +/- 0.000582103
+
+Hybrid result saved as HypoTestResult_mh120_r5.76222_1947549666 in higgsCombineTest.HybridNew.mH120.13.quant0.975.root : higgsCombineTest.HybridNew.mH120.13.quant0.975.root:/toys
+Search for lower limit to the limit
+  r = 0.576222 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs      = 1 +/- 0
+	CLb      = 1 +/- 0
+	CLsplusb = 1 +/- 0
+
+Hybrid result saved as HypoTestResult_mh120_r0.576222_2842891081 in higgsCombineTest.HybridNew.mH120.13.quant0.975.root : higgsCombineTest.HybridNew.mH120.13.quant0.975.root:/toys
+Now doing proper bracketing & bisection
+  r = 3.31031 +/- 2.593
+	CLs = 0.035 +/- 0.00581163
+	CLs = 0.036 +/- 0.00416557
+	CLs      = 0.036 +/- 0.00416557
+	CLb      = 1 +/- 0
+	CLsplusb = 0.036 +/- 0.00416557
+
+Hybrid result saved as HypoTestResult_mh120_r3.31031_251309215 in higgsCombineTest.HybridNew.mH120.13.quant0.975.root : higgsCombineTest.HybridNew.mH120.13.quant0.975.root:/toys
+  r = 3.04013 +/- 1.36704
+	CLs = 0.047047 +/- 0.00669947
+	CLs = 0.047047 +/- 0.00473724
+	CLs      = 0.047047 +/- 0.00473724
+	CLb      = 0.999 +/- 0.000706753
+	CLsplusb = 0.047 +/- 0.00473239
+
+Hybrid result saved as HypoTestResult_mh120_r3.04013_2025473426 in higgsCombineTest.HybridNew.mH120.13.quant0.975.root : higgsCombineTest.HybridNew.mH120.13.quant0.975.root:/toys
+Trying to move the interval edges closer
+  r = 1.80817 +/- 0
+	CLs = 0.176 +/- 0.0120426
+	CLs      = 0.176 +/- 0.0120426
+	CLb      = 1 +/- 0
+	CLsplusb = 0.176 +/- 0.0120426
+
+Hybrid result saved as HypoTestResult_mh120_r1.80817_2134621653 in higgsCombineTest.HybridNew.mH120.13.quant0.975.root : higgsCombineTest.HybridNew.mH120.13.quant0.975.root:/toys
+  r = 2.42415 +/- 0
+	CLs = 0.085 +/- 0.00881901
+	CLs      = 0.085 +/- 0.00881901
+	CLb      = 1 +/- 0
+	CLsplusb = 0.085 +/- 0.00881901
+
+Hybrid result saved as HypoTestResult_mh120_r2.42415_1916698698 in higgsCombineTest.HybridNew.mH120.13.quant0.975.root : higgsCombineTest.HybridNew.mH120.13.quant0.975.root:/toys
+  r = 2.73214 +/- 0
+	CLs = 0.0590591 +/- 0.0074588
+	CLs = 0.0635636 +/- 0.00545852
+	CLs = 0.0644192 +/- 0.00448557
+	CLs      = 0.0644192 +/- 0.00448557
+	CLb      = 0.998667 +/- 0.000666222
+	CLsplusb = 0.0643333 +/- 0.00447938
+
+Hybrid result saved as HypoTestResult_mh120_r2.73214_4265961882 in higgsCombineTest.HybridNew.mH120.13.quant0.975.root : higgsCombineTest.HybridNew.mH120.13.quant0.975.root:/toys
+  r = 2.88613 +/- 0
+	CLs = 0.057 +/- 0.00733151
+	CLs = 0.058 +/- 0.00522666
+	CLs = 0.0586667 +/- 0.00429049
+	CLs      = 0.0586667 +/- 0.00429049
+	CLb      = 1 +/- 0
+	CLsplusb = 0.0586667 +/- 0.00429049
+
+Hybrid result saved as HypoTestResult_mh120_r2.88613_774411577 in higgsCombineTest.HybridNew.mH120.13.quant0.975.root : higgsCombineTest.HybridNew.mH120.13.quant0.975.root:/toys
+  r = 2.96313 +/- 0
+	CLs = 0.0581162 +/- 0.00740689
+	CLs = 0.0541353 +/- 0.00506694
+	CLs = 0.0521216 +/- 0.00406338
+	CLs      = 0.0521216 +/- 0.00406338
+	CLb      = 0.997667 +/- 0.000880888
+	CLsplusb = 0.052 +/- 0.00405364
+
+Hybrid result saved as HypoTestResult_mh120_r2.96313_4033431923 in higgsCombineTest.HybridNew.mH120.13.quant0.975.root : higgsCombineTest.HybridNew.mH120.13.quant0.975.root:/toys
+  r = 3.17522 +/- 0
+	CLs = 0.04 +/- 0.00619677
+	CLs = 0.0345345 +/- 0.0040852
+	CLs      = 0.0345345 +/- 0.0040852
+	CLb      = 0.999 +/- 0.000706753
+	CLsplusb = 0.0345 +/- 0.00408104
+
+Hybrid result saved as HypoTestResult_mh120_r3.17522_3941802371 in higgsCombineTest.HybridNew.mH120.13.quant0.975.root : higgsCombineTest.HybridNew.mH120.13.quant0.975.root:/toys
+
+ -- HybridNew, before fit -- 
+Limit: r < 3.04013 +/- 1.36704 [2.88613, 3.17522]
+Fit to 4 points: 2.98338 +/- 0.0247157
+
+ -- Hybrid New -- 
+Limit: r < 2.98338 +/- 0.0247157 @ 95% CL
+Done in 0.00 min (cpu), 0.41 min (real)

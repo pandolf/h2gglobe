@@ -1,0 +1,17 @@
+./combine: /usr/lib64/libxml2.so.2: no version information available (required by /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_5/external/slc5_amd64_gcc462/lib/libXMLParser.so)
+>>> including systematics
+>>> using the Simple Likelihood Ratio test statistics (Q_LEP)
+>>> method used to compute upper limit is HybridNew
+>>> random number generator seed is 13
+Traceback (most recent call last):
+  File "/afs/cern.ch/work/p/pandolf/CMSSW_5_2_5/bin/slc5_amd64_gcc462/text2workspace.py", line 8, in <module>
+    import ROOT
+  File "/afs/cern.ch/cms/slc5_amd64_gcc462/lcg/root/5.32.00-cms6/lib/ROOT.py", line 99, in <module>
+    import inspect
+  File "/afs/cern.ch/cms/slc5_amd64_gcc462/external/python/2.6.4/lib/python2.6/inspect.py", line 39, in <module>
+    import tokenize
+  File "/afs/cern.ch/cms/slc5_amd64_gcc462/external/python/2.6.4/lib/python2.6/tokenize.py", line 23, in <module>
+    each time a new token is found."""
+KeyboardInterrupt
+Error when running the combination:
+	Failed to convert the input datacard from LandS to RooStats format. The lines above probably contain more information about the error.

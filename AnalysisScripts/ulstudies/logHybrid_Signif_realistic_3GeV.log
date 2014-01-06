@@ -1,0 +1,23 @@
+./combine: /usr/lib64/libxml2.so.2: no version information available (required by /afs/cern.ch/cms/slc5_amd64_gcc462/cms/cmssw/CMSSW_5_2_5/external/slc5_amd64_gcc462/lib/libXMLParser.so)
+>>> including systematics
+>>> using the Simple Likelihood Ratio test statistics (Q_LEP)
+>>> method used to compute upper limit is HybridNew
+>>> random number generator seed is 13
+Computing limit starting from observation
+	1 - CLb = 0.0025 +/- 0.00249687
+	1 - CLb = 0.00333333 +/- 0.00235309
+	1 - CLb = 0.00375 +/- 0.002161
+	1 - CLb = 0.003 +/- 0.00172945
+	1 - CLb = 0.0025 +/- 0.00144157
+	1 - CLb = 0.00214286 +/- 0.00123585
+	1 - CLb = 0.001875 +/- 0.00108152
+	1 - CLb = 0.00166667 +/- 0.000961448
+	1 - CLb = 0.0015 +/- 0.000865376
+Hybrid result saved as HypoTestResult_mh120_r1_1947549666 in higgsCombineTest.HybridNew.mH120.13.quant0.500.root : higgsCombineTest.HybridNew.mH120.13.quant0.500.root:/toys
+Text statistics for 0.5 quantile: 0.912245
+
+ -- Hybrid New -- 
+Significance: 2.32635  -0.0763601/+0.0929551
+Null p-value: 0.01 +/- 0.00222486
+Done in 0.00 min (cpu), 0.02 min (real)
+Failed to delete temporary file roostats-VHtbz2.root: No such file or directory

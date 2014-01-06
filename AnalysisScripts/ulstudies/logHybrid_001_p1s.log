@@ -1,0 +1,102 @@
+
+ -- Profile Likelihood -- 
+Limit: r < 1.92074 @ 95% CL
+Search for upper limit to the limit
+  r = 5.76222 +/- 0
+	CLs = 0.00607903 +/- 0.00247439
+	CLs = 0.00455696 +/- 0.00151561
+	CLs = 0.00438301 +/- 0.00121302
+	CLs = 0.0042951 +/- 0.00103952
+	CLs = 0.00424328 +/- 0.000924033
+	CLs = 0.00387336 +/- 0.000806118
+	CLs = 0.00375451 +/- 0.000734967
+	CLs = 0.00341254 +/- 0.000655646
+	CLs = 0.00348275 +/- 0.000624455
+	CLs = 0.00353964 +/- 0.000597273
+	CLs      = 0.00353964 +/- 0.000597273
+	CLb      = 0.9888 +/- 0.00105236
+	CLsplusb = 0.0035 +/- 0.000590572
+
+Hybrid result saved as HypoTestResult_mh120_r5.76222_1947549666 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+Search for lower limit to the limit
+  r = 0.576222 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs = 1 +/- 0
+	CLs      = 1 +/- 0
+	CLb      = 1 +/- 0
+	CLsplusb = 1 +/- 0
+
+Hybrid result saved as HypoTestResult_mh120_r0.576222_2842891081 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+Now doing proper bracketing & bisection
+  r = 3.32899 +/- 2.593
+	CLs = 0.0373737 +/- 0.00603064
+	CLs = 0.035339 +/- 0.00415041
+	CLs      = 0.035339 +/- 0.00415041
+	CLb      = 0.990408 +/- 0.00275575
+	CLsplusb = 0.035 +/- 0.00410944
+
+Hybrid result saved as HypoTestResult_mh120_r3.32899_251309215 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+  r = 3.0432 +/- 1.37638
+	CLs = 0.049445 +/- 0.00688995
+	CLs = 0.0453992 +/- 0.00467814
+	CLs      = 0.0453992 +/- 0.00467814
+	CLb      = 0.991207 +/- 0.0026395
+	CLsplusb = 0.045 +/- 0.00463546
+
+Hybrid result saved as HypoTestResult_mh120_r3.0432_2025473426 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+Trying to move the interval edges closer
+  r = 1.80971 +/- 0
+	CLs = 0.176768 +/- 0.01215
+	CLs      = 0.176768 +/- 0.01215
+	CLb      = 0.99 +/- 0.00314643
+	CLsplusb = 0.175 +/- 0.0120156
+
+Hybrid result saved as HypoTestResult_mh120_r1.80971_2134621653 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+  r = 2.42646 +/- 0
+	CLs = 0.0885312 +/- 0.00901527
+	CLs      = 0.0885312 +/- 0.00901527
+	CLb      = 0.994 +/- 0.00244213
+	CLsplusb = 0.088 +/- 0.00895857
+
+Hybrid result saved as HypoTestResult_mh120_r2.42646_1916698698 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+  r = 2.73483 +/- 0
+	CLs = 0.0562814 +/- 0.00730839
+	CLs = 0.0662648 +/- 0.0055753
+	CLs = 0.0700397 +/- 0.00467481
+	CLs      = 0.0700397 +/- 0.00467481
+	CLb      = 0.994674 +/- 0.00187809
+	CLsplusb = 0.0696667 +/- 0.00464805
+
+Hybrid result saved as HypoTestResult_mh120_r2.73483_4265961882 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+  r = 2.88902 +/- 0
+	CLs = 0.0535895 +/- 0.00716559
+	CLs = 0.0501007 +/- 0.00491159
+	CLs      = 0.0501007 +/- 0.00491159
+	CLb      = 0.98801 +/- 0.00307729
+	CLsplusb = 0.0495 +/- 0.00485024
+
+Hybrid result saved as HypoTestResult_mh120_r2.88902_1539031883 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+  r = 3.18609 +/- 0
+	CLs = 0.0424671 +/- 0.0064153
+	CLs = 0.0459407 +/- 0.00470679
+	CLs      = 0.0459407 +/- 0.00470679
+	CLb      = 0.990408 +/- 0.00275575
+	CLsplusb = 0.0455 +/- 0.00465992
+
+Hybrid result saved as HypoTestResult_mh120_r3.18609_3104697120 in higgsCombineTest.HybridNew.mH120.13.quant0.840.root : higgsCombineTest.HybridNew.mH120.13.quant0.840.root:/toys
+
+ -- HybridNew, before fit -- 
+Limit: r < 3.0432 +/- 1.37638 [2.73483, 3.32899]
+Fit to 5 points: 3.00228 +/- 0.0400258
+
+ -- Hybrid New -- 
+Limit: r < 3.00228 +/- 0.0400258 @ 95% CL
+Done in 0.00 min (cpu), 0.35 min (real)
