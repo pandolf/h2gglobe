@@ -282,11 +282,11 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
   datacard << std::endl;;
 
 
-  datacard << "PDF   lnN    -     -         0.922/1.078 ";
+  datacard << "PDF   lnN    0.998/1.019     -         0.922/1.078 ";
   if( !isLeptonic ) datacard <<  " -  - ";
   else              datacard << " 0.99/1.01";
   datacard << std::endl;
-  datacard << "QCDscale   lnN    -     -    0.86/1.11 ";
+  datacard << "QCDscale   lnN    0.957/1.048     -    0.86/1.11 ";
   if( !isLeptonic ) datacard <<  " - - ";
   else              datacard << " 0.977/1.023";
   datacard << std::endl;
