@@ -37,9 +37,9 @@ int main( int argc, char* argv[] ) {
   db->set_outputdir(outputdir);
 
   LDCutStruct cutStruct_LD = findVariableThreshold(db, "thqLD_lept", 0.1);
-  LDCutStruct cutStruct_LD_2 = findVariableThreshold(db, "thqLD_lept_2", 0.1);
-  LDCutStruct cutStruct_LD_2_central = findVariableThreshold(db, "thqLD_lept_2_central", 0.1);
-  LDCutStruct cutStruct_LD_BDT = findVariableThreshold(db, "thqBDT_lept", -1., cutStruct_LD_2_central.tth );
+  //LDCutStruct cutStruct_LD_2 = findVariableThreshold(db, "thqLD_lept_2", 0.1);
+  //LDCutStruct cutStruct_LD_2_central = findVariableThreshold(db, "thqLD_lept_2_central", 0.1);
+  LDCutStruct cutStruct_LD_BDT = findVariableThreshold(db, "thqBDT_lept", -1., cutStruct_LD.tth );
 
   return 0;
 
@@ -89,6 +89,7 @@ LDCutStruct findVariableThreshold( DrawBase* db, const std::string& varName, flo
 
     float sYield = h1_LD_signal->Integral( iBin, nBins );
     float bgYield = h1_LD_bg->Integral( iBin, nBins );
+    bgYield *= 2.4; //ct=-1
 
     float bgFrac = bgYield/sYield;
 
@@ -96,6 +97,7 @@ LDCutStruct findVariableThreshold( DrawBase* db, const std::string& varName, flo
     h1_thq_vs_cut->SetBinContent( iBin, sYield );
     h1_tth_vs_cut->SetBinContent( iBin, bgYield );
 
+    //if( bgYield<0.1 && firstTime ) {
     if( bgFrac<0.1 && firstTime ) {
       foundCut = h1_fraction_vs_cut->GetBinLowEdge(iBin);
       if( fraction>0. ) {
@@ -191,9 +193,13 @@ LDCutStruct findVariableThreshold( DrawBase* db, const std::string& varName, flo
   delete c1;
   delete h2_axes;
   delete h1_fraction_vs_cut;
+  delete h1_thq_vs_cut;
+  delete h1_tth_vs_cut;
   delete h1_LD_bg;
   delete h1_LD_signal;
   delete legend;
+
+
 
   return returnStruct;
 
