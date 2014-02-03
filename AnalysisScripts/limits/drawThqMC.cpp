@@ -35,8 +35,8 @@ int main( int argc, char* argv[] ) {
 
   std::string thqLeptonicFileName = inputDir + "thqLeptonic_m125_8TeV.root";
   TFile* file_thq = TFile::Open( thqLeptonicFileName.c_str() );
-  db->add_mcFile( file_thq, "thq", "tHq (C_{t}=-1)", kWhite );
-  db_nostack->add_mcFile( file_thq, "thq", "tHq (C_{t}=-1)", kBlack );
+  db->add_mcFile( file_thq, "thq", "tHq (Ct = -1)", kWhite );
+  db_nostack->add_mcFile( file_thq, "thq", "tHq (Ct = -1)", kBlack );
 
 
   //std::string wzh2FileName = inputDir + "wzh_m125_8TeV.root";
@@ -45,7 +45,7 @@ int main( int argc, char* argv[] ) {
 
   std::string ttH2FileName = inputDir + "tth_m125_8TeV.root";
   TFile* file_ttH2 = TFile::Open( ttH2FileName.c_str() );
-  db->add_mcFile( file_ttH2, "ttH2", "Extra ttH (C_{t}=-1)", 46, 3004 );
+  db->add_mcFile( file_ttH2, "ttH2", "Extra ttH (Ct = -1)", 46, 3004 );
   db->set_mcWeight( "ttH2", 1.4 ); //extra contribution for Ct=-1
 
 
@@ -68,14 +68,19 @@ int main( int argc, char* argv[] ) {
   //TFile* file_gjet_40_8TeV_pf = TFile::Open( gjet_40_8TeV_pfFileName.c_str() );
   //db->add_mcFile( file_gjet_40_8TeV_pf, "gjet_40_8TeV_pf", "#gamma + Jet", kMagenta );
 
+  //std::string TTJetsFileName = inputDir + "TTJets.root";
+  //TFile* file_TTJets = TFile::Open( TTJetsFileName.c_str() );
+  //db->add_mcFile( file_TTJets, "TTJets", "t#gamma#gamma", 29 );
+  //db_nostack->add_mcFile( file_TTJets, "TTJets", "t#bar{t}", 38 );
+
   std::string tggFileName = inputDir + "tgg.root";
   TFile* file_tgg = TFile::Open( tggFileName.c_str() );
   db->add_mcFile( file_tgg, "tgg", "t#gamma#gamma", 29 );
   db_nostack->add_mcFile( file_tgg, "tgg", "t#gamma#gamma", 29 );
 
-  std::string ttggFileName = inputDir + "ttgg.root";
-  TFile* file_ttgg = TFile::Open( ttggFileName.c_str() );
-  db->add_mcFile( file_ttgg, "ttgg", "tt#gamma#gamma", 38 );
+  //std::string ttggFileName = inputDir + "ttgg.root";
+  //TFile* file_ttgg = TFile::Open( ttggFileName.c_str() );
+  //db->add_mcFile( file_ttgg, "ttgg", "tt#gamma#gamma", 38 );
 
 
   // first some shape norm plots:
@@ -90,11 +95,11 @@ int main( int argc, char* argv[] ) {
   float lumi = 19715.;
   db->set_lumiNormalization(lumi);
 
-  db->drawHisto_fromTree( "tree_passedEvents", "thqLD_lept", Form("weight*( category==11 )/%f", lumi), 40, 0., 1.0001, "thqLD_lept", "tHq Leptonic LD", "", "Events", true );
+  db->drawHisto_fromTree( "tree_passedEvents", "thqLD_lept", Form("weight( category==11 )"), 40, 0., 1.0001, "thqLD_lept", "tHq Leptonic LD", "", "Events", true );
 
-  db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("weight*( category==11 )/%f", lumi), 40, 100., 180., "mgg", "Diphoton Mass", "GeV", "Events", true );
+  db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("weight*( category==11 )"), 40, 100., 180., "mgg", "Diphoton Mass", "GeV", "Events", true );
   printYields( db, "", "presel" );
-  db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("weight*( category==11 && thqLD_lept>0.25 )/%f", lumi), 40, 100., 180., "mgg_LDcut", "Diphoton Mass", "GeV", "Events", true );
+  db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("weight*( category==11 && thqLD_lept>0.25 )"), 40, 100., 180., "mgg_LDcut", "Diphoton Mass", "GeV", "Events", true );
   printYields( db, "thqLD_lept>0.25", "LDcut" );
 
   return 0;
@@ -151,7 +156,9 @@ void printYields( DrawBase* db,  const std::string& additionalSelection, const s
   float signal_noSMH = 0.;
 
 
-  yieldsFile << std::endl << Form("Yields (@ %f.3 fb-1): ", lumi/1000.) << std::endl;
+  yieldsFile << Form("Yields (@ %.3f fb-1): ", lumi/1000.) << std::endl;
+  yieldsFile << Form("(counting in %.0f-%.0f GeV mass window)", xMin, xMax) << std::endl;
+  yieldsFile << std::endl;
 
   for( unsigned int ii=0; ii<mcFiles.size(); ++ii ) {
 
@@ -211,11 +218,9 @@ void printYields( DrawBase* db,  const std::string& additionalSelection, const s
 
       foundSignal = true;
       float thq = integral_massWindow;
-      //float thq = integral_massWindow*34.;
       signal += thq;
       signal_noSMH += thq;
       yieldsFile << db->get_mcFile(ii).datasetName << " " << thq << std::endl;
-      //if( Ct_minus1 ) signal/=34.;
 
     }
 
