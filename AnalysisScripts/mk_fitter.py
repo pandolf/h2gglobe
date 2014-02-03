@@ -216,6 +216,8 @@ if __name__  == "__main__":
 		f = open("%s.sh"%(jobname),"w")
 		
 		f.write("#!/bin/bash\n")
+		f.write("export LANGUAGE=C\n")
+		f.write("export LC_ALL=C\n")
 		f.write("source /vols/cms/grid/setup.sh\n")
 		f.write("export X509_USER_PROXY=/home/hep/%s/.myproxy\n"%options.user)
 		f.write("export SCRAM_ARCH=slc5_amd64_gcc462\n")
@@ -241,6 +243,9 @@ if __name__  == "__main__":
 		f = open("%s.sh"%(jobname),"w")
 		
 		f.write("#!/bin/bash\n")
+		f.write("export LANGUAGE=C\n")
+		f.write("export LC_ALL=C\n")
+
 		f.write("set -x\n")
 		
 		f.write("touch %s.sh.run\n" % os.path.join(mydir,jobname))
@@ -294,9 +299,6 @@ if __name__  == "__main__":
 filesToCopy=\"%(files)s\"
 dstFolder=\"%(histdir)s\"
 cp=\"%(cp)s\"
-
-export LANGUAGE=C
-export LC_ALL=C
 
 python %(run)s -i %(job)s.dat %(runopt)s
 retval=$?
