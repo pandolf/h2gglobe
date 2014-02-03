@@ -26,6 +26,6 @@ mkdir $dir
 jecUncs="csNominal btagZero btagLoose btagLooseInvID btagZeroInvID"
 
 for syst in $jecUncs; do
-    ./mk_fitter.py -i csAnalysis/datafiles_cubased_legacy_fp_CS.dat -n 320 -l ${syst} -o ${dir}/${syst}/sub && \
+    ./mk_fitter.py -i csAnalysis/datafiles_cubased_legacy_fp_CS.dat -n 300 -l ${syst} -o ${dir}/${syst}/sub && \
     ./submit_fitter.py -q 8nh -d ${dir}/${syst}
 done
