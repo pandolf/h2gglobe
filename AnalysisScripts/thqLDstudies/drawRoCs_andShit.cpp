@@ -14,7 +14,7 @@ void compareTaggersLeptonic( DrawBase* db, const std::string& varName1, const st
 int main( int argc, char* argv[] ) {
 
 
-  std::string batchProd = "qJetEtaFix_newLD_v1";
+  std::string batchProd = "qJetEtaFix_newLD_v2_thq_tth";
   if( argc>1 ) {
     std::string batchProd_str(argv[1]);
     batchProd = batchProd_str;
@@ -27,28 +27,30 @@ int main( int argc, char* argv[] ) {
   TFile* file = TFile::Open(fileName.c_str());
   //TFile* file = TFile::Open("../batchOutput_provaLD6_withBDT2/histograms_CMS-HGG.root");
   db->add_mcFile( file, "thefile", "tHq", kBlack, 0);
-  TFile* fileBG = TFile::Open("../batchOutputBG2/histograms_CMS-HGG.root");
+  TFile* fileBG = TFile::Open(Form("../batchOutput_%s/csNominal/histograms_CMS-HGG.root", batchProd.c_str()));
   db->add_mcFile( fileBG, "thefileBG", "diphoton", kBlack, 0);
   std::string outputdir = "RoCs_andShit_" + batchProd;
   db->set_outputdir(outputdir);
 
   
 
-  // hadronic channel (12)
-  compareSingleVariable( db, 12, "njets_InsideEtaCut", 9, -0.5, 8.5,  "Central Jet Multiplicity (|#eta|<2)", "" );
-  compareSingleVariable( db, 12, "njets",              9, -0.5, 8.5,  "Jet Multiplicity", "" );
-  compareSingleVariable( db, 12, "qJetPt",             50, 20., 120.,    "qJet p_{T}", "GeV" );
-  compareSingleVariable( db, 12, "qJetEta",            30, 0., 5.,    "qJet |#eta|", "" );
-  compareSingleVariable( db, 12, "topM",               50, 0., 1000., "Top Transverse Mass", "GeV" );
-  compareSingleVariable( db, 12, "deltaEta_bJet_qJet", 35, 0., 7.,    "|#Delta#eta| (bJet-qJet)", "" );
-  compareSingleVariable( db, 12, "deltaPhi_top_higgs", 30, 0., 3.15,    "#Delta#phi(top-diphoton)", "rad" );
+  //// hadronic channel (12)
+  //compareSingleVariable( db, 12, "njets_InsideEtaCut", 9, -0.5, 8.5,  "Central Jet Multiplicity (|#eta|<2)", "" );
+  //compareSingleVariable( db, 12, "njets",              9, -0.5, 8.5,  "Jet Multiplicity", "" );
+  //compareSingleVariable( db, 12, "qJetPt",             50, 20., 120.,    "qJet p_{T}", "GeV" );
+  //compareSingleVariable( db, 12, "qJetEta",            30, 0., 5.,    "qJet |#eta|", "" );
+  //compareSingleVariable( db, 12, "topM",               50, 0., 1000., "Top Transverse Mass", "GeV" );
+  //compareSingleVariable( db, 12, "deltaEta_bJet_qJet", 35, 0., 7.,    "|#Delta#eta| (bJet-qJet)", "" );
+  //compareSingleVariable( db, 12, "deltaPhi_top_higgs", 30, 0., 3.15,    "#Delta#phi(top-diphoton)", "rad" );
 
 
   // leptonic channel (11)
   compareSingleVariable( db, 11, "njets_InsideEtaCut", 9, -0.5, 8.5,  "Central Jet Multiplicity (|#eta|<1)", "" );
   compareSingleVariable( db, 11, "njets_InsideEtaCut", 9, -0.5, 8.5,  "Central Jet Multiplicity (|#eta|<1)", "", "thqLD_lept>0.25", "LDcut" );
-  compareSingleVariable( db, 11, "njets_OutsideEtaCut", 9, -0.5, 8.5,  "Central Jet Multiplicity (|#eta|>1)", "" );
+  compareSingleVariable( db, 11, "njets_OutsideEtaCut", 9, -0.5, 8.5,  "Forward Jet Multiplicity (|#eta|>1)", "" );
   compareSingleVariable( db, 11, "njets",              9, -0.5, 8.5,  "Jet Multiplicity", "" );
+  compareSingleVariable( db, 11, "nbjets_loose",       9, -0.5, 8.5,  "CSVL b-Jet Multiplicity", "" );
+  compareSingleVariable( db, 11, "nbjets_medium",      9, -0.5, 8.5,  "CSVM b-Jet Multiplicity", "" );
   compareSingleVariable( db, 11, "bJetPt",             50, 20., 320., "bJet p_{T}", "GeV" );
   compareSingleVariable( db, 11, "qJetEta",            30, 0., 5.,    "qJet |#eta|", "" );
   compareSingleVariable( db, 11, "topMt",              50, 0., 1000., "Top Transverse Mass", "GeV" );
@@ -58,13 +60,13 @@ int main( int argc, char* argv[] ) {
   compareSingleVariable( db, 11, "deltaPhi_top_higgs", 30, 0., 3.15,    "#Delta#phi(top-diphoton)", "rad", "thqLD_lept>0.25", "LDcut" );
 
   compareSingleVariable( db, 11, "thqLD_lept", 25, 0., 1.0001,    "tHq Leptonic LD" );
-  compareSingleVariable( db, 11, "thqLD_lept_2", 25, 0., 1.0001,    "tHq Leptonic LD" );
-  compareSingleVariable( db, 11, "thqLD_lept_2_central", 25, 0., 1.0001,    "tHq Leptonic LD (central jets)" );
+  //compareSingleVariable( db, 11, "thqLD_lept_2", 25, 0., 1.0001,    "tHq Leptonic LD" );
+  //compareSingleVariable( db, 11, "thqLD_lept_2_central", 25, 0., 1.0001,    "tHq Leptonic LD (central jets)" );
   compareSingleVariable( db, 11, "thqBDT_lept", 25, -1., 1.0001,    "tHq Leptonic BDT" );
   compareSingleVariable( db, 11, "thqBDT_lept_2", 25, -1., 1.0001,    "tHq Leptonic BDT (6 vars)" );
 
-  compareTaggersLeptonic( db, "thqLD_lept_2", "thqLD_lept_2_central", "Old LD", "New LD" );
-  compareTaggersLeptonic( db, "thqBDT_lept", "thqBDT_lept_2", "BDT 5 vars", "BDT 6 vars", 25, -1., 1. );
+  //compareTaggersLeptonic( db, "thqLD_lept", "thqLD_lept_2_central", "Old LD", "New LD" );
+  //compareTaggersLeptonic( db, "thqBDT_lept", "thqBDT_lept_2", "BDT 5 vars", "BDT 6 vars", 25, -1., 1. );
 
   drawRoc(db);
 
@@ -253,25 +255,26 @@ void drawRoc( DrawBase* db ) {
   }
 
 
-  //gr_RoC_LD->SetMarkerSize(1.3);
-  //gr_RoC_LD->SetMarkerStyle(21);
-  //gr_RoC_LD->SetMarkerColor(29);
+  gr_RoC_LD->SetMarkerSize(1.3);
+  gr_RoC_LD->SetMarkerStyle(20);
+  gr_RoC_LD->SetMarkerColor(kOrange+1);
 
-  gr_RoC_LD_new->SetMarkerSize(1.3);
-  gr_RoC_LD_new->SetMarkerStyle(20);
-  gr_RoC_LD_new->SetMarkerColor(kOrange+1);
+  //gr_RoC_LD_new->SetMarkerSize(1.3);
+  //gr_RoC_LD_new->SetMarkerStyle(20);
+  //gr_RoC_LD_new->SetMarkerColor(kOrange+1);
 
-  gr_RoC_LD_central->SetMarkerSize(1.3);
-  gr_RoC_LD_central->SetMarkerStyle(24);
-  gr_RoC_LD_central->SetMarkerColor(kRed+3);
+  //gr_RoC_LD_central->SetMarkerSize(1.3);
+  //gr_RoC_LD_central->SetMarkerStyle(24);
+  //gr_RoC_LD_central->SetMarkerColor(kRed+3);
 
   gr_RoC_BDT->SetMarkerSize(1.3);
-  gr_RoC_BDT->SetMarkerStyle(21);
-  gr_RoC_BDT->SetMarkerColor(29);
+  gr_RoC_BDT->SetMarkerStyle(24);
+  gr_RoC_BDT->SetMarkerColor(kRed+3);
 
   gr_RoC_BDT2->SetMarkerSize(1.3);
-  gr_RoC_BDT2->SetMarkerStyle(25);
-  gr_RoC_BDT2->SetMarkerColor(kBlack);
+  gr_RoC_BDT2->SetMarkerStyle(21);
+  gr_RoC_BDT2->SetMarkerColor(29);
+
 
 
 
@@ -291,22 +294,17 @@ void drawRoc( DrawBase* db ) {
   TLegend* legend = new TLegend( 0.2, 0.2, 0.45, 0.45, "Leptonic Channel" );
   legend->SetFillColor(0);
   legend->SetTextSize(0.04);
-  legend->AddEntry( gr_RoC_LD_new, "Nominal LD", "P");
-  legend->AddEntry( gr_RoC_LD_central, "New LD (central jets)", "P");
+  legend->AddEntry( gr_RoC_LD, "LD", "P");
+  //legend->AddEntry( gr_RoC_LD_central, "New LD (central jets)", "P");
   legend->AddEntry( gr_RoC_BDT, "BDT", "P");
-  //legend->AddEntry( gr_RoC_BDT2, "BDT (6 var)", "P");
   legend->Draw("same");
 
   TPaveText* labelTop = db->get_labelTop();
   labelTop->Draw("same");
 
-
   
+  gr_RoC_LD->Draw("p same");
   gr_RoC_BDT->Draw("p same");
-  //gr_RoC_LD->Draw("p same");
-  gr_RoC_LD_new->Draw("p same");
-  gr_RoC_LD_central->Draw("p same");
-  //gr_RoC_BDT2->Draw("p same");
 
   gPad->RedrawAxis();
 
@@ -314,9 +312,37 @@ void drawRoc( DrawBase* db ) {
   sprintf( canvasName, "%s/RoC.eps", db->get_outputdir().c_str() );
   c1->SaveAs(canvasName);
 
+
+  c1->Clear();
+
+  h2_axes->Draw();
+  diag->Draw("same");
+  labelTop->Draw("same");
+
+
+  TLegend* legend2 = new TLegend( 0.2, 0.2, 0.45, 0.45, "Leptonic Channel" );
+  legend2->SetFillColor(0);
+  legend2->SetTextSize(0.04);
+  legend2->AddEntry( gr_RoC_LD, "5-variable LD", "P");
+  legend2->AddEntry( gr_RoC_BDT, "5-variable BDT", "P");
+  legend2->AddEntry( gr_RoC_BDT2, "6-variable BDT", "P");
+  legend2->Draw("same");
+
+  
+  gr_RoC_BDT2->Draw("p same");
+  gr_RoC_LD->Draw("p same");
+  gr_RoC_BDT->Draw("p same");
+
+  gPad->RedrawAxis();
+
+  sprintf( canvasName, "%s/RoC_withBDT2.eps", db->get_outputdir().c_str() );
+  c1->SaveAs(canvasName);
+
   delete c1;
   delete h2_axes;
   delete legend;
+  delete legend2;
+
 }
 
 
