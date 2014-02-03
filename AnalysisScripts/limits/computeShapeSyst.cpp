@@ -21,21 +21,24 @@ int main() {
   TF1* flat = new TF1("uniform", "[0]", 10.0, 180.);
   flat->SetParameter(0, 1./80.);
 
-  std::string fileName = (useCS) ? "../batchOutputCS1/histograms_CMS-HGG.root" : "../batchOutput8/histograms_CMS-HGG.root";
-  //TF1* expo = getExpoFromFit(fileName.c_str());
-  TF1* expo = new TF1( "expo", "1.*exp([0]+[1]*x)", 100., 180.);
-  expo->SetParameter(0, -3.71371e-01);
-  expo->SetParameter(1, -3.03197e-02);
+  TF1* expo = new TF1( "expo", "exp([0]*x)", 100., 180.);
+  expo->SetParameter(0, -0.04);
 
-std::cout << "flat int: " << flat->Integral(100., 180.) << std::endl;
-std::cout << "expo int: " << expo->Integral(100., 180.) << std::endl;
+  TF1* expo2 = new TF1( "expo2", "exp([0]*x)", 100., 180.);
+  expo2->SetParameter(0, -0.005);
+
+//std::cout << "flat int: " << flat->Integral(100., 180.) << std::endl;
+//std::cout << "expo int: " << expo->Integral(100., 180.) << std::endl;
   float sf_flat = getScalingFactor(flat, 3.);
+  float sf_expo2 = getScalingFactor(expo2, 3.);
   float sf_expo = getScalingFactor(expo, 3.);
 
   std::cout << "SF: " << std::endl;
   std::cout << "flat: " << sf_flat << std::endl;
   std::cout << "expo: " << sf_expo << std::endl;
-  std::cout << "syst: " << fabs((sf_flat-sf_expo)/sf_flat) << std::endl;
+  std::cout << "expo2: " << sf_expo2 << std::endl;
+  std::cout << "syst(flat-expo): " << fabs((sf_flat-sf_expo)/sf_flat) << std::endl;
+  std::cout << "syst(expo2-expo): " << fabs((sf_expo2-sf_expo)/sf_expo2) << std::endl;
 
 
   return 0;
