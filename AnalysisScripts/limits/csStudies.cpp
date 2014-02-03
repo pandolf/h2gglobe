@@ -687,6 +687,8 @@ RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar
 
   int run;
   tree->SetBranchAddress( "run", &run );
+  int itype;
+  tree->SetBranchAddress( "itype", &itype );
   int event;
   tree->SetBranchAddress( "event", &event );
   float ph1_pt;
