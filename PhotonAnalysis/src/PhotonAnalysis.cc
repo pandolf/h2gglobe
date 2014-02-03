@@ -190,7 +190,7 @@ PhotonAnalysis::PhotonAnalysis()  :
     reader_thqBDT_lept->AddVariable("lept_charge", &lept_charge_bdt );
  
     TString methodName = "BDTG method";
-    TString weightfile = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/AnalysisScripts/thqLDstudies/TMVA/weights/thqBDTlept_v1_BDTG.weights.xml";
+    TString weightfile = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/PhotonAnalysis/data/weights/thqBDTlept_v1_BDTG.weights.xml";
     
     std::cout << "-> Booking BDT" << std::endl;
     reader_thqBDT_lept->BookMVA( methodName, weightfile ); 
@@ -208,7 +208,7 @@ PhotonAnalysis::PhotonAnalysis()  :
     reader_thqBDT_lept_2->AddVariable("deltaPhi_top_higgs", &deltaPhi_top_higgs_bdt );
  
     TString methodName_2 = "BDTG method";
-    TString weightfile_2 = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/AnalysisScripts/thqLDstudies/TMVA/weights/thqBDT2lept_v1_BDTG.weights.xml";
+    TString weightfile_2 = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/PhotonAnalysis/data/weights/thqBDT2lept_v1_BDTG.weights.xml";
     
     std::cout << "-> Booking BDT2" << std::endl;
     reader_thqBDT_lept_2->BookMVA( methodName_2, weightfile_2 ); 
@@ -5274,8 +5274,10 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
 
 
     l.njets              = njets;
-    l.njets_OutsideEtaCut  = njets_OutsideEtaCut;
-    l.njets_InsideEtaCut  = njets_InsideEtaCut;
+    l.njets_OutsideEtaCut= njets_OutsideEtaCut;
+    l.njets_InsideEtaCut = njets_InsideEtaCut;
+    l.nbjets_loose       = njets_btagloose;
+    l.nbjets_medium      = njets_btagmedium;
     l.qJetEta            = qJet->Eta();
     l.qJetPt             = qJet->Pt();
     l.bJetPt             = bJet->Pt();
@@ -5289,9 +5291,8 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
 
     l.thqLD_lept = (float)(thqlikeli->computeLikelihood( njets, qJet->Eta(), top->Mt(), l.lept_charge, deltaEta_lept_qJet ));
 
-    l.thqLD_lept_central = (float)(thqlikeli_central->computeLikelihood( njets_InsideEtaCut, qJet->Eta(), top->Mt(), l.lept_charge, deltaEta_lept_qJet ));
+    //l.thqLD_lept_central = (float)(thqlikeli_central->computeLikelihood( njets_InsideEtaCut, qJet->Eta(), top->Mt(), l.lept_charge, deltaEta_lept_qJet ));
 
-    l.thqLD_lept_central = (float)(thqlikeli_central->computeLikelihood( njets_InsideEtaCut, qJet->Eta(), top->Mt(), l.lept_charge, deltaEta_lept_qJet ));
 
 
     njets_bdt = njets;
@@ -5304,7 +5305,7 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
     l.thqBDT_lept = reader_thqBDT_lept->EvaluateMVA( "BDTG method" );
 
     deltaPhi_top_higgs_bdt = top->DeltaPhi(diphoton);
-    //l.thqBDT_lept_2 = reader_thqBDT_lept_2->EvaluateMVA( "BDTG method" );
+    l.thqBDT_lept_2 = reader_thqBDT_lept_2->EvaluateMVA( "BDTG method" );
 
 
     //int bin_pt1 = h2_fasaWeights_pt->GetYaxis()->FindBin(lead_p4.Pt());
