@@ -13,7 +13,7 @@ int main( int argc, char* argv[] ) {
 
 
   //std::string fileName = "../thq_jetsyst_v11/jerCentral/histograms_CMS-HGG.root"; 
-  std::string fileName = "../batchOutput_qJetEtaFix_v3/histograms_CMS-HGG.root"; 
+  std::string fileName = "../batchOutput_qJetEtaFix_newLD_v2_thq_tth/histograms_CMS-HGG.root"; 
   std::cout << "-> Opening file: " << fileName << std::endl;
   TFile* file = TFile::Open(fileName.c_str());
   TTree* tree_thq = (TTree*)file->Get("thqLeptonic_m125_8TeV");
