@@ -67,7 +67,6 @@ int main( int argc, char* argv[] ) {
 
   int iPoint=0;
 
-  //for( float iCut = 0.; iCut < 0.1; iCut += 0.05 ) {
   for( float iCut = 0.; iCut < 1.; iCut += 0.05 ) {
     char ldcut[100];
     sprintf( ldcut, "thqLD_lept>=%f", iCut );
@@ -116,11 +115,11 @@ int main( int argc, char* argv[] ) {
 
   gr_ul    ->SetMarkerSize( 1.6 );
   gr_ul    ->SetMarkerStyle( 24 );
-  gr_ul    ->SetMarkerColor( kGray );
+  gr_ul    ->SetMarkerColor( kGray+1 );
 
   gr_ul_extraTTH    ->SetMarkerSize( 1.6 );
   gr_ul_extraTTH    ->SetMarkerStyle( 20 );
-  gr_ul_extraTTH    ->SetMarkerColor( kGray );
+  gr_ul_extraTTH    ->SetMarkerColor( kGray+1 );
 
 
   TLegend* legend = new TLegend( 0.2, 0.65, 0.5, 0.9 );
