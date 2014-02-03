@@ -56,11 +56,14 @@
 ##./AnalysisScripts/mk_reduction_dat.py /store/group/phys_higgs/cmshgg/processed/V15_00_08/mc/Summer12_DR53X-PU_RD1_START53_V7N ${storedir}/mc mc2012RD_v2_3.txt
 
 
-rm mc_Summer12_RD1/*.dat
-./AnalysisScripts/mk_reduction_dat.py - ${storedir}/mc/Summer12_RD1 mc_Summer12_RD1.txt
+#rm mc_Summer12_RD1/*.dat
+#./AnalysisScripts/mk_reduction_dat.py - ${storedir}/mc/Summer12_RD1 mc_Summer12_RD1.txt
+#
+#rm data2012_RERECO/*.dat
+#./AnalysisScripts/mk_reduction_dat.py /store/group/phys_higgs/cmshgg/processed/V15_00_05/data ${storedir}/data data2012_RERECO.txt
 
-rm data2012_RERECO/*.dat
-./AnalysisScripts/mk_reduction_dat.py /store/group/phys_higgs/cmshgg/processed/V15_00_05/data ${storedir}/data data2012_RERECO.txt
+rm mc_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/*.dat
+./AnalysisScripts/mk_reduction_dat.py /store/group/phys_higgs/cmshgg/processed/V15_00_11/mc ${storedir}/mc mc_TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1.txt
 
 
 wd=$PWD
