@@ -6,7 +6,7 @@
 
 base_storedir="./datastore"
 ## storeremote="/castor/cern.ch/user/c/cmshgg/reduced"
-storeremote="/store/group/phys_higgs/cmshgg/reduced/${group}"
+storeremote="/store/group/phys_higgs/pandolf/test/h2gglobe/reduced"
 
 export storeremote
 
