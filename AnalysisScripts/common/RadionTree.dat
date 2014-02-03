@@ -267,3 +267,4 @@ type=2 name=thqLD_lept_old
 type=2 name=thqLD_lept
 type=2 name=thqLD_lept_central
 type=2 name=thqBDT_lept
+type=2 name=thqBDT_lept_2
