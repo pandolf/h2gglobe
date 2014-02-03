@@ -63,6 +63,9 @@ validateLDvars: validateLDvars.cpp DrawBase.o fitTools.o
 computePUIDsyst: computePUIDsyst.cpp DrawBase.o fitTools.o
 	$(CC) -Wall $(INCLUDES) -o computePUIDsyst computePUIDsyst.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
+provaRooFit: provaRooFit.cpp DrawBase.o fitTools.o
+	$(CC) -Wall $(INCLUDES) -o provaRooFit provaRooFit.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
 
 
 
