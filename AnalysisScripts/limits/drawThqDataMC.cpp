@@ -10,7 +10,7 @@ bool BLINDED=true;
 
 
 
-void printYields( DrawBase* db, const std::string& suffix, float massWindow=3. );
+//void printYields( DrawBase* db, const std::string& suffix, float massWindow=3. );
 
 
 
@@ -18,6 +18,10 @@ int main( int argc, char* argv[] ) {
 
 
   std::string batchProd = "qJetEtaFix_newLD_v1";
+  if( argc>1 ) {
+    std::string batchProd_str(argv[1]);
+    batchProd = batchProd_str;
+  }
 
   
   DrawBase* db = new DrawBase("THq");
@@ -39,8 +43,9 @@ int main( int argc, char* argv[] ) {
   // add categories 11-12 data for final plots:
   std::string dataFileName = inputDir + "data.root";
   TFile* file_data = TFile::Open( dataFileName.c_str() );
-  db->add_dataFile( file_data, "data", "Data");
-  db_nostack->add_dataFile( file_data, "data", "Data" );
+  std::string dataName = (BLINDED) ? "Blinded Data" : "Data";
+  db->add_dataFile( file_data, "data", dataName );
+  db_nostack->add_dataFile( file_data, "data", dataName );
 
   // use inclusive categories to check PU and shit:
   std::string dataInclusiveFileName = inputDir + "data_inclusive.root";
@@ -53,24 +58,32 @@ int main( int argc, char* argv[] ) {
 
   std::string thqLeptonicFileName = inputDir + "thqLeptonic_m125_8TeV.root";
   TFile* file_thq = TFile::Open( thqLeptonicFileName.c_str() );
-  db->add_mcFile( file_thq, "thq", "tHq (C_{t}=-1)", kWhite );
-  db_inclusiveData->add_mcFile( file_thq, "thq", "tHq (C_{t}=-1)", kBlack );
+  db->add_mcFile( file_thq, "thq", "tHq (Ct = -1)", kWhite );
+  db_inclusiveData->add_mcFile( file_thq, "thq", "tHq (Ct = -1)", kBlack );
+  db_nostack->add_mcFile( file_thq, "thq", "tHq (125)", 38 );
+
+
+  std::string ttH2FileName = inputDir + "tth_m125_8TeV.root";
+  TFile* file_ttH2 = TFile::Open( ttH2FileName.c_str() );
+  db->add_mcFile( file_ttH2, "ttH2", "Extra ttH (Ct = -1)", 46, 3004 );
+  db->set_mcWeight( "ttH2", 1.4 ); //extra contribution for Ct=-1
+
 
   std::string tthFileName = inputDir + "tth_m125_8TeV.root";
   TFile* file_tth = TFile::Open( tthFileName.c_str() );
   db->add_mcFile( file_tth, "tth", "ttH (125)", 46 );
-  db_inclusiveData->add_mcFile( file_tth, "tth", "ttH (125)", 46 );
   db_nostack->add_mcFile( file_tth, "tth", "ttH (125)", 46 );
-  db->set_mcWeight( "tth", 2.4 ); //extra contribution for Ct=-1
+  db_inclusiveData->add_mcFile( file_tth, "tth", "ttH (125)", 46 );
+
 
   std::string wzhFileName = inputDir + "wzh_m125_8TeV.root";
   TFile* file_wzh = TFile::Open( wzhFileName.c_str() );
   db->add_mcFile( file_wzh, "wzh", "VH (125)", 28 );
   db->set_mcWeight( "wzh", 2.4 ); //extra contribution for Ct=-1
 
-  //std::string diphojet_sherpa_8TeVFileName = inputDir + "diphojet_sherpa_8TeV_m125_8TeV.root";
-  //TFile* file_diphojet_sherpa_8TeV = TFile::Open( diphojet_sherpa_8TeVFileName.c_str() );
-  //db->add_mcFile( file_diphojet_sherpa_8TeV, "diphojet_sherpa_8TeV", "Diphoton", 39 );
+  std::string diphojet_sherpa_8TeVFileName = inputDir + "diphojet_sherpa_8TeV.root";
+  TFile* file_diphojet_sherpa_8TeV = TFile::Open( diphojet_sherpa_8TeVFileName.c_str() );
+  db->add_mcFile( file_diphojet_sherpa_8TeV, "diphojet_sherpa_8TeV", "Diphoton", 39 );
 
   //std::string gjet_40_8TeV_pfFileName = inputDir + "gjet_40_8TeV_pf_m125_8TeV.root";
   //TFile* file_gjet_40_8TeV_pf = TFile::Open( gjet_40_8TeV_pfFileName.c_str() );
@@ -81,9 +94,9 @@ int main( int argc, char* argv[] ) {
   db->add_mcFile( file_tgg, "tgg", "t#gamma#gamma", 29 );
   //db_inclusiveData->add_mcFile( file_tgg, "tgg", "t#gamma#gamma", 29 );
 
-  std::string ttggFileName = inputDir + "ttgg.root";
-  TFile* file_ttgg = TFile::Open( ttggFileName.c_str() );
-  db->add_mcFile( file_ttgg, "ttgg", "tt#gamma#gamma", 38 );
+  //std::string ttggFileName = inputDir + "ttgg.root";
+  //TFile* file_ttgg = TFile::Open( ttggFileName.c_str() );
+  //db->add_mcFile( file_ttgg, "ttgg", "tt#gamma#gamma", 38 );
 
 
   // first some shape norm plots:
@@ -95,21 +108,27 @@ int main( int argc, char* argv[] ) {
   db_nostack->set_lumi(lumi);
   db_nostack->set_shapeNormalization();
   db_nostack->set_noStack();
+  db_nostack->set_drawZeros(false);
+
+  db->set_lumiNormalization(lumi);
+  db->set_drawZeros(false);
 
   db_inclusiveData->drawHisto_fromTree( "tree_passedEvents", "nvtx", "weight*( category==11 || itype==0 )", 40, 0.5, 40.5, "nvtx_inclusive", "Number of Reconstructed Vertexes" );
-  db_nostack       ->drawHisto_fromTree( "tree_passedEvents", "nvtx", "weight*( category==11             )", 40, 0.5, 40.5, "nvtx", "Number of Reconstructed Vertexes" );
-//  db_inclusiveData->drawHisto_fromTree( "tree_passedEvents", "rho", "weight*( category==11 )", 30, 0., 50., "rho", "Particle Flow Energy Density (#rho)", "GeV" );
+  db_nostack      ->drawHisto_fromTree( "tree_passedEvents", "nvtx", "weight*( category==11             )", 40, 0.5, 40.5, "nvtx", "Number of Reconstructed Vertexes" );
+  db_inclusiveData->drawHisto_fromTree( "tree_passedEvents", "rho",  "weight*( category==11 || itype==0)", 30, 0., 50., "rho_inclusive", "Particle Flow Energy Density (#rho)", "GeV" );
+
+  db_nostack      ->drawHisto_fromTree( "tree_passedEvents", "thqLD_lept", "dbWeight*( category==11 )", 50, 0., 1.0001, "thqLD_lept_shape", "tHq Leptonic LD");
 
 
+  // then some lumi norm plots:
 
-//// then some lumi norm plots:
+  db->set_yAxisMax(3.5);
+  db->drawHisto_fromTree( "tree_passedEvents", "thqLD_lept", Form("dbWeight*( category==11 )"), 40, 0., 1.0001, "thqLD_lept", "tHq Leptonic LD", "", "Events", true );
 
-//db->drawHisto_fromTree( "tree_passedEvents", "thqLD_lept", Form("weight*( category==11 )/%f", lumi), 40, 0., 1.0001, "thqLD_lept", "tHq Leptonic LD", "", "Events", true );
-
-//db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("weight*( category==11 )/%f", lumi), 40, 100., 180., "mgg", "Diphoton Mass", "GeV", "Events", true );
-//printYields( db, "presel" );
-//db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("weight*( category==11 && thqLD_lept>0.25 )/%f", lumi), 40, 100., 180., "mgg_LDcut", "Diphoton Mass", "GeV", "Events", true );
-//printYields( db, "LDcut" );
+  float massWindow = 3.;
+  db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("dbWeight*( category==11 )"), 40, 100., 180., "mgg", "Diphoton Mass", "GeV", "Events", true );
+  db->set_yAxisMax();
+  db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("dbWeight*( category==11 && thqLD_lept>0.25 )"), 40, 100., 180., "mgg_LDcut", "Diphoton Mass", "GeV", "Events", true );
 
   return 0;
 
@@ -117,7 +136,7 @@ int main( int argc, char* argv[] ) {
 
 
 
-
+/*
 void printYields( DrawBase* db, const std::string& suffix, float massWindow ) {
 
 
@@ -159,6 +178,9 @@ void printYields( DrawBase* db, const std::string& suffix, float massWindow ) {
 
   for( unsigned int ii=0; ii<mcFiles.size(); ++ii ) {
 
+    std::string dataset = db->get_mcFile(ii).datasetName;
+    if( dataset=="ttH2" ) continue;
+
     TH1D* h1_mgg_massWindow = new TH1D("mgg_massWindow", "", 160, 100., 180.);
     h1_mgg_massWindow->Sumw2();
     TH1D* h1_mgg_total = new TH1D("mgg_total", "", 160, 100., 180.);
@@ -170,10 +192,9 @@ void printYields( DrawBase* db, const std::string& suffix, float massWindow ) {
     thisTree->Project( "mgg_massWindow", "PhotonsMass", selection_massWindow );
     thisTree->Project( "mgg_total", "PhotonsMass", selection_total );
 
-    float integral_massWindow = db->get_lumi()*h1_mgg_massWindow->Integral();
-    float integral_total = db->get_lumi()*h1_mgg_total->Integral();
+    float integral_massWindow = h1_mgg_massWindow->Integral();
+    float integral_total = h1_mgg_total->Integral();
 
-    std::string dataset = db->get_mcFile(ii).datasetName;
 
     bool isSMH = (dataset=="tth"||dataset=="wzh"||dataset=="ggh"||dataset=="vbfh");
 
@@ -212,7 +233,7 @@ void printYields( DrawBase* db, const std::string& suffix, float massWindow ) {
     } else {
 
       foundSignal = true;
-      float thq = integral_massWindow*34.;
+      float thq = integral_massWindow;
       signal += thq;
       signal_noSMH += thq;
       yieldsFile << db->get_mcFile(ii).datasetName << " " << thq << std::endl;
@@ -234,13 +255,13 @@ void printYields( DrawBase* db, const std::string& suffix, float massWindow ) {
   yieldsFile << "Total SMH BG under peak: " << totalBG_allSMH << std::endl;
   yieldsFile << "Total extra SMH under peak: " << signal-signal_noSMH << std::endl;
 
-  float signal_xsec = 2.28E-03*(0.0152*34. + 1.4*(19.37 + 1.573 + 0.6966 + 0.3943 + 0.1302));
-  float signal_xsec_noSMH = 2.28E-03*(0.0152*34.);
-  float total_signal = signal_xsec*db->get_lumi();
-  float total_signal_noSMH = signal_xsec_noSMH*db->get_lumi();
-  float effS = signal/total_signal;
-  float effS_noSMH = signal_noSMH/total_signal_noSMH;
-  yieldsFile << "Signal efficiency: " << effS << " w/o SMH: " << effS_noSMH << std::endl;
+//float signal_xsec = 2.28E-03*(0.0152*34. + 1.4*(19.37 + 1.573 + 0.6966 + 0.3943 + 0.1302));
+//float signal_xsec_noSMH = 2.28E-03*(0.0152*34.);
+//float total_signal = signal_xsec*db->get_lumi();
+//float total_signal_noSMH = signal_xsec_noSMH*db->get_lumi();
+//float effS = signal/total_signal;
+//float effS_noSMH = signal_noSMH/total_signal_noSMH;
+//yieldsFile << "Signal efficiency: " << effS << " w/o SMH: " << effS_noSMH << std::endl;
 
 
   
@@ -266,4 +287,4 @@ void printYields( DrawBase* db, const std::string& suffix, float massWindow ) {
 }
 
 
-
+*/
