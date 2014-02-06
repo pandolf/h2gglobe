@@ -17,7 +17,7 @@ bool BLINDED=true;
 int main( int argc, char* argv[] ) {
 
 
-  std::string batchProd = "qJetEtaFix_newLD_v1";
+  std::string batchProd = "preNatal_v5";
   if( argc>1 ) {
     std::string batchProd_str(argv[1]);
     batchProd = batchProd_str;
@@ -26,6 +26,7 @@ int main( int argc, char* argv[] ) {
   
   DrawBase* db = new DrawBase("THq");
   DrawBase* db_inclusiveData = new DrawBase("THq_inclusive");
+  DrawBase* db_csData = new DrawBase("THq_CS");
   DrawBase* db_nostack = new DrawBase("THq_nostack");
 
   //db->set_isCMSArticle(true);
@@ -33,6 +34,7 @@ int main( int argc, char* argv[] ) {
 
   std::string outputdir_str = "THq_plots_dataMC_"+batchProd;
   db->set_outputdir( outputdir_str );
+  db_csData->set_outputdir( outputdir_str );
   db_inclusiveData->set_outputdir( outputdir_str );
   db_nostack->set_outputdir( outputdir_str );
 
@@ -51,6 +53,11 @@ int main( int argc, char* argv[] ) {
   std::string dataInclusiveFileName = inputDir + "data_inclusive.root";
   TFile* file_dataInclusive = TFile::Open( dataInclusiveFileName.c_str() );
   db_inclusiveData->add_dataFile( file_dataInclusive, "data", "Data (inclusive)" );
+
+  // btagZero control sample data:
+  std::string dataCSFileName = inputDir + "dataCS_btagZero.root";
+  TFile* file_dataCS = TFile::Open( dataCSFileName.c_str() );
+  db_csData->add_dataFile( file_dataCS, "data", "Data (CS)" );
 
 
 
@@ -83,7 +90,11 @@ int main( int argc, char* argv[] ) {
 
   std::string diphojet_sherpa_8TeVFileName = inputDir + "diphojet_sherpa_8TeV.root";
   TFile* file_diphojet_sherpa_8TeV = TFile::Open( diphojet_sherpa_8TeVFileName.c_str() );
-  db->add_mcFile( file_diphojet_sherpa_8TeV, "diphojet_sherpa_8TeV", "Diphoton", 39 );
+  //db->add_mcFile( file_diphojet_sherpa_8TeV, "diphojet_sherpa_8TeV", "Diphoton", 39 );
+
+  std::string diphojet_sherpa_8TeVFileName_CS = inputDir + "diphojet_sherpa_8TeVCS_btagZero.root";
+  TFile* file_diphojet_sherpa_8TeV_CS = TFile::Open( diphojet_sherpa_8TeVFileName_CS.c_str() );
+  db_csData->add_mcFile( file_diphojet_sherpa_8TeV_CS, "diphojet_sherpa_8TeV_CS", "Diphoton (CS)", 39 );
 
   //std::string gjet_40_8TeV_pfFileName = inputDir + "gjet_40_8TeV_pf_m125_8TeV.root";
   //TFile* file_gjet_40_8TeV_pf = TFile::Open( gjet_40_8TeV_pfFileName.c_str() );
@@ -91,7 +102,7 @@ int main( int argc, char* argv[] ) {
 
   std::string tggFileName = inputDir + "tgg.root";
   TFile* file_tgg = TFile::Open( tggFileName.c_str() );
-  db->add_mcFile( file_tgg, "tgg", "t#gamma#gamma", 29 );
+  //db->add_mcFile( file_tgg, "tgg", "t#gamma#gamma", 29 );
   //db_inclusiveData->add_mcFile( file_tgg, "tgg", "t#gamma#gamma", 29 );
 
   //std::string ttggFileName = inputDir + "ttgg.root";
@@ -110,6 +121,11 @@ int main( int argc, char* argv[] ) {
   db_nostack->set_noStack();
   db_nostack->set_drawZeros(false);
 
+  db_csData->set_lumi(lumi);
+  db_csData->set_shapeNormalization();
+  db_csData->set_noStack();
+  db_csData->set_drawZeros(false);
+
   db->set_lumiNormalization(lumi);
   db->set_drawZeros(false);
 
@@ -123,7 +139,8 @@ int main( int argc, char* argv[] ) {
   // then some lumi norm plots:
 
   db->set_yAxisMax(3.5);
-  db->drawHisto_fromTree( "tree_passedEvents", "thqLD_lept", Form("dbWeight*( category==11 )"), 40, 0., 1.0001, "thqLD_lept", "tHq Leptonic LD", "", "Events", true );
+  db       ->drawHisto_fromTree( "tree_passedEvents", "thqLD_lept", Form("dbWeight*( category==11 )"), 40, 0., 1.0001, "thqLD_lept",    "tHq Leptonic LD", "", "Events", true );
+  db_csData->drawHisto_fromTree( "tree_passedEvents", "thqLD_lept", Form("dbWeight*( category==11 )"), 40, 0., 1.0001, "thqLD_lept_CS", "tHq Leptonic LD", "", "Events", true );
 
   float massWindow = 3.;
   db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("dbWeight*( category==11 )"), 40, 100., 180., "mgg", "Diphoton Mass", "GeV", "Events", true );
