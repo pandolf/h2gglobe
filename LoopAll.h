@@ -179,7 +179,6 @@ class LoopAll {
   float topMt_bdt;
   float qJetEta_bdt;
   int lept_charge_bdt;
-  float thqLD_lept_old;
   float thqLD_lept;
   float thqBDT_lept;
   float thqBDT_lept_2;

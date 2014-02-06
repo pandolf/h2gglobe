@@ -2678,7 +2678,6 @@ void StatAnalysis::fillOpTree(LoopAll& l, const TLorentzVector & lead_p4, const 
         l.FillTree("leptEta",           (float)l.leptEta);
         l.FillTree("leptPt",            (float)l.leptPt);
         l.FillTree("deltaEta_lept_qJet",(float)l.deltaEta_lept_qJet);
-        l.FillTree("thqLD_lept_old",               (float)l.thqLD_lept_old);
         l.FillTree("thqLD_lept",                   (float)l.thqLD_lept);
         l.FillTree("thqBDT_lept",                   (float)l.thqBDT_lept);
         l.FillTree("thqBDT_lept_2",                   (float)l.thqBDT_lept_2);

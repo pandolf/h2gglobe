@@ -266,7 +266,6 @@ type=2 name=topM
 type=2 name=deltaEta_lept_qJet
 type=2 name=deltaEta_bJet_qJet
 type=2 name=deltaPhi_top_higgs
-type=2 name=thqLD_lept_old
 type=2 name=thqLD_lept
 type=2 name=thqLD_lept_central
 type=2 name=thqBDT_lept

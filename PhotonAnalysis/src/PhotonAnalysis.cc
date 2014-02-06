@@ -168,9 +168,6 @@ PhotonAnalysis::PhotonAnalysis()  :
 
     thqCS_btagLevel = 2;  // 2: nominal (CSVM); 1: CSVL; 0: no threshold (actually, 0)
 
-    std::string thqFile_LD_old = "/afs/cern.ch/work/p/pandolf/public/THq_tHqLeptonic_mH125_8TeV_testtest_presel_isLeptonic_CSV.root";
-    std::string tthFile_LD_old = "/afs/cern.ch/work/p/pandolf/public/THq_TTH_HToGG_M-125_8TeV-pythia6_Summer12-PU_S7_START52_V9-v2_presel_isLeptonic_CSV.root";
-    thqlikeli_old = new THqLeptonicLikelihoodCalculatorOld( thqFile_LD_old, tthFile_LD_old );
 
     //std::string fileName_thq = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/AnalysisScripts/thqLDstudies/tHqLD_leptonic_PDFs.root";
     std::string fileName_thq = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/PhotonAnalysis/data/tHqLD_leptonic_PDFs.root";
@@ -5297,8 +5294,6 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
     l.leptPt             = lep->Pt();
     l.leptEta            = lep->Eta();
 
-
-    l.thqLD_lept_old = (float)(thqlikeli_old->computeLikelihood( njets, qJet->Eta(), top->Mt(), l.lept_charge, deltaEta_lept_qJet ));
 
     l.thqLD_lept = (float)(thqlikeli->computeLikelihood( njets, qJet->Eta(), top->Mt(), l.lept_charge, deltaEta_lept_qJet ));
 
