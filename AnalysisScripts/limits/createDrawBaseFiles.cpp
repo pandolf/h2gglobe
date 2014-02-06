@@ -15,7 +15,7 @@ void createSingleFile( int minCat, int maxCat, const std::string& dataset, const
 int main( int argc, char* argv[] ) {
 
 
-  std::string batchProd = "qJetEtaFix_newLD_v1";
+  std::string batchProd = "preNatal_v5";
   if( argc > 1 ) {
     std::string batchProd_str(argv[1]);
     batchProd = batchProd_str;
@@ -66,6 +66,13 @@ int main( int argc, char* argv[] ) {
 
   if( file!=0 ) createSingleFile( 11, 12, "Data", "data", file, outdir );
   if( file!=0 ) createSingleFile( 0, 10, "Data", "data_inclusive", file, outdir );
+
+
+  std::string fileNameCS = "../batchOutput_" + batchProd + "/btagZero/histograms_CMS-HGG.root";
+  TFile* fileCS = TFile::Open( fileNameCS.c_str() );
+  std::cout << "-> Opening file: " << fileNameCS << std::endl;
+  if( fileCS!=0 ) createSingleFile( 11, 12, "Data", "dataCS_btagZero", fileCS, outdir );
+  if( fileCS!=0 ) createSingleFile( 11, 12, "diphojet_sherpa_8TeV", "diphojet_sherpa_8TeVCS_btagZero", fileCS, outdir );
 
   return 0;
 
