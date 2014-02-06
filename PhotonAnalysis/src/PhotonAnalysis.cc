@@ -4917,6 +4917,7 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
 
     l.isLep_mu=0;
     l.isLep_ele=0;
+    l.isMu = 0; // try this as isLep doesnt work (?)
     l.el_ind=-1;
     l.mu_ind=-1;
     l.diphoton_id_lep=-1;
@@ -5066,21 +5067,29 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
     TLorentzVector* lep;
 
     if(nEle>0){
+      if( FPDEBUGTHQ ) std::cout << "is electron!" << std::endl;
       l.isLep_ele=1;
+      l.isLep_mu=0;
+      l.isMu=0;
       l.el_ind=elIndexes[0];
       lep= (TLorentzVector*) (l.el_std_p4->At(l.el_ind));
       l.lept_charge = l.el_std_charge[l.el_ind];
     }
     if(nMuon>0) {
+      if( FPDEBUGTHQ ) std::cout << "is muon!" << std::endl;
       l.isLep_mu=1;
+      l.isLep_ele=0;
+      l.isMu=1;
       l.mu_ind=muonInd;
       lep= (TLorentzVector*)(l.mu_glo_p4->At(muonInd));
       l.lept_charge = l.mu_glo_charge[muonInd];
     }
 
 
-    if( FPDEBUGTHQ )
-      std::cout << "lepton: pt: " << lep->Pt() << " eta: " << lep->Eta() << std::endl;
+
+    if( FPDEBUGTHQ ) 
+      std::cout << "lepton: pt: " << lep->Pt() << " eta: " << lep->Eta() << " isLep_ele: " << l.isLep_ele << " isLep_mu: " << l.isLep_mu << std::endl;
+      
 
     //    std::cout<<"nLeptons:"<<nLeptons<<endl;
 
@@ -5285,6 +5294,8 @@ bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, floa
     l.deltaEta_lept_qJet = deltaEta_lept_qJet;
     l.deltaEta_bJet_qJet = deltaEta_bJet_qJet;
     l.deltaPhi_top_higgs = top->DeltaPhi(diphoton);
+    l.leptPt             = lep->Pt();
+    l.leptEta            = lep->Eta();
 
 
     l.thqLD_lept_old = (float)(thqlikeli_old->computeLikelihood( njets, qJet->Eta(), top->Mt(), l.lept_charge, deltaEta_lept_qJet ));
