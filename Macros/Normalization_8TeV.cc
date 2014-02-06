@@ -37,8 +37,12 @@ void Normalization_8TeV::Init(int sqrtS){
     for (std::map<double, double>::const_iterator iter = XSectionMap_ggh.begin(); iter != XSectionMap_ggh.end(); ++iter)
       XSectionMap_sm[iter->first]=iter->second+XSectionMap_vbf[iter->first]+XSectionMap_wzh[iter->first]+XSectionMap_tth[iter->first];
 
-    XSectionMap_thqLeptonic[125.0] = 0.0152 * 0.108 * 3. * 34.;
-    XSectionMap_thqHadronic[125.0] = 0.0152 * ( 1. - 0.108 * 3. ) * 34.;
+    //XSectionMap_thqLeptonic[125.0] = 0.0152 * 0.108 * 3. * 34.;
+    //XSectionMap_thqHadronic[125.0] = 0.0152 * ( 1. - 0.108 * 3. ) * 34.;
+
+    // NLO:
+    XSectionMap_thqLeptonic[125.0] = 0.2311*2.4 * 0.108 * 3.;
+    XSectionMap_thqHadronic[125.0] = 0.2311*2.4 * ( 1. - 0.108 * 3. );
 
     
 
