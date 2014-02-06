@@ -22,6 +22,8 @@ int main( int argc, char* argv[] ) {
   }
 
 
+  std::cout << "-> Batch prod: " << batchProd << std::endl;
+
   TFile* weightsFile = TFile::Open("../../AnalysisScripts/aux/JetIdScaleFactor_ZmumuJets_legacypaper.root");
 
 
@@ -58,6 +60,9 @@ void computeSingleSyst( const std::string& batchProd, TFile* weightsFile, const 
   Float_t qJetPt;
   tree->SetBranchAddress("qJetPt", &qJetPt);
 
+  Float_t thqLD_lept;
+  tree->SetBranchAddress("thqLD_lept", &thqLD_lept);
+
 
 
   TH1D* h1_weightsTK = (TH1D*)weightsFile->Get("hJetIdScaleFactor_TK");
@@ -75,6 +80,8 @@ void computeSingleSyst( const std::string& batchProd, TFile* weightsFile, const 
     tree->GetEntry(iEntry);
 
     if( category!=11 ) continue;
+    if( thqLD_lept<0.25 ) continue;
+    if( mgg<122. || mgg>128. ) continue;
 
     yield += weight;
 
