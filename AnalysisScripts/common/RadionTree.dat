@@ -249,6 +249,7 @@ type=2 name=met_phi_pfmet
 #type=2 name=radion_Phi
 
 #thq variables
+type=0 name=isMu
 type=0 name=lept_charge
 type=0 name=njets
 type=0 name=njets_OutsideEtaCut
@@ -257,6 +258,8 @@ type=0 name=nbjets_loose
 type=0 name=nbjets_medium
 type=2 name=qJetEta
 type=2 name=qJetPt
+type=2 name=leptEta
+type=2 name=leptPt
 type=2 name=bJetPt
 type=2 name=topMt
 type=2 name=topM
