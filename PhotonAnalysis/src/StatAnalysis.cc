@@ -2651,8 +2651,6 @@ void StatAnalysis::fillOpTree(LoopAll& l, const TLorentzVector & lead_p4, const 
 	l.FillTree("phiMu",(float)muon->Phi());
 	if(includetHqLeptonic)	l.FillTree("chargeMu",(int)l.mu_glo_charge[l.mu_ind]);
     }
-    l.FillTree("isLep_mu",(int)l.isLep_mu);
-    l.FillTree("isLep_ele",(int)l.isLep_ele);
     l.FillTree("drLepPho",(float)l.drLepPho);
     l.FillTree("drGsf",(float)l.drGsf);
 
@@ -2673,7 +2671,12 @@ void StatAnalysis::fillOpTree(LoopAll& l, const TLorentzVector & lead_p4, const 
       l.FillTree("deltaPhi_top_higgs",(float)l.deltaPhi_top_higgs);
 
       if( includetHqLeptonic ) {
+        l.FillTree("isMu",(int)l.isMu);
+        l.FillTree("isLep_mu",(int)l.isLep_mu);
+        l.FillTree("isLep_ele",(int)l.isLep_ele);
         l.FillTree("lept_charge",       (int)l.lept_charge);
+        l.FillTree("leptEta",           (float)l.leptEta);
+        l.FillTree("leptPt",            (float)l.leptPt);
         l.FillTree("deltaEta_lept_qJet",(float)l.deltaEta_lept_qJet);
         l.FillTree("thqLD_lept_old",               (float)l.thqLD_lept_old);
         l.FillTree("thqLD_lept",                   (float)l.thqLD_lept);
