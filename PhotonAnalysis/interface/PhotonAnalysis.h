@@ -16,7 +16,6 @@
 #include "PhotonFix.h"
 #include <stdio.h>
 
-#include "THqLeptonicLikelihoodCalculatorOld.h"
 #include "THqLeptonicLikelihoodCalculator.h"
 
 #include "TMVA/Reader.h"
