@@ -145,6 +145,7 @@ class LoopAll {
   void AddGlobalHisto(TH1 * x ) { x->SetDirectory(0); globalHistos.push_back(x); }
   TH1D  * pileup;
 
+  int isMu;
   int isLep_mu;
   int isLep_ele;
 
@@ -164,6 +165,8 @@ class LoopAll {
   int   nbjets_medium;
   float qJetEta;
   float qJetPt;
+  float leptEta;
+  float leptPt;
   float bJetPt;
   float topMt;
   float topM;
