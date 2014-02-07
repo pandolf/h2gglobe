@@ -439,7 +439,7 @@ std::cout << "thqlept: first: " << thqLept_btagsyst.first << " second: " << thqL
 
 
   if(isLeptonic) {
-    datacard << "leptEff        lnN    1.025     -    1.025 1.025 1.025" << std::endl;
+    datacard << "leptEff        lnN    1.01     -    1.01 1.01 1.01" << std::endl;
     datacard << "BG_shape       lnN    -     1.25  - - -" << std::endl;
   }
   
