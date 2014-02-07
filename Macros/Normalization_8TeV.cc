@@ -41,7 +41,7 @@ void Normalization_8TeV::Init(int sqrtS){
     //XSectionMap_thqHadronic[125.0] = 0.0152 * ( 1. - 0.108 * 3. ) * 34.;
 
     // NLO:
-    XSectionMap_thqLeptonic[125.0] = 0.2311*2.4 * 0.108 * 3.;
+    XSectionMap_thqLeptonic[125.0] = 0.2311*2.4 * 0.108 * 3. *10.; // <-- x10 to correct for BR in new generation
     XSectionMap_thqHadronic[125.0] = 0.2311*2.4 * ( 1. - 0.108 * 3. );
 
     
