@@ -12,8 +12,15 @@ bool use_centralJets = false;
 int main( int argc, char* argv[] ) {
 
 
+  std::string batchProd = "preNatal_v5";
+  if( argc>1 ) {
+    std::string batchProd_str(argv[1]);
+    batchProd = batchProd_str;
+  }
+  
+
   //std::string fileName = "../thq_jetsyst_v11/jerCentral/histograms_CMS-HGG.root"; 
-  std::string fileName = "../batchOutput_preNatal_v5/histograms_CMS-HGG.root"; 
+  std::string fileName = "../batchOutput_" + batchProd + "/histograms_CMS-HGG.root"; 
   std::cout << "-> Opening file: " << fileName << std::endl;
   TFile* file = TFile::Open(fileName.c_str());
   TTree* tree_thq = (TTree*)file->Get("thqLeptonic_m125_8TeV");
@@ -32,11 +39,11 @@ int main( int argc, char* argv[] ) {
 
 
   //tree_thq->Project("nJetsCentral_thq", "njets_InsideEtaCut", "weight*( category==11 )" );
-  tree_thq->Project("nJets_thq", njetsVar.c_str(), "weight*( category==11 )" );
-  tree_thq->Project("eta_qJet_thq", "qJetEta", "weight*( category==11 )" );
-  tree_thq->Project("mt_top_thq", "topMt", "weight*( category==11 )" );
-  tree_thq->Project("lept_charge_thq", "lept_charge", "weight*( category==11 )" );
-  tree_thq->Project("deltaEta_lept_qJet_thq", "deltaEta_lept_qJet", "weight*( category==11 )" );
+  tree_thq->Project("nJets_thq", njetsVar.c_str(), "evweight*( category==11 )" );
+  tree_thq->Project("eta_qJet_thq", "qJetEta", "evweight*( category==11 )" );
+  tree_thq->Project("mt_top_thq", "topMt", "evweight*( category==11 )" );
+  tree_thq->Project("lept_charge_thq", "lept_charge", "evweight*( category==11 )" );
+  tree_thq->Project("deltaEta_lept_qJet_thq", "deltaEta_lept_qJet", "evweight*( category==11 )" );
 
 
   //h1_nJetsCentral_thq       ->Scale(1./h1_nJetsCentral_thq->Integral());
@@ -57,11 +64,11 @@ int main( int argc, char* argv[] ) {
 
 
   //tree_tth->Project("nJetsCentral_tth", "njets_InsideEtaCut", "weight*( category==11 )" );
-  tree_tth->Project("nJets_tth", njetsVar.c_str(), "weight*( category==11 )" );
-  tree_tth->Project("eta_qJet_tth", "qJetEta", "weight*( category==11 )" );
-  tree_tth->Project("mt_top_tth", "topMt", "weight*( category==11 )" );
-  tree_tth->Project("lept_charge_tth", "lept_charge", "weight*( category==11 )" );
-  tree_tth->Project("deltaEta_lept_qJet_tth", "deltaEta_lept_qJet", "weight*( category==11 )" );
+  tree_tth->Project("nJets_tth", njetsVar.c_str(), "evweight*( category==11 )" );
+  tree_tth->Project("eta_qJet_tth", "qJetEta", "evweight*( category==11 )" );
+  tree_tth->Project("mt_top_tth", "topMt", "evweight*( category==11 )" );
+  tree_tth->Project("lept_charge_tth", "lept_charge", "evweight*( category==11 )" );
+  tree_tth->Project("deltaEta_lept_qJet_tth", "deltaEta_lept_qJet", "evweight*( category==11 )" );
 
 
   //h1_nJetsCentral_tth              ->Scale(1./h1_nJetsCentral_tth->Integral());
@@ -72,13 +79,9 @@ int main( int argc, char* argv[] ) {
   h1_deltaEta_lept_qJet_tth ->Scale(1./h1_deltaEta_lept_qJet_tth->Integral());
 
 
-  std::string outFileName = "tHqLD_leptonic_PDFs";
+  std::string outFileName = "tHqLD_leptonic_PDFs_" + batchProd;
   if( use_centralJets ) outFileName = outFileName + "_central";
   outFileName += ".root";
-  if( argc>1 ) {
-    std::string outFileName_str(argv[1]);
-    outFileName = outFileName_str;
-  }
   std::cout << "-> Writing PDFs in file: " << outFileName << std::endl;
   TFile* outfile = TFile::Open(outFileName.c_str(), "recreate");
   outfile->cd();
