@@ -66,6 +66,9 @@ computePUIDsyst: computePUIDsyst.cpp DrawBase.o fitTools.o
 provaRooFit: provaRooFit.cpp DrawBase.o fitTools.o
 	$(CC) -Wall $(INCLUDES) -o provaRooFit provaRooFit.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
+computeSignificanceFromTestStatistic: computeSignificanceFromTestStatistic.cpp DrawBase.o fitTools.o
+	$(CC) -Wall $(INCLUDES) -o computeSignificanceFromTestStatistic computeSignificanceFromTestStatistic.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+
 
 
 
