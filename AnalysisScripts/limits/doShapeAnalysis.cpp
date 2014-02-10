@@ -104,7 +104,7 @@ TFile* createRootFile( const std::string& channel ) {
   TTree* tree_tth     = (TTree*)file_tth    ->Get("tth_m125_8TeV");
 
   char fullSelection[500];
-  sprintf( fullSelection, "weight*( category==%d )", category );
+  sprintf( fullSelection, "evweight*( category==%d )", category );
 
 
   TH1D* h1_mgg_thqLeptonic = new TH1D("mgg_thqLeptonic", "", nBins, xMin, xMax );
