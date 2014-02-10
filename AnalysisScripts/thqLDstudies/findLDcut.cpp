@@ -68,8 +68,8 @@ LDCutStruct findVariableThreshold( DrawBase* db, const std::string& varName, flo
   TH1F* h1_LD_bg = new TH1F("LD_bg", "", nBins, xMin, 1.0001);
 
 
-  tree_thq->Project( "LD_signal", varName.c_str(), "weight*(category==11)" );
-  tree_tth->Project( "LD_bg", varName.c_str(), "weight*(category==11)" );
+  tree_thq->Project( "LD_signal", varName.c_str(), "evweight*(category==11)" );
+  tree_tth->Project( "LD_bg", varName.c_str(), "evweight*(category==11)" );
 
 
   TH1D* h1_fraction_vs_cut = new TH1D("fraction_vs_cut", "", nBins, xMin, 1.0001 );
