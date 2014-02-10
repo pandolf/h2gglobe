@@ -54,13 +54,13 @@ int main() {
   //tree_thq_old->Project("lept_charge_thq_old", "charge_lept", "isLeptonic*eventWeight");
   //tree_thq_old->Project("deltaEta_lept_qJet_thq_old", "deltaEta_lept_qJet", "isLeptonic*eventWeight");
 
-  tree_thq_old->Project("nJetsCentral_thq_old", "njets_InsideEtaCut", "weight*( category==11 )" );
-  tree_thq_old->Project("nJets_thq_old", "njets", "weight*( category==11 )" );
-  tree_thq_old->Project("eta_qJet_thq_old", "qJetEta", "weight*( category==11 )" );
-  tree_thq_old->Project("mt_top_thq_old", "topMt", "weight*( category==11 )" );
-  tree_thq_old->Project("lept_charge_thq_old", "lept_charge", "weight*( category==11 )" );
-  tree_thq_old->Project("deltaEta_lept_qJet_thq_old", "deltaEta_lept_qJet", "weight*( category==11 )" );
-  tree_thq_old->Project("nvtx_thq_old", "nvtx", "weight*( category==11 )" );
+  tree_thq_old->Project("nJetsCentral_thq_old", "njets_InsideEtaCut", "evweight*( category==11 )" );
+  tree_thq_old->Project("nJets_thq_old", "njets", "evweight*( category==11 )" );
+  tree_thq_old->Project("eta_qJet_thq_old", "qJetEta", "evweight*( category==11 )" );
+  tree_thq_old->Project("mt_top_thq_old", "topMt", "evweight*( category==11 )" );
+  tree_thq_old->Project("lept_charge_thq_old", "lept_charge", "evweight*( category==11 )" );
+  tree_thq_old->Project("deltaEta_lept_qJet_thq_old", "deltaEta_lept_qJet", "evweight*( category==11 )" );
+  tree_thq_old->Project("nvtx_thq_old", "nvtx", "evweight*( category==11 )" );
 
 
 
@@ -90,13 +90,13 @@ int main() {
   //tree_tth_old->Project("lept_charge_tth_old", "charge_lept", "isLeptonic*eventWeight");
   //tree_tth_old->Project("deltaEta_lept_qJet_tth_old", "deltaEta_lept_qJet", "isLeptonic*eventWeight");
 
-  tree_tth_old->Project("nJetsCentral_tth_old", "njets_InsideEtaCut", "weight*( category==11 )" );
-  tree_tth_old->Project("nJets_tth_old", "njets", "weight*( category==11 )" );
-  tree_tth_old->Project("eta_qJet_tth_old", "qJetEta", "weight*( category==11 )" );
-  tree_tth_old->Project("mt_top_tth_old", "topMt", "weight*( category==11 )" );
-  tree_tth_old->Project("lept_charge_tth_old", "lept_charge", "weight*( category==11 )" );
-  tree_tth_old->Project("deltaEta_lept_qJet_tth_old", "deltaEta_lept_qJet", "weight*( category==11 )" );
-  tree_tth_old->Project("nvtx_tth_old", "nvtx", "weight*( category==11 )" );
+  tree_tth_old->Project("nJetsCentral_tth_old", "njets_InsideEtaCut", "evweight*( category==11 )" );
+  tree_tth_old->Project("nJets_tth_old", "njets", "evweight*( category==11 )" );
+  tree_tth_old->Project("eta_qJet_tth_old", "qJetEta", "evweight*( category==11 )" );
+  tree_tth_old->Project("mt_top_tth_old", "topMt", "evweight*( category==11 )" );
+  tree_tth_old->Project("lept_charge_tth_old", "lept_charge", "evweight*( category==11 )" );
+  tree_tth_old->Project("deltaEta_lept_qJet_tth_old", "deltaEta_lept_qJet", "evweight*( category==11 )" );
+  tree_tth_old->Project("nvtx_tth_old", "nvtx", "evweight*( category==11 )" );
 
 
   h1_nJetsCentral_tth_old              ->Scale(1./h1_nJetsCentral_tth_old->Integral());
@@ -117,13 +117,13 @@ int main() {
   TH1D* h1_nvtx_thq_new = new TH1D( "nvtx_thq_new", "", 35, 0.5, 35.5 );
 
 
-  tree_thq_new->Project("nJetsCentral_thq_new", "njets_InsideEtaCut", "weight*( category==11 )" );
-  tree_thq_new->Project("nJets_thq_new", "njets", "weight*( category==11 )" );
-  tree_thq_new->Project("eta_qJet_thq_new", "qJetEta", "weight*( category==11 )" );
-  tree_thq_new->Project("mt_top_thq_new", "topMt", "weight*( category==11 )" );
-  tree_thq_new->Project("lept_charge_thq_new", "lept_charge", "weight*( category==11 )" );
-  tree_thq_new->Project("deltaEta_lept_qJet_thq_new", "deltaEta_lept_qJet", "weight*( category==11 )" );
-  tree_thq_new->Project("nvtx_thq_new", "nvtx", "weight*( category==11 )" );
+  tree_thq_new->Project("nJetsCentral_thq_new", "njets_InsideEtaCut", "evweight*( category==11 )" );
+  tree_thq_new->Project("nJets_thq_new", "njets", "evweight*( category==11 )" );
+  tree_thq_new->Project("eta_qJet_thq_new", "qJetEta", "evweight*( category==11 )" );
+  tree_thq_new->Project("mt_top_thq_new", "topMt", "evweight*( category==11 )" );
+  tree_thq_new->Project("lept_charge_thq_new", "lept_charge", "evweight*( category==11 )" );
+  tree_thq_new->Project("deltaEta_lept_qJet_thq_new", "deltaEta_lept_qJet", "evweight*( category==11 )" );
+  tree_thq_new->Project("nvtx_thq_new", "nvtx", "evweight*( category==11 )" );
 
 
   h1_nJetsCentral_thq_new              ->Scale(1./h1_nJetsCentral_thq_new->Integral());
@@ -145,13 +145,13 @@ int main() {
   TH1D* h1_nvtx_tth_new = new TH1D( "nvtx_tth_new", "", 35, 0.5, 35.5 );
 
 
-  tree_tth_new->Project("nJetsCentral_tth_new", "njets_InsideEtaCut", "weight*( category==11 )" );
-  tree_tth_new->Project("nJets_tth_new", "njets", "weight*( category==11 )" );
-  tree_tth_new->Project("eta_qJet_tth_new", "qJetEta", "weight*( category==11 )" );
-  tree_tth_new->Project("mt_top_tth_new", "topMt", "weight*( category==11 )" );
-  tree_tth_new->Project("lept_charge_tth_new", "lept_charge", "weight*( category==11 )" );
-  tree_tth_new->Project("deltaEta_lept_qJet_tth_new", "deltaEta_lept_qJet", "weight*( category==11 )" );
-  tree_tth_new->Project("nvtx_tth_new", "nvtx", "weight*( category==11 )" );
+  tree_tth_new->Project("nJetsCentral_tth_new", "njets_InsideEtaCut", "evweight*( category==11 )" );
+  tree_tth_new->Project("nJets_tth_new", "njets", "evweight*( category==11 )" );
+  tree_tth_new->Project("eta_qJet_tth_new", "qJetEta", "evweight*( category==11 )" );
+  tree_tth_new->Project("mt_top_tth_new", "topMt", "evweight*( category==11 )" );
+  tree_tth_new->Project("lept_charge_tth_new", "lept_charge", "evweight*( category==11 )" );
+  tree_tth_new->Project("deltaEta_lept_qJet_tth_new", "deltaEta_lept_qJet", "evweight*( category==11 )" );
+  tree_tth_new->Project("nvtx_tth_new", "nvtx", "evweight*( category==11 )" );
 
 
   h1_nJetsCentral_tth_new              ->Scale(1./h1_nJetsCentral_tth_new->Integral());
