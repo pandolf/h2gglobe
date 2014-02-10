@@ -14,7 +14,7 @@ void compareTaggersLeptonic( DrawBase* db, const std::string& varName1, const st
 int main( int argc, char* argv[] ) {
 
 
-  std::string batchProd = "qJetEtaFix_newLD_v2_thq_tth";
+  std::string batchProd = "postFreezeNLO_v2";
   if( argc>1 ) {
     std::string batchProd_str(argv[1]);
     batchProd = batchProd_str;
@@ -23,11 +23,12 @@ int main( int argc, char* argv[] ) {
 
   DrawBase* db = new DrawBase("rocs_and_shit");
 
-  std::string fileName = "../batchOutput_" + batchProd + "/histograms_CMS-HGG.root";
+  std::string fileName = "../histograms_CMS-HGG_btag.root";
+  //std::string fileName = "../batchOutput_" + batchProd + "/histograms_CMS-HGG.root";
   TFile* file = TFile::Open(fileName.c_str());
   //TFile* file = TFile::Open("../batchOutput_provaLD6_withBDT2/histograms_CMS-HGG.root");
   db->add_mcFile( file, "thefile", "tHq", kBlack, 0);
-  TFile* fileBG = TFile::Open(Form("../batchOutput_%s/csNominal/histograms_CMS-HGG.root", batchProd.c_str()));
+  TFile* fileBG = TFile::Open(Form("../batchOutput_%s/histograms_CMS-HGG.root", batchProd.c_str()));
   db->add_mcFile( fileBG, "thefileBG", "diphoton", kBlack, 0);
   std::string outputdir = "RoCs_andShit_" + batchProd;
   db->set_outputdir(outputdir);
@@ -93,9 +94,9 @@ void compareSingleVariable( DrawBase* db, int channel, const std::string& varNam
 
   char fullSelection[500];
   if( additionalCuts=="" ) 
-    sprintf( fullSelection, "weight*( category==%d )", channel );
+    sprintf( fullSelection, "evweight*( category==%d )", channel );
   else
-    sprintf( fullSelection, "weight*( category==%d && %s)", channel,  additionalCuts.c_str() );
+    sprintf( fullSelection, "evweight*( category==%d && %s)", channel,  additionalCuts.c_str() );
 
   tree_thq->Project("thq", varName.c_str(), fullSelection );
   tree_tth->Project("tth", varName.c_str(), fullSelection );
@@ -129,7 +130,10 @@ void compareSingleVariable( DrawBase* db, int channel, const std::string& varNam
 
   std::string legendTitle = (channel==11) ? "Leptonic Channel" : "Hadronic Channel";
 
-  TLegend* legend = new TLegend( 0.55, 0.7, 0.9, 0.9, "Leptonic Channel" );
+  float xMin_leg = (varName=="lept_charge") ? 0.2 : 0.55;
+  float xMax_leg = (varName=="lept_charge") ? 0.55 : 0.9;
+  TLegend* legend = new TLegend( xMin_leg, 0.7, xMax_leg, 0.9 );
+  //TLegend* legend = new TLegend( 0.55, 0.7, 0.9, 0.9, "Leptonic Channel" );
   legend->SetTextSize(0.040);
   legend->SetFillColor(0);
   legend->AddEntry( h1_thq, "tHq", "F" );
@@ -198,17 +202,17 @@ void drawRoc( DrawBase* db ) {
   TH1F* h1_BDT2_signal = new TH1F("BDT2_signal", "", 100, -1, 1.0001);
   TH1F* h1_BDT2_bg = new TH1F("BDT2_bg", "", 100, -1, 1.0001);
 
-  tree_thq->Project( "LD_signal", "thqLD_lept", "weight*(category==11)" );
-  tree_thq->Project( "LD_new_signal", "thqLD_lept_2", "weight*(category==11)" );
-  tree_thq->Project( "LD_central_signal", "thqLD_lept_2_central", "weight*(category==11)" );
-  tree_thq->Project( "BDT_signal", "thqBDT_lept", "weight*(category==11)" );
-  tree_thq->Project( "BDT2_signal", "thqBDT_lept_2", "weight*(category==11)" );
+  tree_thq->Project( "LD_signal", "thqLD_lept", "evweight*(category==11)" );
+  tree_thq->Project( "LD_new_signal", "thqLD_lept_2", "evweight*(category==11)" );
+  tree_thq->Project( "LD_central_signal", "thqLD_lept_2_central", "evweight*(category==11)" );
+  tree_thq->Project( "BDT_signal", "thqBDT_lept", "evweight*(category==11)" );
+  tree_thq->Project( "BDT2_signal", "thqBDT_lept_2", "evweight*(category==11)" );
 
-  tree_tth->Project( "LD_bg", "thqLD_lept", "weight*(category==11)" );
-  tree_tth->Project( "LD_new_bg", "thqLD_lept_2", "weight*(category==11)" );
-  tree_tth->Project( "LD_central_bg", "thqLD_lept_2_central", "weight*(category==11)" );
-  tree_tth->Project( "BDT_bg", "thqBDT_lept", "weight*(category==11)" );
-  tree_tth->Project( "BDT2_bg", "thqBDT_lept_2", "weight*(category==11)" );
+  tree_tth->Project( "LD_bg", "thqLD_lept", "evweight*(category==11)" );
+  tree_tth->Project( "LD_new_bg", "thqLD_lept_2", "evweight*(category==11)" );
+  tree_tth->Project( "LD_central_bg", "thqLD_lept_2_central", "evweight*(category==11)" );
+  tree_tth->Project( "BDT_bg", "thqBDT_lept", "evweight*(category==11)" );
+  tree_tth->Project( "BDT2_bg", "thqBDT_lept_2", "evweight*(category==11)" );
 
 
 
@@ -363,11 +367,11 @@ void compareTaggersLeptonic( DrawBase* db, const std::string& varName1, const st
   TH1F* h1_bg2 = new TH1F("bg2", "", nBins, xMin, xMax );
 
 
-  tree_thq->Project( "signal1", varName1.c_str(), "weight*(category==11)" );
-  tree_thq->Project( "signal2", varName2.c_str(), "weight*(category==11)" );
+  tree_thq->Project( "signal1", varName1.c_str(), "evweight*(category==11)" );
+  tree_thq->Project( "signal2", varName2.c_str(), "evweight*(category==11)" );
 
-  tree_tth->Project( "bg1", varName1.c_str(), "weight*(category==11)" );
-  tree_tth->Project( "bg2", varName2.c_str(), "weight*(category==11)" );
+  tree_tth->Project( "bg1", varName1.c_str(), "evweight*(category==11)" );
+  tree_tth->Project( "bg2", varName2.c_str(), "evweight*(category==11)" );
 
 
   h1_signal1->SetFillColor(46);
