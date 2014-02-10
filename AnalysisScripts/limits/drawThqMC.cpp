@@ -86,8 +86,8 @@ int main( int argc, char* argv[] ) {
   // first some shape norm plots:
   db_nostack->set_shapeNormalization();
 
-  db_nostack->drawHisto_fromTree( "tree_passedEvents", "nvtx", "weight*( category==11 )", 40, 0.5, 40.5, "npu", "Number of Reconstructed Vertexes" );
-  db_nostack->drawHisto_fromTree( "tree_passedEvents", "rho", "weight*( category==11 )", 30, 0., 50., "rho", "Particle Flow Energy Density (#rho)", "GeV" );
+  db_nostack->drawHisto_fromTree( "tree_passedEvents", "nvtx","dbWeight*( category==11 )", 40, 0.5, 40.5, "npu", "Number of Reconstructed Vertexes" );
+  db_nostack->drawHisto_fromTree( "tree_passedEvents", "rho", "dbWeight*( category==11 )", 30, 0., 50., "rho", "Particle Flow Energy Density (#rho)", "GeV" );
 
 
 
@@ -95,11 +95,11 @@ int main( int argc, char* argv[] ) {
   float lumi = 19715.;
   db->set_lumiNormalization(lumi);
 
-  db->drawHisto_fromTree( "tree_passedEvents", "thqLD_lept", Form("weight( category==11 )"), 40, 0., 1.0001, "thqLD_lept", "tHq Leptonic LD", "", "Events", true );
+  db->drawHisto_fromTree( "tree_passedEvents", "thqLD_lept",  Form("dbWeight( category==11 )"), 40, 0., 1.0001, "thqLD_lept", "tHq Leptonic LD", "", "Events", true );
 
-  db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("weight*( category==11 )"), 40, 100., 180., "mgg", "Diphoton Mass", "GeV", "Events", true );
+  db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("dbWeight*( category==11 )"), 40, 100., 180., "mgg", "Diphoton Mass", "GeV", "Events", true );
   printYields( db, "", "presel" );
-  db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("weight*( category==11 && thqLD_lept>0.25 )"), 40, 100., 180., "mgg_LDcut", "Diphoton Mass", "GeV", "Events", true );
+  db->drawHisto_fromTree( "tree_passedEvents", "PhotonsMass", Form("dbWeight*( category==11 && thqLD_lept>0.25 )"), 40, 100., 180., "mgg_LDcut", "Diphoton Mass", "GeV", "Events", true );
   printYields( db, "thqLD_lept>0.25", "LDcut" );
 
   return 0;
