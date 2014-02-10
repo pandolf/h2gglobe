@@ -245,11 +245,11 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
   char fullSelection[500];
   char fullSelection_sidebands[500];
   if( LDsidebands ) {
-    sprintf( fullSelection,           "weight*( category==%d && thqLD_lept<0.25 )", category );
-    sprintf( fullSelection_sidebands, "weight*( category==%d && thqLD_lept<0.25 && (PhotonsMass<115. || PhotonsMass>135.) )", category );
+    sprintf( fullSelection,           "evweight*( category==%d && thqLD_lept<0.25 )", category );
+    sprintf( fullSelection_sidebands, "evweight*( category==%d && thqLD_lept<0.25 && (PhotonsMass<115. || PhotonsMass>135.) )", category );
   } else {
-    sprintf( fullSelection,           "weight*( category==%d && thqLD_lept>=0.25 )", category );
-    sprintf( fullSelection_sidebands, "weight*( category==%d && thqLD_lept>=0.25 && (PhotonsMass<115. || PhotonsMass>135.) )", category );
+    sprintf( fullSelection,           "evweight*( category==%d && thqLD_lept>=0.25 )", category );
+    sprintf( fullSelection_sidebands, "evweight*( category==%d && thqLD_lept>=0.25 && (PhotonsMass<115. || PhotonsMass>135.) )", category );
   }
 
 
@@ -705,6 +705,8 @@ RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar
   tree->SetBranchAddress( "category", &category );
   float weight;
   tree->SetBranchAddress( "weight", &weight );
+  float evweight;
+  tree->SetBranchAddress( "evweight", &evweight );
   float thqLD;
   tree->SetBranchAddress( "thqLD_lept", &thqLD );
 
@@ -732,7 +734,7 @@ RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar
 
     mgg_roo.setVal(mgg);
 
-    float corrweight = weight;
+    float corrweight = evweight;
     if( FASAWEIGHTS ) {
       if( h2_fasaWeights_pt!=0 ) {
         int bin_pt1 = h2_fasaWeights_pt->GetYaxis()->FindBin(ph1_pt);
