@@ -44,10 +44,9 @@ void Normalization_8TeV::Init(int sqrtS){
     XSectionMap_thqLeptonic[125.0] = 0.2311*2.4 * 0.108 * 3. *10.; // <-- x10 to correct for BR in new generation
     XSectionMap_thqHadronic[125.0] = 0.2311*2.4 * ( 1. - 0.108 * 3. );
 
-    
-
    
 }
+
 
 
 void Normalization_8TeV::FillSignalTypes(){
