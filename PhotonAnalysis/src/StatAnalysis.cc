@@ -1399,9 +1399,12 @@ bool StatAnalysis::AnalyseEvent(LoopAll& l, Int_t jentry, float weight, TLorentz
 	    bool isMC = l.itype[l.current]!=0;
 	    if(isMC && applyBtagSF ){
 		if (category==9 ||category ==10 || category==11 || category==12){//tth and thq  categories
+            // btag reweighting:
 		    float reweight = BtagReweight(l,shiftBtagEffUp_bc,shiftBtagEffDown_bc,shiftBtagEffUp_l,shiftBtagEffDown_l,1);
             evweight *= reweight;
             weight *= reweight;
+            // electron SF reweighting:
+            if (l.el_ind>-1) { evweight *=ElectronSFReweight(l); weight *=ElectronSFReweight(l); } 
 		//}else if (category == 11){//vh categories. loose wp for btag
 		//    evweight*=BtagReweight(l,shiftBtagEffUp_bc,shiftBtagEffDown_bc,shiftBtagEffUp_l,shiftBtagEffDown_l,0);
 		}
