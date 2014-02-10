@@ -5915,20 +5915,69 @@ float PhotonAnalysis::MuonSFReweight(LoopAll &l){
 
     TLorentzVector* mymu = (TLorentzVector*) l.mu_glo_p4->At(mu_ind);
     float etaMu = mymu->Eta();
-    // values for full dataset of moriond https://indico.cern.ch/getFile.py/access?contribId=2&resId=0&materialId=slides&confId=233592
-    if ( fabs(etaMu)<0.9 )                     scale_factor = 0.9938;                                                                                                     
-    if ( fabs(etaMu)>=0.9 && fabs(etaMu)<1.2 ) scale_factor = 0.9915;                                                                                                     
-    if ( fabs(etaMu)>=1.2 )                    scale_factor = 0.9992;                                                                                                     
-    // + 1 sigma                                                                                                                                                            
-    //if ( fabs(etaMu)<0.9 )                     scale_factor = 0.9983;                                                                                                     
-    //if ( fabs(etaMu)>=0.9 && fabs(etaMu)<1.2 ) scale_factor = 0.9979;                                                                                                     
-    //if ( fabs(etaMu)>=1.2 )                    scale_factor = 1.0056;                                                                                                     
-    // no SF                                                                                                                                                                
-    //scale_factor = 1.;                                                                                                                                                    
+    //SCALE FACTOR FROM https://indico.cern.ch/getFile.py/access?contribId=1&resId=2&materialId=slides&confId=257630
+    //central value
+    if(mymu->Pt()>10. && mymu->Pt()<20.){
+
+        if(fabs(etaMu)<0.9)                     scale_factor = 0.9300; 
+        if(fabs(etaMu)>=0.9 && fabs(etaMu)<1.2) scale_factor = 0.9679; 
+        if(fabs(etaMu)>=1.2 && fabs(etaMu)<2.1) scale_factor = 1.0001; 
+        if(fabs(etaMu)>=2.1)                    scale_factor = 1.0816; 
+    }else{
+        if(fabs(etaMu)<0.9)                     scale_factor = 0.9919; 
+        if(fabs(etaMu)>=0.9 && fabs(etaMu)<1.2) scale_factor = 0.9941; 
+        if(fabs(etaMu)>=1.2 && fabs(etaMu)<2.1) scale_factor = 0.9974; 
+        if(fabs(etaMu)>=2.1)                    scale_factor = 1.0193; 
+
+
+    }
+    //+ 1 sigma 
+//    if(mymu->Pt()>10. && mymu->Pt()<20.){
+//        
+//        if(fabs(etaMu)<0.9)                     scale_factor = 0.9300+0.03903; 
+//        if(fabs(etaMu)>=0.9 && fabs(etaMu)<1.2) scale_factor = 0.9679+0.03933; 
+//        if(fabs(etaMu)>=1.2 && fabs(etaMu)<2.1) scale_factor = 1.0001+0.02722; 
+//        if(fabs(etaMu)>=2.1)                    scale_factor = 1.0816+0.07419; 
+//
+//    }else{
+//
+//
+//    if(fabs(etaMu)<0.9)                     scale_factor = 0.9919+0.0054; 
+//    if(fabs(etaMu)>=0.9 && fabs(etaMu)<1.2) scale_factor = 0.9941+0.0054;
+//    if(fabs(etaMu)>=1.2 && fabs(etaMu)<2.1) scale_factor = 0.9974+0.0054; 
+//    if(fabs(etaMu)>=2.1)                    scale_factor = 1.0193+0.0054;  
+    // no SF
+    //scale_factor = 1.
+
+
 
     return scale_factor;
 
 }
+
+
+
+//float PhotonAnalysis::MuonSFReweight(LoopAll &l){
+//
+//   float scale_factor=-10;
+//   int mu_ind=0;
+//
+//    TLorentzVector* mymu = (TLorentzVector*) l.mu_glo_p4->At(mu_ind);
+//    float etaMu = mymu->Eta();
+//    // values for full dataset of moriond https://indico.cern.ch/getFile.py/access?contribId=2&resId=0&materialId=slides&confId=233592
+//    if ( fabs(etaMu)<0.9 )                     scale_factor = 0.9938;                                                                                                     
+//    if ( fabs(etaMu)>=0.9 && fabs(etaMu)<1.2 ) scale_factor = 0.9915;                                                                                                     
+//    if ( fabs(etaMu)>=1.2 )                    scale_factor = 0.9992;                                                                                                     
+//    // + 1 sigma                                                                                                                                                            
+//    //if ( fabs(etaMu)<0.9 )                     scale_factor = 0.9983;                                                                                                     
+//    //if ( fabs(etaMu)>=0.9 && fabs(etaMu)<1.2 ) scale_factor = 0.9979;                                                                                                     
+//    //if ( fabs(etaMu)>=1.2 )                    scale_factor = 1.0056;                                                                                                     
+//    // no SF                                                                                                                                                                
+//    //scale_factor = 1.;                                                                                                                                                    
+//
+//    return scale_factor;
+//
+//}
 
 
 

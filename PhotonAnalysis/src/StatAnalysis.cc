@@ -1405,6 +1405,7 @@ bool StatAnalysis::AnalyseEvent(LoopAll& l, Int_t jentry, float weight, TLorentz
             weight *= reweight;
             // electron SF reweighting:
             if (l.el_ind>-1) { evweight *=ElectronSFReweight(l); weight *=ElectronSFReweight(l); } 
+            if (l.mu_ind>-1) { evweight *=MuonSFReweight(l); weight *=MuonSFReweight(l); } 
 		//}else if (category == 11){//vh categories. loose wp for btag
 		//    evweight*=BtagReweight(l,shiftBtagEffUp_bc,shiftBtagEffDown_bc,shiftBtagEffUp_l,shiftBtagEffDown_l,0);
 		}
