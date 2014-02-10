@@ -169,7 +169,6 @@ PhotonAnalysis::PhotonAnalysis()  :
     thqCS_btagLevel = 2;  // 2: nominal (CSVM); 1: CSVL; 0: no threshold (actually, 0)
 
 
-    //std::string fileName_thq = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/AnalysisScripts/thqLDstudies/tHqLD_leptonic_PDFs.root";
     std::string fileName_thq = "/afs/cern.ch/work/p/pandolf/CMSSW_6_1_1_HgglobeOOTB_reloaded/src/h2gglobe/PhotonAnalysis/data/tHqLD_leptonic_PDFs.root";
     thqlikeli = new THqLeptonicLikelihoodCalculator( fileName_thq );
 
@@ -5753,31 +5752,160 @@ void PhotonAnalysis::computeBtagEff(LoopAll &l){
 }
 
 
-float PhotonAnalysis::ElectronSFReweight(LoopAll &l){
+float PhotonAnalysis::ElectronSFReweight(LoopAll &l){ // these are OK for cutbased electron ID
 
-    float scale_factor=-10;
+  float scale_factor=-10;
 
-    TLorentzVector* thissc = (TLorentzVector*) l.el_std_sc->At(l.el_ind);
-    float thiseta = fabs(thissc->Eta());
+  TLorentzVector* thissc = (TLorentzVector*) l.el_std_sc->At(l.el_ind);
+  float thiseta = fabs(thissc->Eta());
+  float thispt = fabs(thissc->Pt());
 
-    // central value                                                                                                                                                        
-    if ( fabs(thiseta)<1. )                           scale_factor = 0.984;                                                                                               
-    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=1.0 )  scale_factor = 0.988;                                                                                               
-    if ( fabs(thiseta)<2.1 && fabs(thiseta)>=1.566 )  scale_factor = 1.016;                                                                                               
-    if ( fabs(thiseta)>=2.1 )                         scale_factor = 0.999;                                                                                               
-    // + 1 sigma                                                                                                                                                            
-    //if ( fabs(thiseta)<1. )                           scale_factor = 0.986;                                                                                               
-    //if ( fabs(thiseta)<1.442 && fabs(thiseta)>=1.0 )  scale_factor = 0.999;                                                                                               
-    //if ( fabs(thiseta)<2.1 && fabs(thiseta)>=1.566 )  scale_factor = 1.024;                                                                                               
-    //if ( fabs(thiseta)>=2.1 )                         scale_factor = 1.017;                                                                                               
-    //                                                                                                                                                                      
-    // to switch off                                                                                                                                                        
-    // scale_factor = 1.;        
+    // central value                                                                                                                              
+  if(thispt > 50.){
+
+    if ( fabs(thiseta)<0.8 )                            scale_factor = 1.004;
+    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.988;
+    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.966;
+    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 1.000;
+    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.022;
+  }else if(thispt>40.){
+
+    if ( fabs(thiseta)<0.8 )                            scale_factor = 1.005;
+    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.988;
+    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.958;
+    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.992;
+    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.019;
+  }else if(thispt>30.){
+
+    if ( fabs(thiseta)<0.8 )                            scale_factor = 1.002;
+    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.980;
+    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.950;
+    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.967;
+    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.021;
+  }else if(thispt>20.){
+
+    if ( fabs(thiseta)<0.8 )                            scale_factor = 0.986;
+    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.959;
+    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.967;
+    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.941;
+    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.020;
+  }else if(thispt>15.){
+
+    if ( fabs(thiseta)<0.8 )                            scale_factor = 0.956;
+    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.962;
+    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.867;
+    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.911;
+    if ( fabs(thiseta)>=2.0 )                           scale_factor = 0.934;
+  }else if(thispt>10.){
+
+    if ( fabs(thiseta)<0.8 )                            scale_factor = 0.863;
+    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.973;
+    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 1.090;
+    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.944;
+    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.024;
+  }else{
+    scale_factor =1;
+  }
+
+
+//  // + 1 sigma                                                                                                                                            \
+//  if(thispt > 50.){
+//    
+//    if ( fabs(thiseta)<0.8 )                            scale_factor = 1.004+0.001;
+//    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.988+0.002;
+//    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.966+0.009;
+//    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 1.000+0.003;
+//    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.022+0.004;
+//  }else if(thispt>40.){
+//
+//    if ( fabs(thiseta)<0.8 )                            scale_factor = 1.005+0.001;
+//    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.988+0.001;
+//    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.958+0.005;
+//    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.992+0.002;
+//    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.019+0.002;
+//  }else if(thispt>30.){
+//
+//    if ( fabs(thiseta)<0.8 )                            scale_factor = 1.002+0.001;
+//    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.980+0.001;
+//    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.950+0.006;
+//    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.967+0.003;
+//    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.021+0.003;
+//  }else if(thispt>20.){
+//
+//    if ( fabs(thiseta)<0.8 )                            scale_factor = 0.986+0.002;
+//    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.959+0.003;
+//    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.967+0.007;
+//    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.941+0.005;
+//    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.020+0.003;
+//  }else if(thispt>15.){
+//
+//    if ( fabs(thiseta)<0.8 )                            scale_factor = 0.956+0.009;
+//    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.962+0.011;
+//    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.867+0.040;
+//    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.911+0.012;
+//    if ( fabs(thiseta)>=2.0 )                           scale_factor = 0.934+0.018;
+//  }else if(thispt>10.){
+//
+//    if ( fabs(thiseta)<0.8 )                            scale_factor = 0.863+0.008;
+//    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.973+0.022;
+//    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 1.090+0.107;
+//    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.944+0.042;
+//    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.024+0.040;
+//  }else{
+//    scale_factor =1;
+//  }
+//                                                                                                                                                             
+//  // - 1 sigma                                                                                                                                            \
+//  if(thispt > 50.){
+//    
+//    if ( fabs(thiseta)<0.8 )                            scale_factor = 1.004-0.001;
+//    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.988-0.002;
+//    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.966-0.009;
+//    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 1.000-0.003;
+//    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.022-0.004;
+//  }else if(thispt>40.){
+//
+//    if ( fabs(thiseta)<0.8 )                            scale_factor = 1.005-0.001;
+//    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.988-0.001;
+//    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.958-0.005;
+//    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.992-0.002;
+//    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.019-0.002;
+//  }else if(thispt>30.){
+//
+//    if ( fabs(thiseta)<0.8 )                            scale_factor = 1.002-0.001;
+//    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.980-0.001;
+//    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.950-0.007;
+//    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.967-0.003;
+//    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.021-0.003;
+//  }else if(thispt>20.){
+//
+//    if ( fabs(thiseta)<0.8 )                            scale_factor = 0.986-0.001;
+//    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.959-0.003;
+//    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.967-0.013;
+//    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.941-0.005;
+//    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.020-0.003;
+//  }else if(thispt>15.){
+//
+//    if ( fabs(thiseta)<0.8 )                            scale_factor = 0.956-0.009;
+//    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.962-0.011;
+//    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 0.867-0.037;
+//    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.911-0.012;
+//    if ( fabs(thiseta)>=2.0 )                           scale_factor = 0.934-0.018;
+//  }else if(thispt>10.){
+//
+//    if ( fabs(thiseta)<0.8 )                            scale_factor = 0.863-0.020;
+//    if ( fabs(thiseta)<1.442 && fabs(thiseta)>=0.8 )    scale_factor = 0.973-0.022;
+//    if ( fabs(thiseta)<1.556 && fabs(thiseta)>=1.442 )  scale_factor = 1.090-0.097;
+//    if ( fabs(thiseta)<2.0 && fabs(thiseta)>=1.556 )    scale_factor = 0.944-0.045;
+//    if ( fabs(thiseta)>=2.0 )                           scale_factor = 1.024-0.039;
+//  }else{
+//    scale_factor =1;
+//  }
+//
 
     return scale_factor;
 
 }
-
 
 
 float PhotonAnalysis::MuonSFReweight(LoopAll &l){
