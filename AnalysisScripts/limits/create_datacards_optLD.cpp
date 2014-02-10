@@ -175,14 +175,14 @@ ULSignif_struct createSingleDatacard( const std::string& batchProd, const std::s
   char fullSelection[500];
   char fullSelection_sidebands[500];
   if( additionalSelection!="" ) {
-    sprintf( fullSelection,           "weight*( category==%d && %s )", category, additionalSelection.c_str() );
-    sprintf( fullSelection_sidebands, "weight*( category==%d && %s && (PhotonsMass<115. || PhotonsMass>135.) )", category, additionalSelection.c_str() );
+    sprintf( fullSelection,           "evweight*( category==%d && %s )", category, additionalSelection.c_str() );
+    sprintf( fullSelection_sidebands, "evweight*( category==%d && %s && (PhotonsMass<115. || PhotonsMass>135.) )", category, additionalSelection.c_str() );
   } else {
-    sprintf( fullSelection,           "weight*( category==%d       )", category );
-    sprintf( fullSelection_sidebands, "weight*( category==%d       && (PhotonsMass<115. || PhotonsMass>135.) )", category );
+    sprintf( fullSelection,           "evweight*( category==%d       )", category );
+    sprintf( fullSelection_sidebands, "evweight*( category==%d       && (PhotonsMass<115. || PhotonsMass>135.) )", category );
   }
   char fullSelection_noAddSel[500];
-  sprintf( fullSelection_noAddSel,    "weight*( category==%d       )", category );
+  sprintf( fullSelection_noAddSel,    "evweight*( category==%d       )", category );
 
 
 
