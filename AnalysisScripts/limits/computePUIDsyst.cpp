@@ -54,6 +54,9 @@ void computeSingleSyst( const std::string& batchProd, TFile* weightsFile, const 
   Float_t weight;
   tree->SetBranchAddress("weight", &weight);
 
+  Float_t evweight;
+  tree->SetBranchAddress("evweight", &evweight);
+
   Float_t qJetEta;
   tree->SetBranchAddress("qJetEta", &qJetEta);
 
@@ -83,7 +86,7 @@ void computeSingleSyst( const std::string& batchProd, TFile* weightsFile, const 
     if( thqLD_lept<0.25 ) continue;
     if( mgg<122. || mgg>128. ) continue;
 
-    yield += weight;
+    yield += evweight;
 
     float puweight = 1.;
     if( fabs(qJetEta)<2.5 )
@@ -95,7 +98,7 @@ void computeSingleSyst( const std::string& batchProd, TFile* weightsFile, const 
     else 
       puweight = getWeight( qJetPt, h1_weightsHF );
 
-    yieldPU += weight*puweight;
+    yieldPU += evweight*puweight;
 
   } 
 
