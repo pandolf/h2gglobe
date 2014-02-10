@@ -54,6 +54,9 @@ void drawOneEffVsPU( DrawBase* db, const std::string& batchProd, const std::stri
   float weight;
   tree->SetBranchAddress( "weight", &weight ); 
 
+  float evweight;
+  tree->SetBranchAddress( "evweight", &evweight ); 
+
   float thqLD_lept;
   tree->SetBranchAddress( "thqLD_lept", &thqLD_lept ); 
 
@@ -78,16 +81,16 @@ void drawOneEffVsPU( DrawBase* db, const std::string& batchProd, const std::stri
 
     tree->GetEntry(iEntry);
 
-    h1_effDenom_vs_nvtx->Fill( nvtx, weight );
-    effMeanDenom += weight;
+    h1_effDenom_vs_nvtx->Fill( nvtx, evweight );
+    effMeanDenom += evweight;
 
     h1_Ntot_vs_nvtx->Fill( nvtx );
 
     if( category!=11 ) continue;
     if( applyLDcut && thqLD_lept<0.25 ) continue;
 
-    h1_effNum_vs_nvtx->Fill( nvtx, weight );
-    effMeanNum += weight;
+    h1_effNum_vs_nvtx->Fill( nvtx, evweight );
+    effMeanNum += evweight;
 
   }
 
