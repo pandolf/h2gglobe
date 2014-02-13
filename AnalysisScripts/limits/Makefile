@@ -42,8 +42,11 @@ drawEffVsPU: drawEffVsPU.cpp DrawBase.o fitTools.o StatTools.o
 drawSandB_vs_LDcut: drawSandB_vs_LDcut.cpp DrawBase.o fitTools.o StatTools.o
 	$(CC) -Wall $(INCLUDES) -o drawSandB_vs_LDcut drawSandB_vs_LDcut.cpp DrawBase.o fitTools.o StatTools.o $(ROOTFLAG) $(EXTRALIBS)
 
-optimizeWindowDummy: optimizeWindowDummy.cpp DrawBase.o fitTools.o
-	$(CC) -Wall $(INCLUDES) -o optimizeWindowDummy optimizeWindowDummy.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
+optimizeWindowDummy: optimizeWindowDummy.cpp DrawBase.o fitTools.o StatTools.o 
+	$(CC) -Wall $(INCLUDES) -o optimizeWindowDummy optimizeWindowDummy.cpp DrawBase.o fitTools.o StatTools.o $(ROOTFLAG) $(EXTRALIBS)
+
+optimizeLDcutZBi: optimizeLDcutZBi.cpp DrawBase.o fitTools.o StatTools.o 
+	$(CC) -Wall $(INCLUDES) -o optimizeLDcutZBi optimizeLDcutZBi.cpp DrawBase.o fitTools.o StatTools.o $(ROOTFLAG) $(EXTRALIBS)
 
 computeShapeSyst: computeShapeSyst.cpp DrawBase.o fitTools.o
 	$(CC) -Wall $(INCLUDES) -o computeShapeSyst computeShapeSyst.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
