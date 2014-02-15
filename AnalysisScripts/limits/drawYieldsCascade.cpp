@@ -136,10 +136,10 @@ int main( int argc, char* argv[] ) {
   std::vector< std::pair<std::string,std::string> > cuts;
   cuts.push_back( std::pair<std::string,std::string>( "(PhotonsMass<115. || PhotonsMass>135.)", "Two Photons, two jets") );
   cuts.push_back( std::pair<std::string,std::string>( "ph1_pt > 50.*PhotonsMass/120.", "p_{T}1 > 50 m_{#gamma#gamma}/120 GeV") );
-  cuts.push_back( std::pair<std::string,std::string>( "leptPt>10.", "Lepton") );
   cuts.push_back( std::pair<std::string,std::string>( "nbjets_loose>1", "CSVL") );
   cuts.push_back( std::pair<std::string,std::string>( "nbjets_medium>1", "CSVM") );
   cuts.push_back( std::pair<std::string,std::string>( "abs(qJetEta)>1.", "|#eta(qJet)|>1") );
+  cuts.push_back( std::pair<std::string,std::string>( "leptPt>10.", "Lepton") );
   cuts.push_back( std::pair<std::string,std::string>( "thqLD_lept>0.25", "LD>0.25") );
   
   drawYieldsCascade( db, cuts );
@@ -155,7 +155,7 @@ void drawYieldsCascade( DrawBase* db, std::vector< std::pair<std::string,std::st
 
   int nBins = cuts.size();
 //  TH2D* h2_yieldsCascade = new TH2D("yields_cascade", "", nBins, 0., nBins, 10, 0., 30000. );
-  TH2D* h2_yieldsCascade = new TH2D("yields_cascade", "", nBins, 0., nBins, 10, 0.1, 60000. );
+  TH2D* h2_yieldsCascade = new TH2D("yields_cascade", "", nBins, 0., nBins, 10, 0.1, 260000. );
 
   std::string selection = "dbWeight*( category==11 ";
 
@@ -176,8 +176,7 @@ void drawYieldsCascade( DrawBase* db, std::vector< std::pair<std::string,std::st
 
     selection = selection + " && (" + cuts[ibin].first + ")";
     std::string this_selection = selection + " )";
-    std::cout << "selection: " << this_selection << std::endl;
-    TCanvas* c3 = db->drawHisto_fromTree( "tree_passedEvents", Form("thqLD_lept + %f", (float)ibin), this_selection, 1, ibin, ibin+1., Form("tmp%d", ibin), "", "", "Events", true );
+    TCanvas* c3 = db->drawHisto_fromTree( "tree_passedEvents", Form("thqLD_lept + %f", (float)ibin), this_selection, 1, ibin, ibin+1., Form("tobedeleted%d", ibin), "", "", "Events", true );
     legend = (TLegend*)gROOT->FindObject("dbLegend");
     TGraphAsymmErrors* gr_data = new TGraphAsymmErrors(*(db->get_lastHistos_dataGraph()));
     gr_data->SetName(Form("gr_%d", ibin));
@@ -196,6 +195,7 @@ void drawYieldsCascade( DrawBase* db, std::vector< std::pair<std::string,std::st
   cc->SaveAs(Form("%s/yieldsCascade.eps", db->get_outputdir().c_str()));
   cc->SaveAs(Form("%s/yieldsCascade.png", db->get_outputdir().c_str()));
 
-
+  std::string rmCommand = "rm " + db->get_outputdir() + "/tobedeleted*";
+  system( rmCommand.c_str() );
 
 }
