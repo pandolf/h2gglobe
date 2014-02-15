@@ -72,6 +72,9 @@ provaRooFit: provaRooFit.cpp DrawBase.o fitTools.o
 computeSignificanceFromTestStatistic: computeSignificanceFromTestStatistic.cpp DrawBase.o fitTools.o
 	$(CC) -Wall $(INCLUDES) -o computeSignificanceFromTestStatistic computeSignificanceFromTestStatistic.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawYieldsCascade: drawYieldsCascade.cpp DrawBase.o fitTools.o StatTools.o
+	$(CC) -Wall $(INCLUDES) -o drawYieldsCascade drawYieldsCascade.cpp DrawBase.o fitTools.o StatTools.o $(ROOTFLAG) $(EXTRALIBS)
+
 
 
 
