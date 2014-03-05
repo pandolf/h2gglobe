@@ -18,7 +18,7 @@ bool useCS = false;
 bool useDefault_ = false;
 
 
-void createSingleDatacard( const std::string& batchProd, const std::string& channel, const std::string& additionalSelection, TTree* tree_data, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_ggh, TTree* tree_vbf, TTree* tree_wzh, TTree* tree_tth, const std::string& suffix="", bool addExtraTTH=false );
+void createSingleDatacard( const std::string& batchProd, const std::string& channel, const std::string& additionalSelection, TTree* tree_data, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_ggh, TTree* tree_vbf, TTree* tree_wzh, TTree* tree_tth, const std::string& suffix="", bool extraTTH=false );
 //void createSingleDatacard_twoRegions( const std::string& channel, const std::string& additionalSelection, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_tth);
 void drawMassPlot( const std::string& dirName, const std::string& category, TH1D* h1_data, TH1D* h1_thq, TH1D* h1_ggh, TH1D* h1_vbf, TH1D* h1_wzh, TH1D* h1_tth, const std::string& suffix="" );
 void drawSignalBGData( const std::string& dirName, const std::string& channel, const std::string& var, const std::string& varName, const std::string& units, int nBins, float xMin, float xMax, TTree* tree_sig, TTree* tree_bg, TTree* tree_data, const std::string& fullSelection, const std::string& fullSelection_sidebands, const std::string& suffix="" );
@@ -108,7 +108,7 @@ int main( int argc, char* argv[] ) {
 
 
 
-void createSingleDatacard( const std::string& batchProd, const std::string& channel, const std::string& additionalSelection, TTree* tree_data, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_ggh, TTree* tree_vbf, TTree* tree_wzh, TTree* tree_tth, const std::string& suffix, bool addExtraTTH ) {
+void createSingleDatacard( const std::string& batchProd, const std::string& channel, const std::string& additionalSelection, TTree* tree_data, TTree* tree_thqLeptonic, TTree* tree_thqHadronic, TTree* tree_ggh, TTree* tree_vbf, TTree* tree_wzh, TTree* tree_tth, const std::string& suffix, bool extraTTH ) {
 
   std::string dirName = "plots_dataMC_" + batchProd;
   if( useCS ) dirName += "_CS";
@@ -236,7 +236,6 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
   float yield_wzh = h1_mgg_wzh->Integral(binMin, binMax-1);
   float yield_tth = h1_mgg_tth->Integral(binMin, binMax-1);
 
-  if( addExtraTTH ) yield_thq += yield_tth*1.4;
 
 
   //float k_BG = massWindow*2./70.;
@@ -245,7 +244,7 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
 
 
   std::string fullSuffix(suffix);
-  if( addExtraTTH ) {
+  if( extraTTH ) {
     if( suffix!="" ) fullSuffix = suffix + "_";
     fullSuffix += "extraTTH";
   }
@@ -265,7 +264,11 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
   datacard << "imax 1" << std::endl;
   datacard << "jmax ";
   if( isLeptonic ) {
-    datacard << "3 " << std::endl; // of SMH, only tth and wzh (ignore ggh and vbf)
+    if( !extraTTH ) {
+      datacard << "3 " << std::endl; // of SMH, only tth and wzh (ignore ggh and vbf)
+    } else {
+      datacard << "5 " << std::endl; // tth and vh are also extra signals
+    }
   } else {
     datacard << "4 " << std::endl; // of SMH, only tth, ggh, and vbf (ignore wzh)
   }
@@ -277,56 +280,98 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
   datacard << std::endl;
   datacard << "    " << std::endl;
   datacard << "bin            1        1       1     1"; 
-  if( !isLeptonic ) datacard <<  "    1 ";
+  if( !isLeptonic )  {
+    datacard <<  "    1 ";
+  } else if( extraTTH ) {
+    datacard <<  "    1      1";
+  }
   datacard << std::endl;
   datacard << "process        s        b       tth  "; 
-  if( isLeptonic ) datacard << " wzh"     << std::endl;
-  else             datacard << " ggh   vbf  "     << std::endl;
+  if( isLeptonic ) {
+    datacard << "  wzh";
+    if( extraTTH ) datacard << "     tth_extra       wzh_extra"; 
+    datacard << std::endl;
+  } else {
+    datacard << " ggh   vbf  "     << std::endl;
+  }
   datacard << "process        0        1       2     3"; 
   if( !isLeptonic )  datacard << " 4";
+  else if( extraTTH )  datacard << "   -1     -2";
   datacard << std::endl;
 
 
   datacard << "rate   " << yield_thq <<  "  " << sidebands_yield*k_BG << "  " << yield_tth;
-  if( isLeptonic )
-    datacard << " " << yield_wzh   << std::endl;
-  else
+  if( isLeptonic ) {
+    datacard << "  " << yield_wzh;
+    if( extraTTH ) datacard << "   " << 1.4*yield_tth << "   " << 1.4*yield_wzh;
+    datacard << std::endl;
+  } else {
     datacard << " " << yield_ggh << " " << yield_vbf << std::endl;
+  }
   datacard << "      " << std::endl;
   datacard << "      " << std::endl;
   datacard << "#syst " << std::endl;
   datacard << "lumi       lnN    1.026 - 1.026 1.026";
   if( !isLeptonic ) datacard <<  " 1.026";
+  else if( extraTTH )  datacard <<  "   1.026   1.026";
   datacard << std::endl;
 
-  datacard << "bg         gmN " << (int)sidebands_yield << "    - " << k_BG << "   - - - -" << std::endl;
+  datacard << "bg         gmN " << (int)sidebands_yield << "    - " << k_BG << "   - - ";
+  if( extraTTH ) datacard << " - - ";
+  datacard << std::endl;
 
 
   // photons: taken from tth leptonic category
   // run this program to get them: dummyDoSystThq.C
-  datacard << "E_res        lnN  0.982825/1.04121 - 0.982825/1.04121 0.982825/1.04121" << std::endl;
-  datacard << "E_scale      lnN  0.963544/1.01161 - 0.963544/1.01161 0.963544/1.01161" << std::endl;
-  datacard << "idEff        lnN  0.984125/1.01627 - 0.984125/1.01627 0.984125/1.01627" << std::endl;
-  datacard << "triggerEff   lnN  0.999499/1.0005  - 0.999499/1.0005  0.999499/1.0005" << std::endl;
-  datacard << "vtxEff       lnN  0.998904/1.0011  - 0.998904/1.0011  0.998904/1.0011" << std::endl;
+  datacard << "E_res        lnN  0.982825/1.04121 - 0.982825/1.04121 0.982825/1.04121"; 
+  if( extraTTH ) 
+    datacard << " 0.982825/1.04121 0.982825/1.04121"; 
+  datacard << std::endl;
+  datacard << "E_scale      lnN  0.963544/1.01161 - 0.963544/1.01161 0.963544/1.01161"; 
+  if( extraTTH ) 
+    datacard << " 0.963544/1.01161 0.963544/1.01161"; 
+  datacard << std::endl;
+  datacard << "idEff        lnN  0.984125/1.01627 - 0.984125/1.01627 0.984125/1.01627"; 
+  if( extraTTH ) 
+    datacard << " 0.984125/1.01627 0.984125/1.01627"; 
+  datacard << std::endl;
+  datacard << "triggerEff   lnN  0.999499/1.0005  - 0.999499/1.0005  0.999499/1.0005" ; 
+  if( extraTTH ) 
+    datacard << " 0.999499/1.0005  0.999499/1.0005" ; 
+  datacard << std::endl;
+  datacard << "vtxEff       lnN  0.998904/1.0011  - 0.998904/1.0011  0.998904/1.0011" ; 
+  if( extraTTH ) 
+    datacard << " 0.998904/1.0011  0.998904/1.0011" ; 
+  datacard << std::endl;
+
 
   // pileup syst taken from ./computePUIDsyst
   datacard << "pileup       lnN    1.02 - 1.005 1.02";
   if( !isLeptonic ) datacard << " 1.02";
+  else if( extraTTH ) datacard << " 1.02 1.02";
   datacard << std::endl;;
 
 
   datacard << "PDF   lnN    0.998/1.019     -         0.922/1.078 ";
   if( !isLeptonic ) datacard <<  " -  - ";
-  else              datacard << " 0.99/1.01";
+  else {
+    datacard << " 0.99/1.01";
+    if( extraTTH ) datacard << "   0.922/1.078 0.99/1.01";
+  }
   datacard << std::endl;
   datacard << "QCDscale   lnN    0.957/1.048     -    0.86/1.11 ";
   if( !isLeptonic ) datacard <<  " - - ";
-  else              datacard << " 0.977/1.023";
+  else {
+    datacard << " 0.977/1.023";
+    if( extraTTH ) datacard << "   0.86/1.11  0.977/1.023";
+  }
   datacard << std::endl;
   datacard << "signalModel   lnN    1.055     -       - ";
   if( !isLeptonic ) datacard <<  " - - ";
-  else              datacard << " - ";
+  else  {
+    datacard << " - ";
+    if( extraTTH ) datacard << "  - - ";
+  }
   datacard << std::endl;
 
 
@@ -334,11 +379,19 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
 
   if( useDefault_ ) {
 
+    datacard << "JEC            lnN   0.998392/1.00681 - 1.03/0.953052 1.07824/0.923764 "   ;
+    datacard << "JER            lnN   1.01259/0.992777 - 1.02566/0.968589 1/1.07831 "       ;
+    datacard << "Btag           lnN   0.980827/1.01917 - 0.986403/1.01331 0.999234/1.00074 ";
 
-    datacard << "JEC            lnN   0.998392/1.00681 - 1.03/0.953052 1.07824/0.923764 \n" << std::endl;
-    datacard << "JER            lnN   1.01259/0.992777 - 1.02566/0.968589 1/1.07831 \n" << std::endl;
-    datacard << "Btag            lnN   0.980827/1.01917 - 0.986403/1.01331 0.999234/1.00074 \n" << std::endl;
+    if( extraTTH ) {
+      datacard << " 1.03/0.953052 1.07824/0.923764 "    << std::endl;
+      datacard << " 1.02566/0.968589 1/1.07831 "        << std::endl;
+      datacard << " 0.986403/1.01331 0.999234/1.00074 " << std::endl;
+    }
 
+    datacard << std::endl;
+    datacard << std::endl;
+    datacard << std::endl;
 
 
   } else { //dont use default: compute them
@@ -366,6 +419,7 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
     datacard << tth_jecsyst.first << "/" << tth_jecsyst.second << " "; 
     if( isLeptonic ) {
       datacard << wzh_jecsyst.first << "/" << wzh_jecsyst.second << " "; 
+      if( extraTTH )  datacard << tth_jecsyst.first << "/" << tth_jecsyst.second << " " << wzh_jecsyst.first << "/" << wzh_jecsyst.second << " ";
     } else {
       datacard << ggh_jecsyst.first << "/" << ggh_jecsyst.second << " "; 
       datacard << vbf_jecsyst.first << "/" << vbf_jecsyst.second << " "; 
@@ -396,6 +450,7 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
     datacard << tth_jersyst.first << "/" << tth_jersyst.second << " "; 
     if( isLeptonic ) {
       datacard << wzh_jersyst.first << "/" << wzh_jersyst.second << " "; 
+      if( extraTTH ) datacard << tth_jersyst.first << "/" << tth_jersyst.second << " "  << wzh_jersyst.first << "/" << wzh_jersyst.second << " ";
     } else {
       datacard << ggh_jersyst.first << "/" << ggh_jersyst.second << " "; 
       datacard << vbf_jersyst.first << "/" << vbf_jersyst.second << " "; 
@@ -478,6 +533,7 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
       datacard << tth_btagsyst.first << "/" << tth_btagsyst.second << " "; 
       if( isLeptonic ) {
         datacard << wzh_btagsyst.first << "/" << wzh_btagsyst.second << " "; 
+        if( extraTTH ) datacard << tth_btagsyst.first << "/" << tth_btagsyst.second << " "  << wzh_btagsyst.first << "/" << wzh_btagsyst.second << " ";
       } else {
         datacard << ggh_btagsyst.first << "/" << ggh_btagsyst.second << " "; 
         datacard << vbf_btagsyst.first << "/" << vbf_btagsyst.second << " "; 
@@ -503,8 +559,12 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
 
 
   if(isLeptonic) {
-    datacard << "leptEff        lnN    1.01     -    1.01 1.01 1.01" << std::endl;
-    datacard << "BG_shape       lnN    -     1.16  - - -" << std::endl;
+    datacard << "leptEff        lnN    1.01     -    1.01 1.01 ";
+    if( extraTTH ) datacard << " 1.01 1.01";
+    datacard << std::endl;
+    datacard << "BG_shape       lnN    -     1.16  - - ";
+    if( extraTTH ) datacard << " - - ";
+    datacard << std::endl;
   }
   
 
