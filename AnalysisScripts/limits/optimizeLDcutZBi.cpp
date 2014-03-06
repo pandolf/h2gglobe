@@ -19,23 +19,35 @@ int main() {
   DrawBase* db = new DrawBase("kk");
 
 
-  TFile* file = TFile::Open("../batchOutput_postFreezeNLO_v2/histograms_CMS-HGG.root");
-  TTree* tree_sig = (TTree*)file->Get("thqLeptonic_m125_8TeV");
-  TTree* tree_tth = (TTree*)file->Get("tth_m125_8TeV");
+  //TFile* file = TFile::Open("../batchOutput_preselectionLoose_v2/histograms_CMS-HGG.root");
+  TFile* file = TFile::Open("../batchOutput_preNatal_v5/histograms_CMS-HGG.root");
+  //TFile* file = TFile::Open("../batchOutput_postFreezeNLO_v2/histograms_CMS-HGG.root");
+  TTree* tree_sig  = (TTree*)file->Get("thqLeptonic_m125_8TeV");
+  TTree* tree_tth  = (TTree*)file->Get("tth_m125_8TeV");
+  TTree* tree_ttgg = (TTree*)file->Get("ttgg");
 
   int nBins = 100;
   TH1D* h1_thq = new TH1D("thq", "", nBins, 0., 1.);
   h1_thq->Sumw2();
   TH1D* h1_tth = new TH1D("tth", "", nBins, 0., 1.);
   h1_tth->Sumw2();
+  TH1D* h1_ttgg = new TH1D("h_ttgg", "", nBins, 0., 1.);
+  h1_ttgg->Sumw2();
 
-  tree_sig->Project( "thq", "thqLD_lept", "evweight*(category==11 && PhotonsMass>122. && PhotonsMass<128.)");
-  tree_tth->Project( "tth", "thqLD_lept", "evweight*(category==11 && PhotonsMass>122. && PhotonsMass<128.)");
+  tree_sig                    ->Project( "thq",    "thqLD_lept", "evweight*(category==11 && PhotonsMass>122. && PhotonsMass<128.)");
+  tree_tth                    ->Project( "tth",    "thqLD_lept", "evweight*(category==11 && PhotonsMass>122. && PhotonsMass<128.)");
+  if( tree_ttgg!=0 ) tree_ttgg->Project( "h_ttgg", "thqLD_lept", "evweight*(category==11 && (PhotonsMass<122. || PhotonsMass>128.))");
+
+//tree_sig                    ->Project( "thq",    "thqLD_lept", "evweight*(category==11 && nbjets_medium>0 && leptPt>10. && ph1_pt>50.*PhotonsMass/120. && abs(qJetEta)>1. && PhotonsMass>122. && PhotonsMass<128.)");
+//tree_tth                    ->Project( "tth",    "thqLD_lept", "evweight*(category==11 && nbjets_medium>0 && leptPt>10. && ph1_pt>50.*PhotonsMass/120. && abs(qJetEta)>1. && PhotonsMass>122. && PhotonsMass<128.)");
+//if( tree_ttgg!=0 ) tree_ttgg->Project( "h_ttgg", "thqLD_lept", "evweight*(category==11 && nbjets_medium>0 && leptPt>10. && ph1_pt>50.*PhotonsMass/120. && abs(qJetEta)>1. && (PhotonsMass<122. || PhotonsMass>128.))");
 
 
   float tth_int = h1_tth->Integral();
   TH1D* h1_bg = new TH1D(*h1_tth); //assume the continuous BG has same LD shape as tth
   float n_sideband_obs = 1.;
+  //float n_sideband_obs = h1_ttgg->Integral()*12.*0.146/0.001316;
+  std::cout << "n_sideband_obs: " << n_sideband_obs << std::endl;
   h1_bg->Scale( n_sideband_obs/tth_int ); // and set integral to number of sideband events in data
 
   // assume exponential BG shape:
@@ -61,14 +73,15 @@ int main() {
 
     int binMin = h1_thq->FindBin(i);
 
-    float thq = h1_thq->Integral( binMin, nBins+1 );
-    float tth = h1_tth->Integral( binMin, nBins+1 );
-    float bg = h1_bg->Integral( binMin, nBins+1 ); // this is for N_obs = 1
+    float thq   = h1_thq ->Integral( binMin, nBins+1 );
+    float tth   = h1_tth ->Integral( binMin, nBins+1 );
+    float bg    = h1_bg  ->Integral( binMin, nBins+1 );
 
     // to get signal, take thq, add 1.4*tth, then subtract tth 
     // (we're assuming here tth is a perfectly well-known BG
     //float s = thq + 1.4*tth;
-    float s = thq + 1.4*tth - tth;
+    float s = thq + 1.4*tth + tth;
+    //float s = thq + 1.4*tth - tth;
 
     float iGev = 3.; //mass counting window is +/-3 gev
     //float alpha_flat = 2.*iGev/(80.-2.*iGev);
