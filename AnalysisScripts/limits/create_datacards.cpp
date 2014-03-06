@@ -238,9 +238,7 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
 
 
 
-  //float k_BG = massWindow*2./70.;
-  float k_BG = massWindow*2./(80.-massWindow*2.);
-  //float k_BG = 0.10; // for expo BG
+  float k_BG = 0.0912427;
 
 
   std::string fullSuffix(suffix);
@@ -562,7 +560,7 @@ void createSingleDatacard( const std::string& batchProd, const std::string& chan
     datacard << "leptEff        lnN    1.01     -    1.01 1.01 ";
     if( extraTTH ) datacard << " 1.01 1.01";
     datacard << std::endl;
-    datacard << "BG_shape       lnN    -     1.16  - - ";
+    datacard << "BG_shape       lnN    -     1.12  - - ";
     if( extraTTH ) datacard << " - - ";
     datacard << std::endl;
   }
