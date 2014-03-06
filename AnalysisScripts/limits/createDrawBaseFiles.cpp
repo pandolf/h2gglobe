@@ -6,7 +6,7 @@
 
 
 
-bool BLINDED=true;
+bool BLINDED=false;
 
 
 void createSingleFile( int minCat, int maxCat, const std::string& dataset, const std::string& saveName, TFile* file, const std::string& outdir );
@@ -21,6 +21,14 @@ int main( int argc, char* argv[] ) {
     batchProd = batchProd_str;
   }
 
+
+  if( !BLINDED ) {
+    std::cout << "You are about to unblind batchProd: " << batchProd << "." << std::endl;
+    std::cout << "ARE YOU SURE? (type 'y' or 'n')" << std::endl;
+    std::string answer;
+    std::cin >> answer;
+    if( answer != "y" ) exit(1);
+  }
 
 
   std::string outdir = "dbFiles_" + batchProd;
@@ -39,6 +47,7 @@ int main( int argc, char* argv[] ) {
   datasets.push_back("wzh_m125_8TeV");
   datasets.push_back("tgg");
   datasets.push_back("ttgg");
+  datasets.push_back("ttg");
 
 
   for( unsigned i=0; i<datasets.size(); ++i )
@@ -54,8 +63,21 @@ int main( int argc, char* argv[] ) {
   datasets2.push_back("qcd_40_8TeV_ff");
   datasets2.push_back("qcd_40_8TeV_pf");
   datasets2.push_back("TTJets");
+  datasets2.push_back("ZGToLLG");
+  datasets2.push_back("WGToLNuG");
+  datasets2.push_back("WJetsToLNu");
+  datasets2.push_back("WWJetsTo2L2Nu");
+  datasets2.push_back("WZJetsTo3LNu");
+  datasets2.push_back("ZZJetsTo2L2Nu");
+  datasets2.push_back("ZZJetsTo2L2Q");
+  datasets2.push_back("ZZJetsTo4L");
+  datasets2.push_back("Wpgg_dR02");
+  datasets2.push_back("Wmgg_dR02");
+  datasets2.push_back("Zgg_dR02");
 
-  std::string fileName2 = "../batchOutput_" + batchProd + "/csNominal/histograms_CMS-HGG.root";
+  std::string fileName2 = "../batchOutput_" + batchProd + "/histograms_CMS-HGG.root";
+  //std::string fileName2 = "../batchOutput_" + batchProd + "/csNominal/histograms_CMS-HGG.root";
+
   TFile* file2 = TFile::Open( fileName2.c_str() );
   std::cout << "-> Opening file: " << fileName2 << std::endl;
 
@@ -63,6 +85,11 @@ int main( int argc, char* argv[] ) {
   for( unsigned i=0; i<datasets2.size(); ++i )
     if( file2!=0 )  createSingleFile( 11, 12, datasets2[i], datasets2[i], file2, outdir );
 
+
+  std::string hadd_gjet = "hadd -f " + outdir + "/gjet.root " + outdir + "/gjet_*_8TeV_pf.root";
+  std::string hadd_qcd  = "hadd -f " + outdir + "/qcd.root " + outdir + "/qcd*_8TeV_*.root";
+  system( hadd_gjet.c_str() );
+  system( hadd_qcd.c_str() );
 
   if( file!=0 ) createSingleFile( 11, 12, "Data", "data", file, outdir );
   if( file!=0 ) createSingleFile( 0, 10, "Data", "data_inclusive", file, outdir );
@@ -81,7 +108,7 @@ int main( int argc, char* argv[] ) {
 
 void createSingleFile( int minCat, int maxCat, const std::string& dataset, const std::string& saveName, TFile* file, const std::string& outdir ) {
 
-  std::cout << "-> Creating file for dataset: " << dataset << std::endl;
+  std::cout << "-> Creating file for dataset: " << dataset << " from file: " << file->GetName() << std::endl;
 
   std::string treeName = dataset;
   TTree* oldTree = (TTree*)file->Get(treeName.c_str());
@@ -103,6 +130,9 @@ void createSingleFile( int minCat, int maxCat, const std::string& dataset, const
   Float_t weight;
   oldTree->SetBranchAddress("weight", &weight);
 
+  Float_t evweight;
+  oldTree->SetBranchAddress("evweight", &evweight);
+
 
   float lumi = 19715.;
 
@@ -114,7 +144,7 @@ void createSingleFile( int minCat, int maxCat, const std::string& dataset, const
   TTree* newTree = oldTree->CloneTree(0);
   newTree->SetName("tree_passedEvents");
 
-  Float_t dbWeight;
+  float dbWeight;
   newTree->Branch( "dbWeight", &dbWeight, "dbWeight/F" );
 
 
@@ -129,7 +159,9 @@ void createSingleFile( int minCat, int maxCat, const std::string& dataset, const
       if( mgg>115. && mgg<135. ) continue; 
     }
 
-    dbWeight = (itype==0) ? 1. : weight/lumi;   
+    dbWeight = (itype==0) ? 1. : evweight/lumi;   
+    //dbWeight = (itype==0) ? 1. : weight/lumi;   
+    if( dbWeight>10000.) continue; //safe vs nans
 
     newTree->Fill();
 
