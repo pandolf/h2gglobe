@@ -33,6 +33,9 @@ testLD: testLD.cpp DrawBase.o fitTools.o THqLeptonicLikelihoodCalculator2.o
 findLDcut: findLDcut.cpp DrawBase.o fitTools.o 
 	$(CC) -Wall $(INCLUDES) -o findLDcut findLDcut.cpp DrawBase.o fitTools.o $(ROOTFLAG) $(EXTRALIBS)
 
+checkLD_onEvents: checkLD_onEvents.cpp DrawBase.o fitTools.o THqLeptonicLikelihoodCalculator.o
+	$(CC) -Wall $(INCLUDES) -o checkLD_onEvents checkLD_onEvents.cpp DrawBase.o fitTools.o THqLeptonicLikelihoodCalculator.o $(ROOTFLAG) $(EXTRALIBS)
+
 
 
 
@@ -43,6 +46,9 @@ DrawBase.o: $(CMSSW_BASE)/src/CommonTools/DrawBase.C fitTools.o
 
 fitTools.o: $(CMSSW_BASE)/src/CommonTools/fitTools.C
 	$(CC) $(CFLAGS) $(INCLUDES) $(CMSSW_BASE)/src/CommonTools/fitTools.C $(ROOTFLAG) $(EXTRALIBS)
+
+THqLeptonicLikelihoodCalculator.o: $(CMSSW_BASE)/src/h2gglobe/PhotonAnalysis/src/THqLeptonicLikelihoodCalculator.cc
+	$(CC) $(CFLAGS) $(INCLUDES) $(CMSSW_BASE)/src/h2gglobe/PhotonAnalysis/src/THqLeptonicLikelihoodCalculator.cc $(ROOTFLAG) $(EXTRALIBS)
 
 THqLeptonicLikelihoodCalculator2.o: $(CMSSW_BASE)/src/h2gglobe/PhotonAnalysis/src/THqLeptonicLikelihoodCalculator2.cc
 	$(CC) $(CFLAGS) $(INCLUDES) $(CMSSW_BASE)/src/h2gglobe/PhotonAnalysis/src/THqLeptonicLikelihoodCalculator2.cc $(ROOTFLAG) $(EXTRALIBS)
