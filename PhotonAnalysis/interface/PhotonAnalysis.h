@@ -438,8 +438,9 @@ class PhotonAnalysis : public BaseAnalysis
     float generatorY_;
 
     int thqCS_btagLevel;
+    int thqPreselectionLoose;
     THqLeptonicLikelihoodCalculator *thqlikeli;
-    THqLeptonicLikelihoodCalculator *thqlikeli_central;
+    THqLeptonicLikelihoodCalculator *thqlikeli_new;
     TFile* file_fasaWeights_pt;
     TFile* file_fasaWeights_eta;
 
