@@ -43,6 +43,9 @@ mv RoCs_andShit_${1}/topMt_leptonic.pdf ~/tdr2/notes/AN-13-392/trunk/figures/lep
 epstopdf RoCs_andShit_${1}/bJetPt_leptonic.eps
 mv RoCs_andShit_${1}/bJetPt_leptonic.pdf ~/tdr2/notes/AN-13-392/trunk/figures/leptonic/
 
+epstopdf RoCs_andShit_${1}/qJetPt_leptonic.eps
+mv RoCs_andShit_${1}/qJetPt_leptonic.pdf ~/tdr2/notes/AN-13-392/trunk/figures/leptonic/
+
 epstopdf RoCs_andShit_${1}/thqLD_lept_leptonic.eps
 mv RoCs_andShit_${1}/thqLD_lept_leptonic.pdf ~/tdr2/notes/AN-13-392/trunk/figures/leptonic/
 
