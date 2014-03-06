@@ -83,12 +83,11 @@ int main( int argc, char* argv[] ) {
   //std::string ttggFileName = "dbFiles_ttgg_tmp/ttgg.root";
   TFile* file_ttgg = TFile::Open( ttggFileName.c_str() );
   db->add_mcFile( file_ttgg, "ttgg", "tt#gamma#gamma", 38 );
-  //db->set_mcWeight( "ttgg", 12.0124 );
   db->set_mcWeight( "ttgg", 9.07045 );
 
   std::string ttgFileName = inputDir + "ttg.root";
   TFile* file_ttg = TFile::Open( ttgFileName.c_str() );
-  //db->add_mcFile( file_ttg, "ttg", "tt#gamma", 18 );
+  db->add_mcFile( file_ttg, "ttg", "tt#gamma", 18 );
 
 
   int ii=25;
@@ -168,7 +167,7 @@ int main( int argc, char* argv[] ) {
   std::vector< std::pair<std::string,std::string> > cuts;
   cuts.push_back( std::pair<std::string,std::string>( blindCondition, "2#gamma + 2j") );
   cuts.push_back( std::pair<std::string,std::string>( "leptPt>10.", "Lepton") );
-  //cuts.push_back( std::pair<std::string,std::string>( "isMu || abs(m_lept_phot2-91.19)>5.", "|M(e#gamma)-M(Z)|>5") );
+  cuts.push_back( std::pair<std::string,std::string>( "isMu || abs(m_lept_phot2-91.19)>10.", "|M(e#gamma)-M(Z)|>10") );
   cuts.push_back( std::pair<std::string,std::string>( "ph1_pt > 50.*PhotonsMass/120.", "p_{T1} > 50 m_{#gamma#gamma}/120") );
   cuts.push_back( std::pair<std::string,std::string>( "nbjets_loose>0", "CSVL") );
   cuts.push_back( std::pair<std::string,std::string>( "nbjets_medium>0", "CSVM") );
@@ -176,6 +175,7 @@ int main( int argc, char* argv[] ) {
   cuts.push_back( std::pair<std::string,std::string>( "abs(qJetEta)>1.", "|#eta(qJet)|>1") );
   cuts.push_back( std::pair<std::string,std::string>( "thqLD_lept>0.25", "LD>0.25") );
   //cuts.push_back( std::pair<std::string,std::string>( "thqLD_lept<0.25", "LD<0.25") );
+  
   
   drawYieldsCascade( db, cuts );
 
