@@ -10,6 +10,7 @@
 
 THqLeptonicLikelihoodCalculator::THqLeptonicLikelihoodCalculator( const std::string& fileName ) {
 
+  debug_ = false;
 
   TFile* file_ = TFile::Open(fileName.c_str());
 
@@ -103,18 +104,30 @@ double THqLeptonicLikelihoodCalculator::computeLikelihood( int nJets, float eta_
 
 
   double likeliProd_tHq = 1.;
+  if( debug_ ) std::cout << " likeliProd_tHq: " << std::endl;
   likeliProd_tHq *= h1_nJets_tHq_             ->GetBinContent(h1_nJets_tHq_             ->FindBin(nJets));
+  if( debug_ ) std::cout << "    (after njets): " << likeliProd_tHq << std::endl;
   likeliProd_tHq *= h1_eta_qJet_tHq_          ->GetBinContent(h1_eta_qJet_tHq_          ->FindBin(eta_qJet));
+  if( debug_ ) std::cout << "    (after qJetEta): " << likeliProd_tHq << std::endl;
   likeliProd_tHq *= h1_mt_top_tHq_            ->GetBinContent(h1_mt_top_tHq_            ->FindBin(mt_top));
+  if( debug_ ) std::cout << "    (after mtTop): " << likeliProd_tHq << std::endl;
   likeliProd_tHq *= h1_lept_charge_tHq_       ->GetBinContent(h1_lept_charge_tHq_       ->FindBin(lept_charge));
+  if( debug_ ) std::cout << "    (after lept_charge): " << likeliProd_tHq << std::endl;
   likeliProd_tHq *= h1_deltaEta_lept_qJet_tHq_->GetBinContent(h1_deltaEta_lept_qJet_tHq_->FindBin(deltaEta_lept_qJet));
+  if( debug_ ) std::cout << "    (after deltaEta): " << likeliProd_tHq << std::endl;
 
   double likeliProd_ttH = 1.;
+  if( debug_ ) std::cout << std::endl << " likeliProd_ttH: " << std::endl;
   likeliProd_ttH *= h1_nJets_ttH_             ->GetBinContent(h1_nJets_ttH_             ->FindBin(nJets));
+  if( debug_ ) std::cout << "    (after njets): " << likeliProd_ttH << std::endl;
   likeliProd_ttH *= h1_eta_qJet_ttH_          ->GetBinContent(h1_eta_qJet_ttH_          ->FindBin(eta_qJet));
+  if( debug_ ) std::cout << "    (after qJetEta): " << likeliProd_ttH << std::endl;
   likeliProd_ttH *= h1_mt_top_ttH_            ->GetBinContent(h1_mt_top_ttH_            ->FindBin(mt_top));
+  if( debug_ ) std::cout << "    (after mtTop): " << likeliProd_ttH << std::endl;
   likeliProd_ttH *= h1_lept_charge_ttH_       ->GetBinContent(h1_lept_charge_ttH_       ->FindBin(lept_charge));
+  if( debug_ ) std::cout << "    (after lept_charge): " << likeliProd_ttH << std::endl;
   likeliProd_ttH *= h1_deltaEta_lept_qJet_ttH_->GetBinContent(h1_deltaEta_lept_qJet_ttH_->FindBin(deltaEta_lept_qJet));
+  if( debug_ ) std::cout << "    (after deltaEta): " << likeliProd_ttH << std::endl;
 
   
   double likelihood = (likeliProd_tHq>0.) ? likeliProd_tHq / ( likeliProd_tHq + likeliProd_ttH ) : 0.;
