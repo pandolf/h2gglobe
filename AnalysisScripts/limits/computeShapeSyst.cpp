@@ -22,23 +22,40 @@ int main() {
   flat->SetParameter(0, 1./80.);
 
   TF1* expo = new TF1( "expo", "exp([0]*x)", 100., 180.);
-  expo->SetParameter(0, -0.04);
+  expo->SetParameter(0, -0.038);
 
   TF1* expo2 = new TF1( "expo2", "exp([0]*x)", 100., 180.);
-  expo2->SetParameter(0, -0.005);
+  expo2->SetParameter(0, -0.0049);
+
+  TF1* expo3 = new TF1( "expo3", "exp([0]*x)", 100., 180.);
+  expo3->SetParameter(0, -0.0185625);
+
+  TF1* expo4 = new TF1( "expo4", "exp([0]*x)", 100., 180.);
+  expo4->SetParameter(0, -0.00852878);
+
+  TF1* expo5 = new TF1( "expo5", "exp([0]*x)", 100., 180.);
+  expo5->SetParameter(0, -0.011);
 
 //std::cout << "flat int: " << flat->Integral(100., 180.) << std::endl;
 //std::cout << "expo int: " << expo->Integral(100., 180.) << std::endl;
   float sf_flat = getScalingFactor(flat, 3.);
-  float sf_expo2 = getScalingFactor(expo2, 3.);
   float sf_expo = getScalingFactor(expo, 3.);
+  float sf_expo2 = getScalingFactor(expo2, 3.);
+  float sf_expo3 = getScalingFactor(expo3, 3.);
+  float sf_expo4 = getScalingFactor(expo4, 3.);
+  float sf_expo5 = getScalingFactor(expo5, 3.);
 
   std::cout << "SF: " << std::endl;
-  std::cout << "flat: " << sf_flat << std::endl;
-  std::cout << "expo: " << sf_expo << std::endl;
-  std::cout << "expo2: " << sf_expo2 << std::endl;
+  std::cout << "flat: "  << sf_flat << std::endl;
+  std::cout << "expo:  p0: " << expo ->GetParameter(0) << " alpha: " << sf_expo << std::endl;
+  std::cout << "expo2: p0: " << expo2->GetParameter(0) << " alpha: " << sf_expo2 << std::endl;
+  std::cout << "expo3: p0: " << expo3->GetParameter(0) << " alpha: " << sf_expo3 << std::endl;
+  std::cout << "expo4: p0: " << expo4->GetParameter(0) << " alpha: " << sf_expo4 << std::endl;
+  std::cout << "expo5: p0: " << expo5->GetParameter(0) << " alpha: " << sf_expo5 << std::endl;
   std::cout << "syst(flat-expo): " << fabs((sf_flat-sf_expo)/sf_flat) << std::endl;
   std::cout << "syst(expo2-expo): " << fabs((sf_expo2-sf_expo)/sf_expo2) << std::endl;
+  std::cout << "syst(expo3-expo4): " << fabs((sf_expo3-sf_expo4)/sf_expo3) << std::endl;
+  std::cout << "syst(expo4-expo): " << fabs((sf_expo4-sf_expo)/sf_expo4) << std::endl;
 
 
   return 0;
