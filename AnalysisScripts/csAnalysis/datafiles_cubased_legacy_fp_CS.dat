@@ -27,6 +27,9 @@ typ=0   ind=0 draw=1   Nam=Data tot=1 red=1 lum=1.0e10   xsec=1. kfac=1.0   scal
 #
 ### diphoton jets sherpa should be Box+Born
 typ=+3    ind=97 draw=1  Nam=diphojet_sherpa_8TeV CaDir=/store/group/phys_higgs/cmshgg/reduced/legacy_paper/legacy_paper_reduction_8TeV_v5/mc/Summer12_RD1/DiPhotonJetsBox_M60_8TeV-sherpa_Summer12_DR53X-PU_RD1_START53_V7N-v1     red=0   lum=1.e10  xsec=120.354   kfac=1.12  scal=3.51
+typ=83 ind=24 draw=1 Nam=ttgg   CaDir=/store/group/phys_higgs/cmshgg/reduced/tPrime_analysis/TPrimeSamples_20131118/mc/Tprime/ttGG_8TeV-whizard-pythia6_Summer12_DR53X-PU_RD1_START53_V7N-v1         red=0 lum=1. xsec=0.146      kfac=1.     scal=1.
+typ=84 ind=25 draw=1 Nam=ttg   CaDir=/store/group/phys_higgs/cmshgg/reduced/TTG/mc/Summer12_DR53X-PU_S10_START53_V19-v1         red=0 lum=1. xsec=2.0     kfac=1.     scal=1.
+typ=60 ind=13 draw=1 Nam=ZGToLLG                 CaDir=/store/group/phys_higgs/cmshgg/reduced/thq_analysis/V5_2/mc/Summer12_S10_8TeV/ZGToLLG_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1                              red=0 lum=1. xsec=132.6        kfac=1.   scal=1.
 
 
 ## VERIFIED THAT gJet and QCD play no role in leptonic analysis (0 events passing selections):
