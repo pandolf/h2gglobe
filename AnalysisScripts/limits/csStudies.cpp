@@ -7,6 +7,7 @@
 #include "TTree.h"
 #include "TH1D.h"
 #include "THStack.h"
+#include "TChain.h"
 
 #include "RooDataSet.h"
 #include "RooExponential.h"
@@ -33,12 +34,12 @@ struct ValAndErr {
 };
 
 
-void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase* db_data, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands=false, TH2D* h2_fasaWeights_pt=0, TH2D* h2_fasaWeights_eta=0 );
-TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const std::string& saveName, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands=false, TH2D* h2_fasaWeights_pt=0, TH2D* h2_fasaWeights_eta=0 );
+void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase* db_data, TFile* file_nominal, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands=false, TH2D* h2_fasaWeights_pt=0, TH2D* h2_fasaWeights_eta=0 );
+TGraphErrors* drawPlotsCS( DrawBase* db, std::vector<std::string> datasetNames, const std::string& saveName, TFile* file_nominal, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta );
 TF1* fitHisto( TH1D* h1, int lineColor, int lineStyle=1 );
 //void compareVariableCS( DrawBase* db, const std::string& datasetName, const std::string& varName, int nBins, float xMin, float xMax, const std::string& axisName, const std::string& units, TFile* file_invID, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID );
-RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar& mgg_roo, bool blind, bool LDsidebands=false, TH2D* h2_fasaWeights_pt=0, TH2D* h2_fasaWeights_eta=0 );
-void fitTreeWithExponential( DrawBase* db, const std::string& name, TTree* tree, RooWorkspace* w, const std::string& varName, bool blind, bool LDsidebands=false, TH2D* h2_fasaWeights_pt=0, TH2D* h2_fasaWeights_eta=0 );
+RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar& mgg_roo, bool LDsidebands=false, TH2D* h2_fasaWeights_pt=0, TH2D* h2_fasaWeights_eta=0 );
+void fitTreeWithExponential( DrawBase* db, const std::string& name, TTree* tree, RooWorkspace* w, const std::string& varName, bool LDsidebands=false, TH2D* h2_fasaWeights_pt=0, TH2D* h2_fasaWeights_eta=0 );
 
 
 int main( int argc, char* argv[] ) {
@@ -62,13 +63,17 @@ int main( int argc, char* argv[] ) {
   DrawBase* db = new DrawBase("csStudies");
   db->set_outputdir(Form("csStudiesPlots_%s", batchProd.c_str()));
 
-  TFile* file_nominal        = TFile::Open(Form("../batchOutput_%s/histograms_CMS-HGG.root", batchProd.c_str()) );
-//TFile* file_invID_data     = TFile::Open(Form("../batchOutput_%s/histograms_CMS-HGG.root");
-//TFile* file_invID          = TFile::Open(Form("../batchOutput_%s/histograms_CMS-HGG.root");
+  TFile* file_nominal        = TFile::Open(Form("../batchOutput_%s/csNominal/histograms_CMS-HGG.root", batchProd.c_str()) );
   TFile* file_btagZero       = TFile::Open(Form("../batchOutput_%s/btagZero/histograms_CMS-HGG.root", batchProd.c_str()) );
   TFile* file_btagLoose      = TFile::Open(Form("../batchOutput_%s/btagLoose/histograms_CMS-HGG.root", batchProd.c_str()) );
   TFile* file_btagZeroInvID  = TFile::Open(Form("../batchOutput_%s/btagZeroInvID/histograms_CMS-HGG.root", batchProd.c_str()) );
   TFile* file_btagLooseInvID = TFile::Open(Form("../batchOutput_%s/btagLooseInvID/histograms_CMS-HGG.root", batchProd.c_str()) );
+
+  //TFile* file_nominal        = TFile::Open(Form("../batchOutput_preselectionLoose_v6/histograms_CMS-HGG.root"));
+  //TFile* file_btagZero       = TFile::Open(Form("../batchOutput_preselectionLoose_v6/histograms_CMS-HGG.root"));
+  //TFile* file_btagZeroInvID       = TFile::Open(Form("../batchOutput_preselectionLoose_v6/histograms_CMS-HGG.root"));
+  //TFile* file_btagLoose       = TFile::Open(Form("../batchOutput_preselectionLoose_v6/histograms_CMS-HGG.root"));
+  //TFile* file_btagLooseInvID       = TFile::Open(Form("../batchOutput_preselectionLoose_v6/histograms_CMS-HGG.root"));
 
 
 //compareVariableCS( db_data, "Data", "ph1_pt", 25, 25., 225., "Lead Photon p_{T}", "GeV", file_invID_data, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID );
@@ -88,8 +93,8 @@ int main( int argc, char* argv[] ) {
   TH2D* h2_fasaWeights_eta = (TH2D*)file_fasaWeights_eta->Get("h2D_eta_data");
 
 
-  doPlotForOneSelection( "LDcut", db, db_data, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, false, h2_fasaWeights_pt, h2_fasaWeights_eta );
-  doPlotForOneSelection( "LDsidebands", db, db_data, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, true, h2_fasaWeights_pt, h2_fasaWeights_eta );
+  doPlotForOneSelection( "LDcut", db, db_data, file_nominal, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, false, h2_fasaWeights_pt, h2_fasaWeights_eta );
+  //doPlotForOneSelection( "LDsidebands", db, db_data, file_nominal, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, true, h2_fasaWeights_pt, h2_fasaWeights_eta );
 
   return 0;
 
@@ -97,22 +102,33 @@ int main( int argc, char* argv[] ) {
 
 
 
-void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase* db_data, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta ) {
+void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase* db_data, TFile* file_nominal, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta ) {
 
 
-  TGraphErrors* gr_p0_data = drawPlotsCS( db_data,            "Data", saveName, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
-  TGraphErrors* gr_p0_mc   = drawPlotsCS( db, "diphojet_sherpa_8TeV", saveName, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
+  std::vector<std::string> dataNames;
+  dataNames.push_back("Data");
+
+  std::vector<std::string> mcNames;
+  mcNames.push_back("diphojet_sherpa_8TeV");
+  mcNames.push_back("ZGToLLG");
+  mcNames.push_back("ttgg");
+  mcNames.push_back("ttg");
+
+  TGraphErrors* gr_p0_data = drawPlotsCS( db_data, dataNames, saveName, file_nominal, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
+  TGraphErrors* gr_p0_mc   = drawPlotsCS( db,        mcNames, saveName, file_nominal, file_btagZero, file_btagLoose, file_btagZeroInvID, file_btagLooseInvID, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
 
   TCanvas* c2 = new TCanvas("c2", "c2", 600, 600);
   c2->cd();
 
+  
   //TH2D* h2_axes = new TH2D("axes2", "", 5, 0., 5., 10, -0.1, 0.1);
-  TH2D* h2_axes = new TH2D("axes2", "", 4, 0., 4., 10, -0.12, 0.05);
+  TH2D* h2_axes = new TH2D("axes2", "", 5, 0., 5., 10, -0.12, 0.05);
   //h2_axes->GetXaxis()->SetBinLabel( 1, "InvID" );
-  h2_axes->GetXaxis()->SetBinLabel( 1, "CSVL" );
-  h2_axes->GetXaxis()->SetBinLabel( 2, "CSV0" );
-  h2_axes->GetXaxis()->SetBinLabel( 3, "InvID CSVL" );
-  h2_axes->GetXaxis()->SetBinLabel( 4, "InvID CSV0" );
+  h2_axes->GetXaxis()->SetBinLabel( 1, "Nominal" );
+  h2_axes->GetXaxis()->SetBinLabel( 2, "CSVL" );
+  h2_axes->GetXaxis()->SetBinLabel( 3, "CSV0" );
+  h2_axes->GetXaxis()->SetBinLabel( 4, "InvID CSVL" );
+  h2_axes->GetXaxis()->SetBinLabel( 5, "InvID CSV0" );
   h2_axes->SetYTitle( "p0 [GeV^{-1}]" );
 
   h2_axes->Draw();
@@ -145,7 +161,7 @@ void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase*
   legend->AddEntry( gr_p0_mc,   "Simulation", "P" );
   legend->Draw("same");
 
-  TPaveText* labelTop = db->get_labelTop();
+  TPaveText* labelTop = db_data->get_labelTop();
   labelTop->Draw("same");
 
   gr_p0_data->Draw("p same");
@@ -176,21 +192,47 @@ void doPlotForOneSelection( const std::string& saveName, DrawBase* db, DrawBase*
 
 
 
-TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const std::string& saveName, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta ) {
+TGraphErrors* drawPlotsCS( DrawBase* db, std::vector<std::string> datasetNames, const std::string& saveName, TFile* file_nominal, TFile* file_btagZero, TFile* file_btagLoose, TFile* file_btagZeroInvID, TFile* file_btagLooseInvID, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta ) {
+
+
+  TChain* tree_nominal        = new TChain("chain_nominal");
+  TChain* tree_btagLoose      = new TChain("chain_btagLoose");
+  TChain* tree_btagZero       = new TChain("chain_btagZero");
+  TChain* tree_btagZeroInvID  = new TChain("chain_btagZeroInvID");
+  TChain* tree_btagLooseInvID = new TChain("chain_btagLooseInvID");
+
+  for( unsigned idataset=0; idataset<datasetNames.size(); ++idataset ) {
+
+    std::string treeName_nominal        (file_nominal->GetName());
+    std::string treeName_btagLoose      (file_btagLoose->GetName());
+    std::string treeName_btagLooseInvID (file_btagLooseInvID->GetName());
+    std::string treeName_btagZero       (file_btagZero->GetName());
+    std::string treeName_btagZeroInvID  (file_btagZeroInvID->GetName());
+
+    treeName_nominal        = treeName_nominal        + "/" + datasetNames[idataset];
+    treeName_btagLoose      = treeName_btagLoose      + "/" + datasetNames[idataset];
+    treeName_btagLooseInvID = treeName_btagLooseInvID + "/" + datasetNames[idataset];
+    treeName_btagZero       = treeName_btagZero       + "/" + datasetNames[idataset];
+    treeName_btagZeroInvID  = treeName_btagZeroInvID  + "/" + datasetNames[idataset];
+
+    tree_nominal       ->Add(treeName_nominal.c_str());
+    tree_btagLoose     ->Add(treeName_btagLoose.c_str());
+    tree_btagLooseInvID->Add(treeName_btagLooseInvID.c_str());
+    tree_btagZero      ->Add(treeName_btagZero.c_str());
+    tree_btagZeroInvID ->Add(treeName_btagZeroInvID.c_str());
+
+  } // for datasets
+
+  ////TTree* tree_invID           = (TTree*)file_invID->Get(datasetName.c_str());
+  //TTree* tree_btagLoose       = (TTree*)file_btagLoose->Get(datasetName.c_str());
+  //TTree* tree_btagZero        = (TTree*)file_btagZero->Get(datasetName.c_str());
+  //TTree* tree_btagZeroInvID   = (TTree*)file_btagZeroInvID->Get(datasetName.c_str());
+  //TTree* tree_btagLooseInvID  = (TTree*)file_btagLooseInvID->Get(datasetName.c_str());
 
 
 
-  //TTree* tree_invID           = (TTree*)file_invID->Get(datasetName.c_str());
-  TTree* tree_btagLoose       = (TTree*)file_btagLoose->Get(datasetName.c_str());
-  TTree* tree_btagZero        = (TTree*)file_btagZero->Get(datasetName.c_str());
-  TTree* tree_btagZeroInvID   = (TTree*)file_btagZeroInvID->Get(datasetName.c_str());
-  TTree* tree_btagLooseInvID  = (TTree*)file_btagLooseInvID->Get(datasetName.c_str());
 
-
-
-
-  bool isData = (datasetName=="Data");
-  bool blindFit = (BLINDED && isData);
+  bool isData = (datasetNames[0]=="Data");
   int nBins = 80;
   float xMin = 100.;
   float xMax = 180.;
@@ -204,36 +246,41 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
   RooWorkspace* w = new RooWorkspace("csworkspace");
   w->import( *mgg_roo );
 
-  //fitTreeWithExponential( db, datasetName + "_" + saveName + "_invID",         tree_invID,          w, "mgg_roo", blindFit, fullThqSelection );
-  fitTreeWithExponential( db, datasetName + "_" + saveName + "_btagLoose",     tree_btagLoose,      w, "mgg_roo", blindFit, LDsidebands );
-  fitTreeWithExponential( db, datasetName + "_" + saveName + "_btagZero",      tree_btagZero,       w, "mgg_roo", blindFit, LDsidebands );
-  fitTreeWithExponential( db, datasetName + "_" + saveName + "_btagLooseInvID",tree_btagLooseInvID, w, "mgg_roo", blindFit, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
-  fitTreeWithExponential( db, datasetName + "_" + saveName + "_btagZeroInvID", tree_btagZeroInvID,  w, "mgg_roo", blindFit, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
+  std::string datasetNameSave = (isData) ? "Data" : "MC";
+  //fitTreeWithExponential( db, datasetName + "_" + saveName + "_invID",         tree_invID,          w, "mgg_roo", fullThqSelection );
+  fitTreeWithExponential( db, datasetNameSave + "_" + saveName + "_nominal",       tree_nominal,      w, "mgg_roo", LDsidebands );
+  fitTreeWithExponential( db, datasetNameSave + "_" + saveName + "_btagLoose",     tree_btagLoose,      w, "mgg_roo", LDsidebands );
+  fitTreeWithExponential( db, datasetNameSave + "_" + saveName + "_btagZero",      tree_btagZero,       w, "mgg_roo", LDsidebands );
+  fitTreeWithExponential( db, datasetNameSave + "_" + saveName + "_btagLooseInvID",tree_btagLooseInvID, w, "mgg_roo", LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
+  fitTreeWithExponential( db, datasetNameSave + "_" + saveName + "_btagZeroInvID", tree_btagZeroInvID,  w, "mgg_roo", LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
 
 
   //RooRealVar* p0_invID          = (RooRealVar*)w->var( Form("p0_%s_%s_invID",         saveName.c_str(), datasetName.c_str()) );
-  RooRealVar* p0_btagLoose      = (RooRealVar*)w->var( Form("p0_%s_%s_btagLoose",     datasetName.c_str(), saveName.c_str()) );
-  RooRealVar* p0_btagZero       = (RooRealVar*)w->var( Form("p0_%s_%s_btagZero",      datasetName.c_str(), saveName.c_str()) );
-  RooRealVar* p0_btagLooseInvID = (RooRealVar*)w->var( Form("p0_%s_%s_btagLooseInvID",datasetName.c_str(), saveName.c_str()) );
-  RooRealVar* p0_btagZeroInvID  = (RooRealVar*)w->var( Form("p0_%s_%s_btagZeroInvID", datasetName.c_str(), saveName.c_str()) );
+  RooRealVar* p0_nominal        = (RooRealVar*)w->var( Form("p0_%s_%s_nominal",       datasetNameSave.c_str(), saveName.c_str()) );
+  RooRealVar* p0_btagLoose      = (RooRealVar*)w->var( Form("p0_%s_%s_btagLoose",     datasetNameSave.c_str(), saveName.c_str()) );
+  RooRealVar* p0_btagZero       = (RooRealVar*)w->var( Form("p0_%s_%s_btagZero",      datasetNameSave.c_str(), saveName.c_str()) );
+  RooRealVar* p0_btagLooseInvID = (RooRealVar*)w->var( Form("p0_%s_%s_btagLooseInvID",datasetNameSave.c_str(), saveName.c_str()) );
+  RooRealVar* p0_btagZeroInvID  = (RooRealVar*)w->var( Form("p0_%s_%s_btagZeroInvID", datasetNameSave.c_str(), saveName.c_str()) );
 
   //RooExponential* exp_invID          = (RooExponential*)w->pdf( Form("exp_%s_%s_invID",         saveName.c_str(), datasetName.c_str()) );
-  RooExponential* exp_btagLoose      = (RooExponential*)w->pdf( Form("exp_%s_%s_btagLoose",     datasetName.c_str(), saveName.c_str()) );
-  RooExponential* exp_btagZero       = (RooExponential*)w->pdf( Form("exp_%s_%s_btagZero",      datasetName.c_str(), saveName.c_str()) );
-  RooExponential* exp_btagLooseInvID = (RooExponential*)w->pdf( Form("exp_%s_%s_btagLooseInvID",datasetName.c_str(), saveName.c_str()) );
-  RooExponential* exp_btagZeroInvID  = (RooExponential*)w->pdf( Form("exp_%s_%s_btagZeroInvID", datasetName.c_str(), saveName.c_str()) );
+  RooExponential* exp_nominal        = (RooExponential*)w->pdf( Form("exp_%s_%s_nominal",       datasetNameSave.c_str(), saveName.c_str()) );
+  RooExponential* exp_btagLoose      = (RooExponential*)w->pdf( Form("exp_%s_%s_btagLoose",     datasetNameSave.c_str(), saveName.c_str()) );
+  RooExponential* exp_btagZero       = (RooExponential*)w->pdf( Form("exp_%s_%s_btagZero",      datasetNameSave.c_str(), saveName.c_str()) );
+  RooExponential* exp_btagLooseInvID = (RooExponential*)w->pdf( Form("exp_%s_%s_btagLooseInvID",datasetNameSave.c_str(), saveName.c_str()) );
+  RooExponential* exp_btagZeroInvID  = (RooExponential*)w->pdf( Form("exp_%s_%s_btagZeroInvID", datasetNameSave.c_str(), saveName.c_str()) );
 
   //RooFitResult* f_invID          = (RooFitResult*)w->obj( Form("f_%s_%s_invID",          saveName.c_str(), datasetName.c_str()) );
-  RooFitResult* f_btagLoose      = (RooFitResult*)w->obj( Form("f_%s_%s_btagLoose",      datasetName.c_str(), saveName.c_str()) );
-  RooFitResult* f_btagZero       = (RooFitResult*)w->obj( Form("f_%s_%s_btagZero",       datasetName.c_str(), saveName.c_str()) );
-  RooFitResult* f_btagLooseInvID = (RooFitResult*)w->obj( Form("f_%s_%s_btagLooseInvID", datasetName.c_str(), saveName.c_str()) );
-  RooFitResult* f_btagZeroInvID  = (RooFitResult*)w->obj( Form("f_%s_%s_btagZeroInvID",  datasetName.c_str(), saveName.c_str()) );
+  RooFitResult* f_nominal        = (RooFitResult*)w->obj( Form("f_%s_%s_nominal",        datasetNameSave.c_str(), saveName.c_str()) );
+  RooFitResult* f_btagLoose      = (RooFitResult*)w->obj( Form("f_%s_%s_btagLoose",      datasetNameSave.c_str(), saveName.c_str()) );
+  RooFitResult* f_btagZero       = (RooFitResult*)w->obj( Form("f_%s_%s_btagZero",       datasetNameSave.c_str(), saveName.c_str()) );
+  RooFitResult* f_btagLooseInvID = (RooFitResult*)w->obj( Form("f_%s_%s_btagLooseInvID", datasetNameSave.c_str(), saveName.c_str()) );
+  RooFitResult* f_btagZeroInvID  = (RooFitResult*)w->obj( Form("f_%s_%s_btagZeroInvID",  datasetNameSave.c_str(), saveName.c_str()) );
 
 
-  TFile* file = TFile::Open("paologay.root", "recreate");
-  file->cd();
-  w->Write();
-  file->Close();
+  //TFile* file = TFile::Open("paologay.root", "recreate");
+  //file->cd();
+  //w->Write();
+  //file->Close();
 
 
 
@@ -254,12 +301,14 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
 
 
   //TH1D* h1_mgg_invID           = new TH1D("mgg_invID", "", nBins, xMin, xMax);
+  TH1D* h1_mgg_nominal         = new TH1D("mgg_nominal", "", nBins, xMin, xMax);
   TH1D* h1_mgg_btagLoose       = new TH1D("mgg_btagLoose", "", nBins, xMin, xMax);
   TH1D* h1_mgg_btagZero        = new TH1D("mgg_btagZero", "", nBins, xMin, xMax);
   TH1D* h1_mgg_btagLooseInvID  = new TH1D("mgg_btagLooseInvID", "", nBins, xMin, xMax);
   TH1D* h1_mgg_btagZeroInvID   = new TH1D("mgg_btagZeroInvID", "", nBins, xMin, xMax);
 
   //h1_mgg_invID           ->Sumw2();
+  h1_mgg_nominal         ->Sumw2();
   h1_mgg_btagLoose       ->Sumw2();
   h1_mgg_btagZero        ->Sumw2();
   h1_mgg_btagLooseInvID  ->Sumw2();
@@ -268,12 +317,14 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
 
   if( BLINDED && isData ) {
     //tree_invID->Project( "mgg_invID", "PhotonsMass", fullSelection_sidebands );
+    tree_nominal->Project(        "mgg_nominal", "PhotonsMass", fullSelection_sidebands );
     tree_btagLoose->Project(      "mgg_btagLoose", "PhotonsMass", fullSelection_sidebands );
     tree_btagZero->Project(       "mgg_btagZero", "PhotonsMass", fullSelection_sidebands );
     tree_btagLooseInvID->Project( "mgg_btagLooseInvID", "PhotonsMass", fullSelection_sidebands );
     tree_btagZeroInvID->Project(  "mgg_btagZeroInvID", "PhotonsMass", fullSelection_sidebands );
   } else {
     //tree_invID->Project( "mgg_invID", "PhotonsMass", fullSelection );
+    tree_nominal->Project(        "mgg_nominal", "PhotonsMass", fullSelection );
     tree_btagLoose->Project(      "mgg_btagLoose", "PhotonsMass", fullSelection );
     tree_btagZero->Project(       "mgg_btagZero", "PhotonsMass", fullSelection );
     tree_btagLooseInvID->Project( "mgg_btagLooseInvID", "PhotonsMass", fullSelection );
@@ -281,7 +332,8 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
   }
 
 
-  ofstream ofs(Form("%s/events_%s_%s.txt", db->get_outputdir().c_str(), datasetName.c_str(), saveName.c_str()) );
+  ofstream ofs(Form("%s/events_%s_%s.txt", db->get_outputdir().c_str(), datasetNameSave.c_str(), saveName.c_str()) );
+  ofs << "nominal: " << h1_mgg_nominal->GetEntries() << std::endl;
   ofs << "btagLoose: " << h1_mgg_btagLoose->GetEntries() << std::endl;
   ofs << "btagZero: " << h1_mgg_btagZero->GetEntries() << std::endl;
   ofs << "btagLooseInvID: " << h1_mgg_btagLooseInvID->GetEntries() << std::endl;
@@ -289,30 +341,35 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
   ofs.close();
 
   //TF1* f1_invID = fitHisto( h1_mgg_invID, kRed, 1 );
+  TF1* f1_nominal = fitHisto( h1_mgg_nominal, kBlack, 1 );
   TF1* f1_btagLoose = fitHisto( h1_mgg_btagLoose, kBlack, 1 );
   TF1* f1_btagZero = fitHisto( h1_mgg_btagZero, 29, 1 );
   TF1* f1_btagLooseInvID = fitHisto( h1_mgg_btagLooseInvID, 39, 2 );
   TF1* f1_btagZeroInvID = fitHisto( h1_mgg_btagZeroInvID, kRed+1, 2 );
 
   //TH1D* h1_band_invID          = fitTools::getBand( f1_invID, "invID" );
+  TH1D* h1_band_nominal        = fitTools::getBand( f1_nominal, "band_nominal" );
   TH1D* h1_band_btagLoose      = fitTools::getBand( f1_btagLoose, "band_btagLoose" );
   TH1D* h1_band_btagZero       = fitTools::getBand( f1_btagZero, "band_btagZero" );
   TH1D* h1_band_btagLooseInvID = fitTools::getBand( f1_btagLooseInvID, "band_btagLooseInvID" );
   TH1D* h1_band_btagZeroInvID  = fitTools::getBand( f1_btagZeroInvID, "band_btagZeroInvID" );
 
   //h1_band_invID          ->SetFillStyle(3003);
+  h1_band_nominal        ->SetFillStyle(3003);
   h1_band_btagLoose      ->SetFillStyle(3003);
   h1_band_btagZero       ->SetFillStyle(3003);
   h1_band_btagLooseInvID ->SetFillStyle(3003);
   h1_band_btagZeroInvID  ->SetFillStyle(3003);
 
   //h1_band_invID          ->SetFillColor(kRed);
+  h1_band_nominal        ->SetFillColor(kGray+2);
   h1_band_btagLoose      ->SetFillColor(kGray);
   h1_band_btagZero       ->SetFillColor(29);
   h1_band_btagLooseInvID ->SetFillColor(39);
   h1_band_btagZeroInvID  ->SetFillColor(kRed+1);
 
   //h1_band_invID          ->SetLineColor(kRed);
+  h1_band_nominal        ->SetLineColor(kGray);
   h1_band_btagLoose      ->SetLineColor(kGray);
   h1_band_btagZero       ->SetLineColor(29);
   h1_band_btagLooseInvID ->SetLineColor(39);
@@ -332,6 +389,8 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
 
   //char text_invID[300];
   //sprintf( text_invID, "InvID (%.0f evts)", h1_mgg_invID->GetEntries() );
+  char text_nominal[300];
+  sprintf( text_nominal, "Nominal (%.0f evts)", h1_mgg_nominal->GetEntries() );
   char text_btagLoose[300];
   sprintf( text_btagLoose, "CSVL (%.0f evts)", h1_mgg_btagLoose->GetEntries() );
   char text_btagZero[300];
@@ -341,10 +400,11 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
   char text_btagZeroInvID[300];
   sprintf( text_btagZeroInvID, "No Btag + InvID (%.0f evts)", h1_mgg_btagZeroInvID->GetEntries() );
 
-  TLegend* legend = new TLegend( 0.23, 0.6, 0.9, 0.9, datasetName.c_str() );
+  TLegend* legend = new TLegend( 0.23, 0.6, 0.9, 0.9, datasetNameSave.c_str() );
   legend->SetTextSize(0.04);
   legend->SetFillColor(0);
   //legend->AddEntry( f1_invID, text_invID, "L" );
+  legend->AddEntry( f1_nominal, text_nominal, "L" );
   legend->AddEntry( f1_btagLoose, text_btagLoose, "L" );
   legend->AddEntry( f1_btagZero, text_btagZero, "L" );
   legend->AddEntry( f1_btagLooseInvID, text_btagLooseInvID, "L" );
@@ -352,6 +412,7 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
   legend->Draw("same");
 
   //f1_invID->Draw("l same");
+  f1_nominal->Draw("l same");
   f1_btagLoose->Draw("l same");
   f1_btagZero->Draw("l same");
   f1_btagLooseInvID->Draw("l same");
@@ -371,6 +432,7 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
   //h1_mgg_btagZeroInvID->Rebin(10);
 
   //h1_mgg_invID->Scale(          1./h1_mgg_invID->Integral("width") );
+  h1_mgg_nominal->Scale(        1./h1_mgg_nominal->Integral("width") );
   h1_mgg_btagLoose->Scale(      1./h1_mgg_btagLoose->Integral("width") );
   h1_mgg_btagZero->Scale(       1./h1_mgg_btagZero->Integral("width") );
   h1_mgg_btagLooseInvID->Scale( 1./h1_mgg_btagLooseInvID->Integral("width") );
@@ -387,7 +449,7 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
 
   gPad->RedrawAxis();
 
-  std::string canvasName = db->get_outputdir() + "/mgg_" + datasetName + "_" + saveName;
+  std::string canvasName = db->get_outputdir() + "/mgg_" + datasetNameSave + "_" + saveName;
   std::string canvasName_eps = canvasName + ".eps";
   std::string canvasName_png = canvasName + ".png";
   c2->SaveAs(canvasName_eps.c_str());
@@ -398,32 +460,40 @@ TGraphErrors* drawPlotsCS( DrawBase* db, const std::string& datasetName, const s
   delete legend;
   delete h2_axes;
   //delete h1_mgg_invID;
+  delete h1_mgg_nominal;
   delete h1_mgg_btagLoose;
   delete h1_mgg_btagZero;
   delete h1_mgg_btagLooseInvID;
   delete h1_mgg_btagZeroInvID;
 
+  delete h1_band_nominal     ;
   delete h1_band_btagLoose     ;
   delete h1_band_btagZero      ;
   delete h1_band_btagLooseInvID;
   delete h1_band_btagZeroInvID ;
 
 
-  std::string gr_name = "p0_"+datasetName+"_"+saveName;
+
+  float stagger = (isData) ? 0.98 : 1.02;
+
+  std::string gr_name = "p0_"+datasetNameSave+"_"+saveName;
   TGraphErrors* gr_p0 = new TGraphErrors(0);
   gr_p0->SetName(gr_name.c_str());
   //gr_p0->SetPoint( 0, 0.5, p0_invID         ->getVal() );
-  gr_p0->SetPoint( 0, 0.5, p0_btagLoose     ->getVal() );
-  gr_p0->SetPoint( 1, 1.5, p0_btagZero      ->getVal() );
-  gr_p0->SetPoint( 2, 2.5, p0_btagLooseInvID->getVal() );
-  gr_p0->SetPoint( 3, 3.5, p0_btagZeroInvID ->getVal() );
+  gr_p0->SetPoint( 0, stagger*0.5, p0_nominal       ->getVal() );
+  gr_p0->SetPoint( 1, stagger*1.5, p0_btagLoose     ->getVal() );
+  gr_p0->SetPoint( 2, stagger*2.5, p0_btagZero      ->getVal() );
+  gr_p0->SetPoint( 3, stagger*3.5, p0_btagLooseInvID->getVal() );
+  gr_p0->SetPoint( 4, stagger*4.5, p0_btagZeroInvID ->getVal() );
   //gr_p0->SetPointError( 0, 0., p0_invID         ->getError() );
-  gr_p0->SetPointError( 0, 0., p0_btagLoose     ->getError() );
-  gr_p0->SetPointError( 1, 0., p0_btagZero      ->getError() );
-  gr_p0->SetPointError( 2, 0., p0_btagLooseInvID->getError() );
-  gr_p0->SetPointError( 3, 0., p0_btagZeroInvID ->getError() );
+  gr_p0->SetPointError( 0, 0., p0_nominal     ->getError() );
+  gr_p0->SetPointError( 1, 0., p0_btagLoose     ->getError() );
+  gr_p0->SetPointError( 2, 0., p0_btagZero      ->getError() );
+  gr_p0->SetPointError( 3, 0., p0_btagLooseInvID->getError() );
+  gr_p0->SetPointError( 4, 0., p0_btagZeroInvID ->getError() );
 
-  ofstream ofs_p0(Form("%s/p0_%s_%s.txt", db->get_outputdir().c_str(), datasetName.c_str(), saveName.c_str()) );
+  ofstream ofs_p0(Form("%s/p0_%s_%s.txt", db->get_outputdir().c_str(), datasetNameSave.c_str(), saveName.c_str()) );
+  ofs_p0 << "nominal: " << p0_nominal->getVal() << " +- " << p0_nominal->getError() << std::endl;
   ofs_p0 << "btagLoose: " << p0_btagLoose->getVal() << " +- " << p0_btagLoose->getError() << std::endl;
   ofs_p0 << "btagZero: " << p0_btagZero->getVal() << " +- " << p0_btagZero->getError() << std::endl;
   ofs_p0 << "btagLooseInvID: " << p0_btagLooseInvID->getVal() << " +- " << p0_btagLooseInvID->getError() << std::endl;
@@ -607,12 +677,12 @@ void compareVariableCS( DrawBase* db, const std::string& datasetName, const std:
 
 
 
-void fitTreeWithExponential( DrawBase* db, const std::string& name, TTree* tree, RooWorkspace* w, const std::string& varName, bool blind, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta ) {
+void fitTreeWithExponential( DrawBase* db, const std::string& name, TTree* tree, RooWorkspace* w, const std::string& varName, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta ) {
 
 
   RooRealVar* mgg_roo = w->var(varName.c_str());
 
-  RooDataSet* dataset = getDatasetFromTree( name, tree, *mgg_roo, blind, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
+  RooDataSet* dataset = getDatasetFromTree( name, tree, *mgg_roo, LDsidebands, h2_fasaWeights_pt, h2_fasaWeights_eta );
 
   dataset->Print();
   //stringstream weight;
@@ -673,7 +743,7 @@ void fitTreeWithExponential( DrawBase* db, const std::string& name, TTree* tree,
 
 
 
-RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar& mgg_roo, bool blind, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta ) {
+RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar& mgg_roo, bool LDsidebands, TH2D* h2_fasaWeights_pt, TH2D* h2_fasaWeights_eta ) {
 
 
   if( tree==0 ) {
@@ -691,6 +761,8 @@ RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar
   tree->SetBranchAddress( "itype", &itype );
   int event;
   tree->SetBranchAddress( "event", &event );
+  bool isMu;
+  tree->SetBranchAddress( "isMu", &isMu );
   float ph1_pt;
   tree->SetBranchAddress( "ph1_pt", &ph1_pt );
   float ph2_pt;
@@ -709,6 +781,8 @@ RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar
   tree->SetBranchAddress( "evweight", &evweight );
   float thqLD;
   tree->SetBranchAddress( "thqLD_lept", &thqLD );
+  float m_lept_phot2;
+  tree->SetBranchAddress( "m_lept_phot2", &m_lept_phot2 );
 
   RooRealVar weight_roo("weight_roo", "weight_roo", 1., 0., 10.);
   RooArgSet aset(mgg_roo, weight_roo, "argset");
@@ -722,14 +796,15 @@ RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar
   
     if( category!=11 ) continue;
     if( mgg<100. || mgg>180. ) continue;
-    if( blind && (mgg>115. && mgg<135.) ) continue;
+    if( ph1_pt<50.*mgg/120. ) continue;
+    if( BLINDED && itype==0 && (mgg>115. && mgg<135.) ) continue;
     if( LDsidebands ) {
       if( thqLD>0.25 ) continue;
     } else {
       if( thqLD<0.25 ) continue;
     }
 
-
+    if( !isMu && fabs(m_lept_phot2 - 91.91)<5. ) continue; // cut on M(e,gamma2)
     //if( mgg<115. ) weight = 1000.;
 
     mgg_roo.setVal(mgg);
@@ -750,6 +825,7 @@ RooDataSet* getDatasetFromTree( const std::string& name, TTree* tree, RooRealVar
       }
     }
 
+    if( itype==83 ) corrweight *= 9.; // ttgg
 
     weight_roo.setVal(corrweight);
     aset.setRealValue("mgg_roo", mgg);
