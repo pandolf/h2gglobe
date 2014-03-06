@@ -2663,7 +2663,12 @@ void StatAnalysis::fillOpTree(LoopAll& l, const TLorentzVector & lead_p4, const 
       l.FillTree("njets",             (int)l.njets);
       l.FillTree("qJetEta",           (float)l.qJetEta);
       l.FillTree("qJetPt",            (float)l.qJetPt);
+      l.FillTree("qJetPhi",           (float)l.qJetPhi);
+      l.FillTree("qJetE",             (float)l.qJetE);
+      l.FillTree("bJetEta",           (float)l.bJetEta);
       l.FillTree("bJetPt",            (float)l.bJetPt);
+      l.FillTree("bJetPhi",           (float)l.bJetPhi);
+      l.FillTree("bJetE",             (float)l.bJetE);
 
       l.FillTree("deltaEta_bJet_qJet",(float)l.deltaEta_bJet_qJet);
       l.FillTree("njets_OutsideEtaCut",      (int)l.njets_OutsideEtaCut);
@@ -2681,8 +2686,13 @@ void StatAnalysis::fillOpTree(LoopAll& l, const TLorentzVector & lead_p4, const 
         l.FillTree("lept_charge",       (int)l.lept_charge);
         l.FillTree("leptEta",           (float)l.leptEta);
         l.FillTree("leptPt",            (float)l.leptPt);
+        l.FillTree("leptPhi",           (float)l.leptPhi);
+        l.FillTree("leptE",             (float)l.leptE);
+        l.FillTree("m_lept_phot1",       (float)l.m_lept_phot1);
+        l.FillTree("m_lept_phot2",       (float)l.m_lept_phot2);
         l.FillTree("deltaEta_lept_qJet",(float)l.deltaEta_lept_qJet);
         l.FillTree("thqLD_lept",                   (float)l.thqLD_lept);
+        l.FillTree("thqLD_lept_new",                   (float)l.thqLD_lept_new);
         l.FillTree("thqBDT_lept",                   (float)l.thqBDT_lept);
         l.FillTree("thqBDT_lept_2",                   (float)l.thqBDT_lept_2);
       } 
