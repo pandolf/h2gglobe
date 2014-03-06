@@ -11,7 +11,7 @@ def cback(option,opt_str,value,parser):
 parser = OptionParser()
 parser.add_option("","--resubFailed",action="store_true",dest="resubFailed",default=False)
 parser.add_option("","--submitMissing",action="store_true",dest="submitMissing",default=False)
-parser.add_option("-q","--queue",dest="queue",default="1nh")
+parser.add_option("-q","--queue",dest="queue",default="8nh")
 parser.add_option("-d","--directory",dest="directory")
 parser.add_option("-j","--jobs",dest="jobs",action="callback",callback=cback,type='string')
 parser.add_option("-l","--label",dest="label",default="sub")
