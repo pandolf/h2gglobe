@@ -19,7 +19,7 @@ class THqLeptonicLikelihoodCalculator {
 
   double computeLikelihood( int nJets, float eta_qJet, float mt_top, int lept_charge, float deltaEta_lept_qJet ); 
 
-
+  void setDebug( bool set=true ) { debug_ = set; };
 
  private:
 
@@ -34,6 +34,8 @@ class THqLeptonicLikelihoodCalculator {
   TH1D* h1_mt_top_tHq_;
   TH1D* h1_lept_charge_tHq_;
   TH1D* h1_deltaEta_lept_qJet_tHq_;
+
+  bool debug_;
 
 };
 
