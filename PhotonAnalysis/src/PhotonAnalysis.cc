@@ -4887,6 +4887,7 @@ bool PhotonAnalysis::TTHleptonicTag2012(LoopAll& l, int& diphotonTTHlep_id, floa
 
 bool PhotonAnalysis::tHqLeptonicTag(LoopAll& l, int diphotontHqLeptonic_id, float* smeared_pho_energy, bool nm1, float eventweight, float myweight,bool *jetid_flags ){
 
+
     if( FPDEBUGTHQ ) std::cout << std::endl << std::endl << std::endl << "-------------------------------------------------------------------" << std::endl;
     if( FPDEBUGTHQ ) std::cout << "THQ LEPTONIC CATEGORY" << std::endl;
     if( FPDEBUGTHQ ) std::cout << "event: " << l.event << std::endl;
