@@ -31,7 +31,7 @@ int main( int argc, char* argv[] ) {
 
 
   //TH1D* h1_nJetsCentral_thq       = new TH1D( "nJetsCentral_thq", "", 9, -0.5, 8.5 );
-  TH1D* h1_nJets_thq              = new TH1D( "nJets_thq", "", 11, -0.5, 10.5 );
+  TH1D* h1_nJets_thq              = new TH1D( "nJets_thq", "", 8, -0.5, 7.5 );
   TH1D* h1_eta_qJet_thq           = new TH1D( "eta_qJet_thq", "", 30, 0., 5. );
   TH1D* h1_mt_top_thq             = new TH1D( "mt_top_thq", "", 50, 0., 1000. );
   TH1D* h1_lept_charge_thq        = new TH1D( "lept_charge_thq", "", 3, -1.5, 1.5 );
@@ -40,7 +40,7 @@ int main( int argc, char* argv[] ) {
 
   //tree_thq->Project("nJetsCentral_thq", "njets_InsideEtaCut", "weight*( category==11 )" );
   tree_thq->Project("nJets_thq", njetsVar.c_str(), "evweight*( category==11 )" );
-  tree_thq->Project("eta_qJet_thq", "qJetEta", "evweight*( category==11 )" );
+  tree_thq->Project("eta_qJet_thq", "abs(qJetEta)", "evweight*( category==11 )" );
   tree_thq->Project("mt_top_thq", "topMt", "evweight*( category==11 )" );
   tree_thq->Project("lept_charge_thq", "lept_charge", "evweight*( category==11 )" );
   tree_thq->Project("deltaEta_lept_qJet_thq", "deltaEta_lept_qJet", "evweight*( category==11 )" );
@@ -56,7 +56,7 @@ int main( int argc, char* argv[] ) {
 
 
   //TH1D* h1_nJetsCentral_tth       = new TH1D( "nJetsCentral_tth", "", 9, -0.5, 8.5 );
-  TH1D* h1_nJets_tth              = new TH1D( "nJets_tth", "", 11, -0.5, 10.5 );
+  TH1D* h1_nJets_tth              = new TH1D( "nJets_tth", "", 8, -0.5, 7.5 );
   TH1D* h1_eta_qJet_tth           = new TH1D( "eta_qJet_tth", "", 30, 0., 5. );
   TH1D* h1_mt_top_tth             = new TH1D( "mt_top_tth", "", 50, 0., 1000. );
   TH1D* h1_lept_charge_tth        = new TH1D( "lept_charge_tth", "", 3, -1.5, 1.5 );
@@ -65,7 +65,7 @@ int main( int argc, char* argv[] ) {
 
   //tree_tth->Project("nJetsCentral_tth", "njets_InsideEtaCut", "weight*( category==11 )" );
   tree_tth->Project("nJets_tth", njetsVar.c_str(), "evweight*( category==11 )" );
-  tree_tth->Project("eta_qJet_tth", "qJetEta", "evweight*( category==11 )" );
+  tree_tth->Project("eta_qJet_tth", "abs(qJetEta)", "evweight*( category==11 )" );
   tree_tth->Project("mt_top_tth", "topMt", "evweight*( category==11 )" );
   tree_tth->Project("lept_charge_tth", "lept_charge", "evweight*( category==11 )" );
   tree_tth->Project("deltaEta_lept_qJet_tth", "deltaEta_lept_qJet", "evweight*( category==11 )" );
