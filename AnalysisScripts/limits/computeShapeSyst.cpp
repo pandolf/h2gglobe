@@ -25,13 +25,13 @@ int main() {
   expo->SetParameter(0, -0.038);
 
   TF1* expo2 = new TF1( "expo2", "exp([0]*x)", 100., 180.);
-  expo2->SetParameter(0, -0.0049);
+  expo2->SetParameter(0, -0.00852878);
 
   TF1* expo3 = new TF1( "expo3", "exp([0]*x)", 100., 180.);
   expo3->SetParameter(0, -0.0185625);
 
   TF1* expo4 = new TF1( "expo4", "exp([0]*x)", 100., 180.);
-  expo4->SetParameter(0, -0.00852878);
+  expo4->SetParameter(0, 0.00307959);
 
   TF1* expo5 = new TF1( "expo5", "exp([0]*x)", 100., 180.);
   expo5->SetParameter(0, -0.011);
