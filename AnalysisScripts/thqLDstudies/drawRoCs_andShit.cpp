@@ -23,8 +23,8 @@ int main( int argc, char* argv[] ) {
 
   DrawBase* db = new DrawBase("rocs_and_shit");
 
-  std::string fileName = "../histograms_CMS-HGG_btag.root";
-  //std::string fileName = "../batchOutput_" + batchProd + "/histograms_CMS-HGG.root";
+  //std::string fileName = "../histograms_CMS-HGG_btag.root";
+  std::string fileName = "../batchOutput_" + batchProd + "/histograms_CMS-HGG.root";
   TFile* file = TFile::Open(fileName.c_str());
   //TFile* file = TFile::Open("../batchOutput_provaLD6_withBDT2/histograms_CMS-HGG.root");
   db->add_mcFile( file, "thefile", "tHq", kBlack, 0);
@@ -53,6 +53,7 @@ int main( int argc, char* argv[] ) {
   compareSingleVariable( db, 11, "nbjets_loose",       9, -0.5, 8.5,  "CSVL b-Jet Multiplicity", "" );
   compareSingleVariable( db, 11, "nbjets_medium",      9, -0.5, 8.5,  "CSVM b-Jet Multiplicity", "" );
   compareSingleVariable( db, 11, "bJetPt",             50, 20., 320., "bJet p_{T}", "GeV" );
+  compareSingleVariable( db, 11, "qJetPt",             50, 20., 320., "qJet p_{T}", "GeV" );
   compareSingleVariable( db, 11, "qJetEta",            30, 0., 5.,    "qJet |#eta|", "" );
   compareSingleVariable( db, 11, "topMt",              50, 0., 1000., "Top Transverse Mass", "GeV" );
   compareSingleVariable( db, 11, "lept_charge",        3, -1.5, 1.5,  "Lepton Charge", "" );
