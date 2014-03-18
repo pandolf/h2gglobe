@@ -135,7 +135,7 @@ int main( int argc, char* argv[] ) {
   if( file_ttgg!=0 && allMC )
     db->add_mcFile( file_ttgg, "ttgg", "tt#gamma#gamma", 38 );
   //db->set_mcWeight( "ttgg", 12.0124 );
-  db->set_mcWeight( "ttgg", 9.07045 );
+  //db->set_mcWeight( "ttgg", 9.07045 );
 
   std::string ttgFileName = inputDir + "ttg.root";
   TFile* file_ttg = TFile::Open( ttgFileName.c_str() );
@@ -183,12 +183,22 @@ int main( int argc, char* argv[] ) {
 
   // check LD input variables with only lepton
   db->drawHisto_fromTree( "tree_passedEvents", "abs(qJetEta)",       Form("dbWeight*( category==11 && %s )", blindCondition.c_str()),  10, 0., 5., "qJetEta_prepresel", "|#eta(qJet)|", "", "Events" );
+  db->drawHisto_fromTree( "tree_passedEvents", "njets",              Form("dbWeight*( category==11 && %s )", blindCondition.c_str()),  9, 1.5, 10.5, "njets_prepresel", "Jet Multiplicity", "", "Events", true );
+  db->drawHisto_fromTree( "tree_passedEvents", "nbjets_loose",       Form("dbWeight*( category==11 && %s )", blindCondition.c_str()),  5, -0.5, 4.5, "nbjetsloose_prepresel", "CSVL Jet Multiplicity", "", "Events", true );
+  db->drawHisto_fromTree( "tree_passedEvents", "nbjets_medium",      Form("dbWeight*( category==11 && %s )", blindCondition.c_str()),  5, -0.5, 4.5, "nbjetsmedium_prepresel", "CSVM Jet Multiplicity", "", "Events", true );
+
 
   db->drawHisto_fromTree( "tree_passedEvents", "isMu",               Form("dbWeight*( category==11 && leptPt>=10. && %s)", blindCondition.c_str()),  2, -0.5, 1.5, "isMu_preselLept", "is Muon Event", "", "Events" );
   //db->drawHisto_fromTree( "tree_passedEvents", "m_lept_phot1",       Form("dbWeight*( category==11 && leptPt>=10. && %s && !isMu)", blindCondition.c_str()),  20, 50., 250., "m_lept_phot1_preselLept", "M(e-#gamma_{1})", "GeV", "Events" );
   //db->drawHisto_fromTree( "tree_passedEvents", "m_lept_phot2",       Form("dbWeight*( category==11 && leptPt>=10. && %s && !isMu)", blindCondition.c_str()),  20, 50., 250., "m_lept_phot2_preselLept", "M(e-#gamma_{2})", "GeV", "Events" );
-  db->drawHisto_fromTree( "tree_passedEvents", "m_lept_phot1",       Form("dbWeight*( category==11 && leptPt>=10. && %s && !isMu )", blindCondition.c_str()),  20, 45., 245., "m_lept_phot1_preselLept", "M(e-#gamma_{1})", "GeV", "Events" );
-  db->drawHisto_fromTree( "tree_passedEvents", "m_lept_phot2",       Form("dbWeight*( category==11 && leptPt>=10. && %s && !isMu )", blindCondition.c_str()),  20, 45., 245., "m_lept_phot2_preselLept", "M(e-#gamma_{2})", "GeV", "Events" );
+  db->drawHisto_fromTree( "tree_passedEvents", "m_lept_phot1",       Form("dbWeight*( category==11 && leptPt>=10. && %s && !isMu && nbjets_loose>0 )", blindCondition.c_str()),  20, 45., 245., "m_ele_phot1_preselLept_bloose", "M(e,#gamma_{1})", "GeV", "Events" );
+  db->drawHisto_fromTree( "tree_passedEvents", "m_lept_phot2",       Form("dbWeight*( category==11 && leptPt>=10. && %s && !isMu && nbjets_loose>0 )", blindCondition.c_str()),  20, 45., 245., "m_ele_phot2_preselLept_bloose", "M(e,#gamma_{2})", "GeV", "Events" );
+  db->drawHisto_fromTree( "tree_passedEvents", "m_lept_phot1",       Form("dbWeight*( category==11 && leptPt>=10. && %s && !isMu && nbjets_medium>0 )", blindCondition.c_str()),  20, 45., 245., "m_ele_phot1_preselLept_bmedium", "M(e,#gamma_{1})", "GeV", "Events" );
+  db->drawHisto_fromTree( "tree_passedEvents", "m_lept_phot2",       Form("dbWeight*( category==11 && leptPt>=10. && %s && !isMu && nbjets_medium>0 )", blindCondition.c_str()),  20, 45., 245., "m_ele_phot2_preselLept_bmedium", "M(e,#gamma_{2})", "GeV", "Events" );
+  db->drawHisto_fromTree( "tree_passedEvents", "m_lept_phot1",       Form("dbWeight*( category==11 && leptPt>=10. && %s && !isMu )", blindCondition.c_str()),  20, 45., 245., "m_ele_phot1_preselLept", "M(e,#gamma_{1})", "GeV", "Events" );
+  db->drawHisto_fromTree( "tree_passedEvents", "m_lept_phot2",       Form("dbWeight*( category==11 && leptPt>=10. && %s && !isMu )", blindCondition.c_str()),  20, 45., 245., "m_ele_phot2_preselLept", "M(e,#gamma_{2})", "GeV", "Events" );
+  db->drawHisto_fromTree( "tree_passedEvents", "m_lept_phot1",       Form("dbWeight*( category==11 && leptPt>=10. && %s && isMu  )", blindCondition.c_str()),  20, 45., 245., "m_mu_phot1_preselLept", "M(#mu,#gamma_{1})", "GeV", "Events" );
+  db->drawHisto_fromTree( "tree_passedEvents", "m_lept_phot2",       Form("dbWeight*( category==11 && leptPt>=10. && %s && isMu  )", blindCondition.c_str()),  20, 45., 245., "m_mu_phot2_preselLept", "M(#mu,#gamma_{2})", "GeV", "Events" );
   db->drawHisto_fromTree( "tree_passedEvents", "TMath::Min( abs(m_lept_phot1-91.19), abs(m_lept_phot2-91.19) )",        Form("dbWeight*( category==11 && leptPt>=10. && %s && !isMu)", blindCondition.c_str()),  20, 0., 100., "m_lept_phot_preselLept", "Min( M_{e,#gamma}, M_{Z} )", "GeV", "Events" );
   db->drawHisto_fromTree( "tree_passedEvents", "lept_charge",        Form("dbWeight*( category==11 && leptPt>=10. && %s)", blindCondition.c_str()),  3, -1.5, 1.5, "lept_charge_preselLept", "Lepton Charge", "", "Events" );
   db->drawHisto_fromTree( "tree_passedEvents", "deltaEta_lept_qJet", Form("dbWeight*( category==11 && leptPt>=10. && %s)", blindCondition.c_str()),  10, 0, 5., "deltaEta_lept_qJet_preselLept", "|#Delta#eta(lepton-qJet)|", "", "Events" );
@@ -197,6 +207,10 @@ int main( int argc, char* argv[] ) {
   db->drawHisto_fromTree( "tree_passedEvents", "njets",              Form("dbWeight*( category==11 && leptPt>=10. && %s)", blindCondition.c_str()),  6, 1.5, 7.5, "njets_preselLept", "Jet Multiplicity", "", "Events" );
   db->drawHisto_fromTree( "tree_passedEvents", "nbjets_loose",       Form("dbWeight*( category==11 && leptPt>=10. && %s)", blindCondition.c_str()),  6, -0.5, 5.5, "nbjets_loose_preselLept", "b-Jet Multiplicity (CSVL)", "", "Events" );
   db->drawHisto_fromTree( "tree_passedEvents", "nbjets_medium",      Form("dbWeight*( category==11 && leptPt>=10. && %s)", blindCondition.c_str()),  6, -0.5, 5.5, "nbjets_medium_preselLept", "b-Jet Multiplicity (CSVM)", "", "Events" );
+
+  db->drawHisto_fromTree( "tree_passedEvents", "njets",              Form("dbWeight*( category==11 && leptPt>=10. && %s && ph1_pt>50.*PhotonsMass/120.)", blindCondition.c_str()),  6, 1.5, 7.5, "njets_preselLeptPh1", "Jet Multiplicity", "", "Events" );
+  db->drawHisto_fromTree( "tree_passedEvents", "nbjets_loose",       Form("dbWeight*( category==11 && leptPt>=10. && %s && ph1_pt>50.*PhotonsMass/120.)", blindCondition.c_str()),  6, -0.5, 5.5, "nbjets_loose_preselLeptPh1", "b-Jet Multiplicity (CSVL)", "", "Events" );
+  db->drawHisto_fromTree( "tree_passedEvents", "nbjets_medium",      Form("dbWeight*( category==11 && leptPt>=10. && %s && ph1_pt>50.*PhotonsMass/120.)", blindCondition.c_str()),  6, -0.5, 5.5, "nbjets_medium_preselLeptPh1", "b-Jet Multiplicity (CSVM)", "", "Events" );
 
   //db->drawHisto_fromTree( "tree_passedEvents", "lept_charge",        Form("dbWeight*( category==11 && leptPt>=10. )"),  3, -1.5, 1.5, "lept_charge_preselLept", "Lepton Charge", "", "Events" );
   //db->drawHisto_fromTree( "tree_passedEvents", "deltaEta_lept_qJet", Form("dbWeight*( category==11 && leptPt>=10. )"),  10, 0, 5., "deltaEta_lept_qJet_preselLept", "|#Delta#eta(lepton-qJet)|", "", "Events" );
